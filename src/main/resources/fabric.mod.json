@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "bigsignwriter",
+  "version": "${version}",
+  "name": "Big Sign Writer",
+  "description": "Allows for easy writing of large multi-line characters on signs!",
+  "authors": [],
+  "contact": {},
+  "license": "CC0-1.0",
+  "icon": "assets/bigsignwriter/icon.png",
+  "environment": "client",
+  "accessWidener": "bigsignwriter.accesswidener",
+  "entrypoints": {
+    "client": [
+      "dev.chililisoup.bigsignwriter.BigSignWriter"
+    ],
+    "main": []
+  },
+  "mixins": [
+    "bigsignwriter.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "${minecraft_version}"
+  }
+}
