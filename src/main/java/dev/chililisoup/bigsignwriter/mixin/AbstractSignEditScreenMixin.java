@@ -10,7 +10,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
 import net.minecraft.client.util.SelectionManager;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.ColorHelper;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,7 +27,7 @@ public abstract class AbstractSignEditScreenMixin {
         return Text.of("Big Characters: ".concat(BigSignWriter.ENABLED ? "ON" : "OFF"));
     }
 
-    @Shadow protected @Final SignBlockEntity blockEntity;
+    @Shadow private @Final SignBlockEntity blockEntity;
     @Shadow private @Final String[] messages;
     @Shadow private int currentRow;
     @Shadow private void setCurrentRowMessage(String message) {}
@@ -70,7 +69,7 @@ public abstract class AbstractSignEditScreenMixin {
                         (this.messages[i].isEmpty() ? "" : MAIN_CONFIG.characterSeparator).concat(bigChar[i])
                 );
 
-                if (editScreen.getTextRenderer().getWidth(line) > this.blockEntity.getMaxTextWidth())
+                if (editScreen.textRenderer.getWidth(line) > this.blockEntity.getMaxTextWidth())
                     continue;
 
                 this.currentRow = i;
@@ -111,14 +110,14 @@ public abstract class AbstractSignEditScreenMixin {
         if (!BigSignWriter.ENABLED) return;
 
         AbstractSignEditScreen editScreen = (AbstractSignEditScreen) (Object) this;
-        int opaqueColor = ColorHelper.fullAlpha(color);
+        int opaqueColor = -16777216 | color;
         int lineHeight = this.blockEntity.getTextLineHeight();
 
         for (int i = 0; i < messages.length; i++) {
             if (!blink) continue;
 
             String string = messages[i] == null ? "" : messages[i];
-            int lineX = editScreen.getTextRenderer().getWidth(string) / 2;
+            int lineX = editScreen.textRenderer.getWidth(string) / 2;
             int lineY = (i - 2) * lineHeight;
 
             context.fill(lineX, lineY - 1, lineX + 1, lineY + lineHeight, opaqueColor);
