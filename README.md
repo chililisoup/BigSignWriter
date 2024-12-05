@@ -8,6 +8,7 @@ A client-side utitility mod that eases inputting text onto signs that forms larg
 
 <p align="center">
  <a href="https://modrinth.com/mod/bigsignwriter"><img src="https://img.shields.io/badge/Modrinth-00AF5C?style=for-the-badge&logo=modrinth&labelColor=16181C" alt="Modrinth downloads"></a>
+ <a href="https://curseforge.com/minecraft/mc-mods/big-sign-writer"><img src="https://img.shields.io/badge/CurseForge-F16436?style=for-the-badge&logo=curseforge&labelColor=0D0D0D" alt="CurseForge downloads"></a>
 </p>
 
 <hr>
