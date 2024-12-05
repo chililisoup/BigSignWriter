@@ -4,7 +4,7 @@
   "version": "${version}",
   "name": "Big Sign Writer",
   "description": "Allows for easy writing of large multi-line characters on signs!",
-  "authors": [],
+  "authors": [ "chililisoup" ],
   "contact": {},
   "license": "CC0-1.0",
   "icon": "assets/bigsignwriter/icon.png",
