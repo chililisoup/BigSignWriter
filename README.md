@@ -33,7 +33,7 @@ There are two config files, one for general mod settings, and one containing eac
 <hr>
 
 ### `config/bigsignwriter-config.json`
-Contains coordinates to render the 'large text' button at.
+Contains coordinates to render the 'big characters' button at.
 Also contains `characterSeparator`, which dictates what should separate each of the large characters, which is a single space by default.
 
 <hr>
