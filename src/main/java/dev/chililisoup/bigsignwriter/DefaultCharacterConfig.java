@@ -252,10 +252,10 @@ public class DefaultCharacterConfig {
                 "      "
         );
         addChar('_',
-                "",
-                "",
-                "",
-                ""
+                "      ",
+                "      ",
+                "      ",
+                "███"
         );
         addChar('=',
                 "▄▄▄",
