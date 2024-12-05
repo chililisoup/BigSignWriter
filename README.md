@@ -2,7 +2,7 @@
 
 <h1 align="center">Big Sign Writer - Fabric Mod</h1>
 
-A client-side utitility mod that eases inputting text onto signs that forms larger letters! Each large character is made up of smaller, normal unicode characters from the vanilla Minecraft font, allowing this mod to work on most servers!
+A client-side utitility mod that eases inputting text onto signs that forms larger letters! Just turn the toggle on in the sign editing UI, and type as normal! Each large character is made up of smaller, normal unicode characters from the vanilla Minecraft font, allowing this mod to work on most servers.
 
 **Font resource packs may cause issues.**
 
