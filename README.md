@@ -29,7 +29,7 @@ The default configuration has large characters for all uppercase letters, all nu
 <details>
 <summary>Configuration</summary>
 <br>
-There are two config files, one for general mod settings, and one containing each large character. They are loaded once at runtime, so to make any changes, you'll have to restart your game.
+There are two config files, one for general mod settings, and one containing each large character. They are loaded once at runtime, and are reloaded every time you hit the 'Reload' button in the sign editing screen.
 
 <hr>
 
