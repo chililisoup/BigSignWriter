@@ -11,8 +11,8 @@ import java.nio.file.Path;
 import java.util.Map;
 
 public class BigSignWriterConfig {
-    public static final Map<Character, String[]> CHARACTERS;
-    public static final MainConfig MAIN_CONFIG;
+    public static Map<Character, String[]> CHARACTERS;
+    public static MainConfig MAIN_CONFIG;
 
     public static class MainConfig {
         public int toggleButtonX = 0;
@@ -21,7 +21,7 @@ public class BigSignWriterConfig {
         MainConfig() {}
     }
 
-    static {
+    public static void reload() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Path configDir = FabricLoader.getInstance().getConfigDir();
 
@@ -48,6 +48,10 @@ public class BigSignWriterConfig {
         mainConfig.save(MAIN_CONFIG);
 
         BigSignWriter.LOGGER.info("Configs loaded!");
+    }
+
+    static {
+        reload();
     }
 
     private record ConfigInterface<T>(Gson gson, TypeToken<T> typeToken, Path path, T defaultConfig) {

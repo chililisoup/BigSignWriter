@@ -3,12 +3,14 @@ package dev.chililisoup.bigsignwriter.mixin;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
+import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.ClickableButtonWidget;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
 import net.minecraft.client.util.SelectionManager;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.ColorHelper;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +27,7 @@ import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.MAIN_CONFIG;
 public abstract class AbstractSignEditScreenMixin {
     @Unique
     private static Text createToggleButtonText() {
-        return Text.of("Big Characters: ".concat(BigSignWriter.ENABLED ? "ON" : "OFF"));
+        return ScreenTexts.composeToggleText(Text.translatable("bigsignwriter.enabled"), BigSignWriter.ENABLED);
     }
 
     @Shadow protected @Final SignBlockEntity blockEntity;
@@ -36,13 +38,13 @@ public abstract class AbstractSignEditScreenMixin {
     @Shadow @Nullable private SelectionManager selectionManager;
 
     @Inject(method = "init", at = @At("HEAD"))
-    private void addBigTextToggle(CallbackInfo ci) {
+    private void addButtons(CallbackInfo ci) {
         AbstractSignEditScreen editScreen = (AbstractSignEditScreen) (Object) this;
 
-        ClickableButtonWidget buttonWidget = new ClickableButtonWidget(
+        ClickableButtonWidget toggleButton = new ClickableButtonWidget(
                 editScreen.width / 2 + MAIN_CONFIG.toggleButtonX - 100,
                 editScreen.height / 4 + MAIN_CONFIG.toggleButtonY,
-                200,
+                136,
                 20,
                 createToggleButtonText(),
                 button -> {
@@ -51,7 +53,17 @@ public abstract class AbstractSignEditScreenMixin {
                 }
         );
 
-        editScreen.addDrawableChild(buttonWidget);
+        ClickableButtonWidget reloadButton = new ClickableButtonWidget(
+                editScreen.width / 2 + MAIN_CONFIG.toggleButtonX + 40,
+                editScreen.height / 4 + MAIN_CONFIG.toggleButtonY,
+                60,
+                20,
+                Text.translatable("bigsignwriter.reload"),
+                button -> BigSignWriterConfig.reload()
+        );
+
+        editScreen.addDrawableChild(toggleButton);
+        editScreen.addDrawableChild(reloadButton);
     }
 
     @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
