@@ -27,7 +27,7 @@ import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.MAIN_CONFIG;
 public abstract class AbstractSignEditScreenMixin {
     @Unique
     private static Text createToggleButtonText() {
-        return ScreenTexts.composeToggleText(Text.translatable("bigsignwriter.enabled"), BigSignWriter.ENABLED);
+        return ScreenTexts.composeToggleText(Text.translatableWithFallback("bigsignwriter.enabled", "Big Characters"), BigSignWriter.ENABLED);
     }
 
     @Shadow protected @Final SignBlockEntity blockEntity;
@@ -58,7 +58,7 @@ public abstract class AbstractSignEditScreenMixin {
                 editScreen.height / 4 + MAIN_CONFIG.toggleButtonY,
                 60,
                 20,
-                Text.translatable("bigsignwriter.reload"),
+                Text.translatableWithFallback("bigsignwriter.reload", "Reload"),
                 button -> BigSignWriterConfig.reload()
         );
 
