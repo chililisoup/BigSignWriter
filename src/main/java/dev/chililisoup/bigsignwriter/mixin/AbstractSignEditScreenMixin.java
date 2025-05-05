@@ -20,15 +20,26 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.CHARACTERS;
+import java.util.Objects;
+
+import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.FONT;
 import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.MAIN_CONFIG;
 
 @Mixin(AbstractSignEditScreen.class)
 public abstract class AbstractSignEditScreenMixin {
     @Unique
     private static Text createToggleButtonText() {
-        return ScreenTexts.composeToggleText(Text.translatableWithFallback("bigsignwriter.enabled", "Big Characters"), BigSignWriter.ENABLED);
+        return ScreenTexts.composeToggleText(Text.translatableWithFallback("bigsignwriter.enabled", "Big Text"), BigSignWriter.ENABLED);
     }
+    @Unique
+    private static Text createFontButtonText() {
+        String fontName = (FONT.name == null) ? "Unknown" : FONT.name;
+        return ScreenTexts.composeGenericOptionText(
+                Text.translatableWithFallback("bigsignwriter.font", "Font"),
+                Text.literal(fontName)
+        );
+    }
+
 
     @Shadow protected @Final SignBlockEntity blockEntity;
     @Shadow private @Final String[] messages;
@@ -44,7 +55,7 @@ public abstract class AbstractSignEditScreenMixin {
         ClickableButtonWidget toggleButton = new ClickableButtonWidget(
                 editScreen.width / 2 + MAIN_CONFIG.toggleButtonX - 100,
                 editScreen.height / 4 + MAIN_CONFIG.toggleButtonY,
-                136,
+                75,
                 20,
                 createToggleButtonText(),
                 button -> {
@@ -53,33 +64,59 @@ public abstract class AbstractSignEditScreenMixin {
                 }
         );
 
-        ClickableButtonWidget reloadButton = new ClickableButtonWidget(
-                editScreen.width / 2 + MAIN_CONFIG.toggleButtonX + 40,
+        ClickableButtonWidget fontButton = new ClickableButtonWidget(
+                editScreen.width / 2 + MAIN_CONFIG.toggleButtonX - 25,
                 editScreen.height / 4 + MAIN_CONFIG.toggleButtonY,
-                60,
+                80,
+                20,
+                createFontButtonText(),
+                button -> {
+                    BigSignWriterConfig.getNextFont();
+                    BigSignWriterConfig.reloadFonts();
+                    button.setMessage(createFontButtonText());
+                }
+        );
+
+        ClickableButtonWidget reloadButton = new ClickableButtonWidget(
+                editScreen.width / 2 + MAIN_CONFIG.toggleButtonX + 55,
+                editScreen.height / 4 + MAIN_CONFIG.toggleButtonY,
+                45,
                 20,
                 Text.translatableWithFallback("bigsignwriter.reload", "Reload"),
-                button -> BigSignWriterConfig.reload()
+                button -> {
+                    BigSignWriterConfig.reloadConfig();
+                    BigSignWriterConfig.reloadFonts();
+                    fontButton.setMessage(createFontButtonText());
+                }
         );
 
         editScreen.addDrawableChild(toggleButton);
+        editScreen.addDrawableChild(fontButton);
         editScreen.addDrawableChild(reloadButton);
     }
 
     @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
     private void charTypedInject(char chr, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if (!BigSignWriter.ENABLED) return;
+        if (FONT.characters == null) {
+            cir.setReturnValue(true);
+            return;
+        }
 
-        if (!CHARACTERS.containsKey(chr))
+        if (!FONT.characters.containsKey(chr))
             chr = Character.toUpperCase(chr);
 
-        if (CHARACTERS.containsKey(chr)) {
-            String[] bigChar = CHARACTERS.get(chr);
+        if (FONT.characters.containsKey(chr)) {
+            String[] bigChar = FONT.characters.get(chr);
             AbstractSignEditScreen editScreen = (AbstractSignEditScreen) (Object) this;
 
             for (int i = 0; i < this.messages.length; i++) {
+                if (FONT.characterSeparator == null){
+                    FONT.characterSeparator = MAIN_CONFIG.characterSeparator;
+                }
+                if (i >= bigChar.length || bigChar[i] == null) continue;
                 String line = this.messages[i].concat(
-                        (this.messages[i].isEmpty() ? "" : MAIN_CONFIG.characterSeparator).concat(bigChar[i])
+                        (this.messages[i].isEmpty() ? "" : FONT.characterSeparator).concat(bigChar[i])
                 );
 
                 if (editScreen.getTextRenderer().getWidth(line) > this.blockEntity.getMaxTextWidth())
