@@ -26,11 +26,26 @@ public class BigSignWriterConfig {
     }
 
     private static Path getConfigDir() {
-        return FabricLoader.getInstance().getConfigDir().resolve("bigsignwriter");
+        Path configDir = FabricLoader.getInstance().getConfigDir().resolve("bigsignwriter");
+        try {
+            Files.createDirectories(configDir);
+        } catch (IOException e) {
+            System.err.println("Failed to create config directory: " + configDir);
+            e.printStackTrace();
+        }
+        return configDir;
     }
 
+
     private static @NotNull Path getFontsDir() {
-        return getConfigDir().resolve("fonts");
+        Path fontsDir = getConfigDir().resolve("fonts");
+        try {
+            Files.createDirectories(fontsDir);
+        } catch (IOException e) {
+            System.err.println("Failed to create fonts directory: " + fontsDir);
+            e.printStackTrace();
+        }
+        return fontsDir;
     }
 
     public static void reloadFonts() {
@@ -38,7 +53,6 @@ public class BigSignWriterConfig {
         ConfigInterface<FontFile> charConfig = getMapConfigInterface(gson);
         FONT = charConfig.load();
         BigSignWriter.LOGGER.info("Fonts loaded!");
-        copyBuiltInFonts();
     }
 
     private static void copyBuiltInFonts() {
@@ -107,6 +121,7 @@ public class BigSignWriterConfig {
     }
 
     static {
+        copyBuiltInFonts();
         reloadConfig();
         reloadFonts();
     }
