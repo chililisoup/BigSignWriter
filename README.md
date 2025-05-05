@@ -39,7 +39,7 @@ Also contains `characterSeparator`, which dictates what should separate each of 
 
 ### `config/bigsignwriter/fonts/`
 Three fonts are bundled in by default: `default.json`, `retro.json` and `sharp.json`.
-These contain a `"name":""` field, an optional `"characterSeparator":""` field which determines which character(s) to use in between letters, and a `"characters":{}` field containing every large character and the normal character they represent. You may add additional entries, as long as what you want replaced is a single, typeable character. You may also add new fonts as jsons inside `config/bigsignwriter/fonts/`.
+These contain a `"name":""` field, an optional `"characterSeparator":""` field which determines which character(s) to use in between letters, and a `"characters":{}` field containing every large character and the normal character they represent. You may add additional characters, as long as what you want replaced is a single, typeable character. You may also add new fonts as jsons inside `config/bigsignwriter/fonts/`.
 
 When editing/creating large characters, it is important that each line is the exact same width to maintain alignment. Different fonts will have different widths for different characters, so it is a good idea to make these directly inside Minecraft, and then copy each line into the config file.
 
