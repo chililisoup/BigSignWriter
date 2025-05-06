@@ -70,7 +70,6 @@ public abstract class AbstractSignEditScreenMixin {
                 createFontButtonText(),
                 button -> {
                     BigSignWriterConfig.getNextFont();
-                    BigSignWriterConfig.reloadFonts();
                     button.setMessage(createFontButtonText());
                 }
         );
