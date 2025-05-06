@@ -68,12 +68,7 @@ public class BigSignWriterConfig {
 
         Arrays.sort(jsonFiles, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
 
-        AVAILABLE_FONTS = Arrays.stream(jsonFiles).map(file -> new ConfigInterface<>(
-                gson,
-                new TypeToken<>() {},
-                file.toPath(),
-                new FontFile()
-        ).load()).toList();
+        AVAILABLE_FONTS = Arrays.stream(jsonFiles).map(file -> getFont(gson, file.toPath()).load()).toList();
 
         SELECTED_FONT_INDEX = SELECTED_FONT_INDEX >= AVAILABLE_FONTS.size() ? 0 : SELECTED_FONT_INDEX;
         SELECTED_FONT = AVAILABLE_FONTS.get(SELECTED_FONT_INDEX);
@@ -81,8 +76,19 @@ public class BigSignWriterConfig {
         BigSignWriter.LOGGER.info("Fonts loaded!");
     }
 
+    private static ConfigInterface<FontFile> getFont(Gson gson, Path path) {
+        return new ConfigInterface<>(
+                gson,
+                new TypeToken<>() {},
+                path,
+                new FontFile()
+        );
+    }
+
     private static void copyBuiltInFonts() {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Path configFonts = getFontsDir();
+
         try {
             Files.createDirectories(configFonts);
 
@@ -100,6 +106,25 @@ public class BigSignWriterConfig {
                 if (Files.notExists(target)) {
                     Files.copy(new FileInputStream(file), target);
                     BigSignWriter.LOGGER.info("Copied built-in font: {}", file.getName());
+                    continue;
+                }
+
+                ConfigInterface<FontFile> existing = getFont(gson, target);
+                FontFile existingFont = existing.load();
+                FontFile builtIn = getFont(gson, file.toPath()).load();
+
+                boolean changed = false;
+                for (char character : builtIn.characters.keySet()) {
+                    if (existingFont.characters.containsKey(character)) continue;
+
+                    existingFont.characters.put(character, builtIn.characters.get(character));
+                    BigSignWriter.LOGGER.debug("Added missing character '{}' to {}", character, builtIn.name);
+                    changed = true;
+                }
+
+                if (changed) {
+                    existing.save(existingFont);
+                    BigSignWriter.LOGGER.info("Merged new characters from built-in font: {}", builtIn.name);
                 }
             }
         } catch (Exception e) {
