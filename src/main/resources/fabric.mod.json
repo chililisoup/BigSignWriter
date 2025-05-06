@@ -4,7 +4,7 @@
   "version": "${version}",
   "name": "Big Sign Writer",
   "description": "Allows for easy writing of large multi-line characters on signs!",
-  "authors": [ "chililisoup" ],
+  "authors": [ "chililisoup", "DebornMC" ],
   "contact": {
     "homepage": "https://modrinth.com/mod/bigsignwriter",
     "sources": "https://github.com/chililisoup/BigSignWriter",

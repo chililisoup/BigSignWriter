@@ -5,17 +5,22 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 
 public class BigSignWriterConfig {
-    public static FontFile FONT;
+    public static FontFile SELECTED_FONT;
+    private static int SELECTED_FONT_INDEX;
+    public static List<FontFile> AVAILABLE_FONTS;
     public static MainConfig MAIN_CONFIG;
 
     public static class MainConfig {
@@ -30,28 +35,49 @@ public class BigSignWriterConfig {
         try {
             Files.createDirectories(configDir);
         } catch (IOException e) {
-            System.err.println("Failed to create config directory: " + configDir);
-            e.printStackTrace();
+            BigSignWriter.LOGGER.error("Failed to create config directory: {}", configDir, e);
         }
         return configDir;
     }
-
 
     private static @NotNull Path getFontsDir() {
         Path fontsDir = getConfigDir().resolve("fonts");
         try {
             Files.createDirectories(fontsDir);
         } catch (IOException e) {
-            System.err.println("Failed to create fonts directory: " + fontsDir);
-            e.printStackTrace();
+            BigSignWriter.LOGGER.error("Failed to create fonts directory: {}", fontsDir, e);
         }
         return fontsDir;
     }
 
     public static void reloadFonts() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        ConfigInterface<FontFile> charConfig = getMapConfigInterface(gson);
-        FONT = charConfig.load();
+
+        Path fontsDir = getFontsDir();
+        File[] jsonFiles = fontsDir.toFile().listFiles((dir, name) -> name.endsWith(".json"));
+
+        if (jsonFiles == null || jsonFiles.length == 0) {
+            BigSignWriter.LOGGER.error("No fonts found. Recreating built-in fonts.");
+            copyBuiltInFonts();
+            jsonFiles = fontsDir.toFile().listFiles((dir, name) -> name.endsWith(".json"));
+            if (jsonFiles == null || jsonFiles.length == 0) {
+                BigSignWriter.LOGGER.error("Built-in font recreation failed to produce new font files. Mod behavior from here is undefined. Please report!");
+                return;
+            }
+        }
+
+        Arrays.sort(jsonFiles, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+
+        AVAILABLE_FONTS = Arrays.stream(jsonFiles).map(file -> new ConfigInterface<>(
+                gson,
+                new TypeToken<>() {},
+                file.toPath(),
+                new FontFile()
+        ).load()).toList();
+
+        SELECTED_FONT_INDEX = SELECTED_FONT_INDEX >= AVAILABLE_FONTS.size() ? 0 : SELECTED_FONT_INDEX;
+        SELECTED_FONT = AVAILABLE_FONTS.get(SELECTED_FONT_INDEX);
+
         BigSignWriter.LOGGER.info("Fonts loaded!");
     }
 
@@ -59,20 +85,24 @@ public class BigSignWriterConfig {
         Path configFonts = getFontsDir();
         try {
             Files.createDirectories(configFonts);
-            String resourcePath = "/assets/bigsignwriter/fonts/";
-            List<String> builtInFonts = List.of("default.json", "sharp.json", "retro.json");
-            for (String fileName : builtInFonts) {
-                Path target = configFonts.resolve(fileName);
+
+            Optional<ModContainer> container = FabricLoader.getInstance().getModContainer(BigSignWriter.MOD_ID);
+            if (container.isEmpty()) throw new Exception("Failed to get mod container.");
+
+            Optional<Path> path = container.get().findPath("assets/" + BigSignWriter.MOD_ID + "/fonts");
+            if (path.isEmpty()) throw new Exception("Failed to get built-in fonts folder.");
+            
+            File[] builtInFonts = path.get().toFile().listFiles();
+            if (builtInFonts == null) throw new Exception("Failed to get files from the built-in fonts folder.");
+            
+            for (File file : builtInFonts) {
+                Path target = configFonts.resolve(file.getName());
                 if (Files.notExists(target)) {
-                    try (InputStream in = BigSignWriterConfig.class.getResourceAsStream(resourcePath + fileName)) {
-                        if (in != null) {
-                            Files.copy(in, target);
-                            BigSignWriter.LOGGER.info("Copied built-in font: {}", fileName);
-                        }
-                    }
+                    Files.copy(new FileInputStream(file), target);
+                    BigSignWriter.LOGGER.info("Copied built-in font: {}", file.getName());
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             BigSignWriter.LOGGER.error("Error copying built-in fonts", e);
         }
     }
@@ -92,32 +122,11 @@ public class BigSignWriterConfig {
         BigSignWriter.LOGGER.info("Configs loaded!");
     }
 
-    public static int selectedFont = 0;
-
     public static void getNextFont() {
-        File[] jsonFiles = getFontsDir().toFile().listFiles((d, n) -> n.endsWith(".json"));
-        assert jsonFiles != null;
-        Arrays.sort(jsonFiles, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
-        int len = jsonFiles.length;
-        if (len > 0) {
-            selectedFont = (selectedFont + 1) % len;
-        }
-        BigSignWriter.LOGGER.info("Switched to font index: {}", selectedFont);
-    }
+        SELECTED_FONT_INDEX = (SELECTED_FONT_INDEX + 1) % AVAILABLE_FONTS.size();
+        SELECTED_FONT = AVAILABLE_FONTS.get(SELECTED_FONT_INDEX);
 
-
-    private static @NotNull ConfigInterface<FontFile> getMapConfigInterface(Gson gson) {
-        Path fontsDir = getFontsDir();
-        File[] jsonFiles = fontsDir.toFile().listFiles((dir, name) -> name.endsWith(".json"));
-        assert jsonFiles != null;
-        Arrays.sort(jsonFiles, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
-        File selectedFile = jsonFiles[selectedFont];
-        return new ConfigInterface<>(
-                gson,
-                new TypeToken<>() {},
-                selectedFile.toPath(),
-                new FontFile()
-        );
+        BigSignWriter.LOGGER.debug("Switched to font {} at index {}", SELECTED_FONT.name, SELECTED_FONT_INDEX);
     }
 
     static {
@@ -128,24 +137,23 @@ public class BigSignWriterConfig {
 
     private record ConfigInterface<T>(Gson gson, TypeToken<T> typeToken, Path path, T defaultConfig) {
         public T load() {
-            try (FileReader fileReader = new FileReader(path.toFile())) {
-                JsonReader jsonReader = new JsonReader(fileReader);
+            try (InputStreamReader reader = new InputStreamReader(new FileInputStream(path.toFile()), StandardCharsets.UTF_8)) {
+                JsonReader jsonReader = new JsonReader(reader);
                 return gson.fromJson(jsonReader, typeToken);
             } catch (FileNotFoundException e) {
                 this.save(defaultConfig);
                 return defaultConfig;
             } catch (Exception e) {
-                System.err.println("Failed to load config: " + path.getFileName());
-                e.printStackTrace();
+                BigSignWriter.LOGGER.error("Failed to load config: {}", path.getFileName(), e);
                 return defaultConfig;
             }
         }
 
         public void save(T config) {
-            try (FileWriter fileWriter = new FileWriter(new File(path.toUri()))) {
-                gson.toJson(config, fileWriter);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
+            try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(path.toFile()), StandardCharsets.UTF_8)) {
+                gson.toJson(config, writer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
     }
