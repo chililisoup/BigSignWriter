@@ -1,4 +1,5 @@
 {
-  "bigsignwriter.enabled": "Big Characters",
-  "bigsignwriter.reload": "Reload"
+  "bigsignwriter.enabled": "Big Text",
+  "bigsignwriter.reload": "Reload",
+  "bigsignwriter.reload": "Font"
 }
