@@ -19,31 +19,29 @@ A client-side utitility mod that eases inputting text onto signs that forms larg
 
 <hr>
 
-A button is added to the sign editing GUI to switch between large letter typing and normal. This button's position can be changed in the config file. (`config/bigsignwriter-config.json`)
+A button is added to the sign editing GUI to switch between large letter typing and normal. This button's position can be changed in the config file. (`config/bigsignwriter/config.json`)
 
-With the default configuration, normal signs can support 3 of these large characters, while hanging signs can show 2.
-
-The default configuration has large characters for all uppercase letters, all numbers, and a few additional symbols. Each large character can be modified, and new ones can be added using the config.
+The default fonts have large characters for all uppercase letters, all numbers, and a few additional symbols. Each character can be modified, and new fonts can be added in the fonts folder. (`config/bigsignwriter/fonts/`)
 
 <hr>
 <details>
 <summary>Configuration</summary>
 <br>
-There are two config files, one for general mod settings, and one containing each large character. They are loaded once at runtime, and are reloaded every time you hit the 'Reload' button in the sign editing screen.
+The config and font files are loaded once at runtime, and are reloaded every time you hit the 'Reload' button in the sign editing screen.
 
 <hr>
 
-### `config/bigsignwriter-config.json`
+### `config/bigsignwriter/config.json`
 Contains coordinates to render the 'big characters' button at.
 Also contains `characterSeparator`, which dictates what should separate each of the large characters, which is a single space by default.
 
 <hr>
 
-### `config/bigsignwriter-characters.json`
-Contains every large character and the normal character they represent.
-You may add additional entries, as long as what you want replaced is a single, typeable character.
+### `config/bigsignwriter/fonts/`
+Three fonts are bundled in by default: `default.json`, `retro.json` and `sharp.json`.
+These contain a `"name":""` field, an optional `"characterSeparator":""` field which determines which character(s) to use in between letters, and a `"characters":{}` field containing every large character and the normal character they represent. You may add additional characters, as long as what you want replaced is a single, typeable character. You may also add new fonts as jsons inside `config/bigsignwriter/fonts/`.
 
-When editing/creating these large characters, it is important that each line is the exact same width to maintain alignment. Different fonts will have different widths for different characters, so it is a good idea to make these directly inside Minecraft, and then copy each line into the config file.
+When editing/creating large characters, it is important that each line is the exact same width to maintain alignment. Different fonts will have different widths for different characters, so it is a good idea to make these directly inside Minecraft, and then copy each line into the config file.
 
 The default 'T' is a good example, the top line is 3 blocks, which are 9 pixels wide each, making for a total of 27 pixels. Each subsequent line has one block, then on both sides of the block there is 1 space (4 pixels wide), and 1 "thin space" (5 pixels wide), bringing the total in line at 27.
 
