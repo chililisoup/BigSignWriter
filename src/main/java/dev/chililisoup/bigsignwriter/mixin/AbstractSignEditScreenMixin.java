@@ -19,9 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Objects;
-
-import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.FONT;
+import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.SELECTED_FONT;
 import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.MAIN_CONFIG;
 
 @Mixin(AbstractSignEditScreen.class)
@@ -32,7 +30,7 @@ public abstract class AbstractSignEditScreenMixin {
     }
     @Unique
     private static Text createFontButtonText() {
-        String fontName = (FONT.name == null) ? "Unknown" : FONT.name;
+        String fontName = (SELECTED_FONT.name == null) ? "Unknown" : SELECTED_FONT.name;
         return ScreenTexts.composeGenericOptionText(
                 Text.translatableWithFallback("bigsignwriter.font", "Font"),
                 Text.literal(fontName)
@@ -97,25 +95,25 @@ public abstract class AbstractSignEditScreenMixin {
     @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
     private void charTypedInject(char chr, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if (!BigSignWriter.ENABLED) return;
-        if (FONT.characters == null) {
+        if (SELECTED_FONT.characters == null) {
             cir.setReturnValue(true);
             return;
         }
 
-        if (!FONT.characters.containsKey(chr))
+        if (!SELECTED_FONT.characters.containsKey(chr))
             chr = Character.toUpperCase(chr);
 
-        if (FONT.characters.containsKey(chr)) {
-            String[] bigChar = FONT.characters.get(chr);
+        if (SELECTED_FONT.characters.containsKey(chr)) {
+            String[] bigChar = SELECTED_FONT.characters.get(chr);
             AbstractSignEditScreen editScreen = (AbstractSignEditScreen) (Object) this;
 
             for (int i = 0; i < this.messages.length; i++) {
-                if (FONT.characterSeparator == null){
-                    FONT.characterSeparator = MAIN_CONFIG.characterSeparator;
+                if (SELECTED_FONT.characterSeparator == null){
+                    SELECTED_FONT.characterSeparator = MAIN_CONFIG.characterSeparator;
                 }
                 if (i >= bigChar.length || bigChar[i] == null) continue;
                 String line = this.messages[i].concat(
-                        (this.messages[i].isEmpty() ? "" : FONT.characterSeparator).concat(bigChar[i])
+                        (this.messages[i].isEmpty() ? "" : SELECTED_FONT.characterSeparator).concat(bigChar[i])
                 );
 
                 if (editScreen.textRenderer.getWidth(line) > this.blockEntity.getMaxTextWidth())

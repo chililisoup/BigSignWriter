@@ -2,7 +2,7 @@
 
 <h1 align="center">Big Sign Writer - Fabric Mod</h1>
 
-A client-side utitility mod that eases inputting text onto signs that forms larger letters! Just turn the toggle on in the sign editing UI, and type as normal! Each large character is made up of smaller, normal unicode characters from the vanilla Minecraft font, allowing this mod to work on most servers.
+A client-side utility mod that eases inputting text onto signs that forms larger letters! Just turn the toggle on in the sign editing UI, and type as normal! Each large character is made up of smaller, normal Unicode characters from the vanilla Minecraft font, allowing this mod to work on most servers.
 
 **Font resource packs may cause issues.**
 
@@ -21,7 +21,7 @@ A client-side utitility mod that eases inputting text onto signs that forms larg
 
 A button is added to the sign editing GUI to switch between large letter typing and normal. This button's position can be changed in the config file. (`config/bigsignwriter/config.json`)
 
-The default fonts have large characters for all uppercase letters, all numbers, and a few additional symbols. Each character can be modified, and new fonts can be added in the fonts folder. (`config/bigsignwriter/fonts/`)
+The default fonts have large characters for all uppercase letters, all numbers, and a few additional symbols. Each character can be modified, and new fonts can be added in the 'fonts' folder. (`config/bigsignwriter/fonts/`)
 
 <hr>
 <details>
@@ -39,7 +39,7 @@ Also contains `characterSeparator`, which dictates what should separate each of 
 
 ### `config/bigsignwriter/fonts/`
 Three fonts are bundled in by default: `default.json`, `retro.json` and `sharp.json`.
-These contain a `"name":""` field, an optional `"characterSeparator":""` field which determines which character(s) to use in between letters, and a `"characters":{}` field containing every large character and the normal character they represent. You may add additional characters, as long as what you want replaced is a single, typeable character. You may also add new fonts as jsons inside `config/bigsignwriter/fonts/`.
+These contain a `"name":""` field, an optional `"characterSeparator":""` field which determines which character(s) to use in between letters, and a `"characters":{}` field containing every large character and the normal character they represent. You may add additional characters, as long as what you want replaced is a single, type-able character. You may also add new fonts as jsons inside `config/bigsignwriter/fonts/`.
 
 When editing/creating large characters, it is important that each line is the exact same width to maintain alignment. Different fonts will have different widths for different characters, so it is a good idea to make these directly inside Minecraft, and then copy each line into the config file.
 
@@ -47,7 +47,7 @@ The default 'T' is a good example, the top line is 3 blocks, which are 9 pixels 
 
 To check that your alignment is good, I like to copy three blocks `███` onto both sides of each line, then modify each line until all the blocks are in line with each other.
 
-A massively helpful tool to aid in this process is [Symbol Chat](https://modrinth.com/mod/symbol-chat), which adds a menu where you can filter every available unicode character by their width, among other things.
+A massively helpful tool to aid in this process is [Symbol Chat](https://modrinth.com/mod/symbol-chat), which adds a menu where you can filter every available Unicode character by their width, among other things.
 
 </details>
 
