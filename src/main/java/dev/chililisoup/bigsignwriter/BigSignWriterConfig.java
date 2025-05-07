@@ -12,6 +12,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -113,18 +114,17 @@ public class BigSignWriterConfig {
                 FontFile existingFont = existing.load();
                 FontFile builtIn = getFont(gson, file.toPath()).load();
 
-                boolean changed = false;
+                ArrayList<Character> changed = new ArrayList<>();
                 for (char character : builtIn.characters.keySet()) {
                     if (existingFont.characters.containsKey(character)) continue;
 
                     existingFont.characters.put(character, builtIn.characters.get(character));
-                    BigSignWriter.LOGGER.debug("Added missing character '{}' to {}", character, builtIn.name);
-                    changed = true;
+                    changed.add(character);
                 }
 
-                if (changed) {
+                if (!changed.isEmpty()) {
                     existing.save(existingFont);
-                    BigSignWriter.LOGGER.info("Merged new characters from built-in font: {}", builtIn.name);
+                    BigSignWriter.LOGGER.info("Merged new characters from built-in font '{}': {}", builtIn.name, changed);
                 }
             }
         } catch (Exception e) {
