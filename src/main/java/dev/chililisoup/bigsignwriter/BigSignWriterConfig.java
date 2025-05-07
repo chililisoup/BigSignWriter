@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import dev.chililisoup.bigsignwriter.fonts.*;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -15,20 +15,21 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+
+import static java.util.Map.entry;
 
 
 public class BigSignWriterConfig {
     public static FontFile SELECTED_FONT;
-    private static int SELECTED_FONT_INDEX;
     public static List<FontFile> AVAILABLE_FONTS;
     public static MainConfig MAIN_CONFIG;
+    private static int SELECTED_FONT_INDEX;
 
-    public static class MainConfig {
-        public int buttonsX = 0;
-        public int buttonsY = 120;
-        public String defaultCharacterSeparator = " ";
-        public MainConfig() {}
+    static {
+        copyBuiltInFonts();
+        reloadConfig();
+        reloadFonts();
     }
 
     private static Path getConfigDir() {
@@ -80,9 +81,18 @@ public class BigSignWriterConfig {
     private static ConfigInterface<FontFile> getFont(Gson gson, Path path) {
         return new ConfigInterface<>(
                 gson,
-                new TypeToken<>() {},
+                new TypeToken<>() {
+                },
                 path,
                 new FontFile()
+        );
+    }
+
+    private static Map<String, FontInterface> getBuiltInFonts() {
+        return Map.ofEntries(
+                entry("default", new DefaultFont()),
+                entry("sharp", new SharpFont()),
+                entry("retro", new RetroFont())
         );
     }
 
@@ -93,40 +103,31 @@ public class BigSignWriterConfig {
         try {
             Files.createDirectories(configFonts);
 
-            Optional<ModContainer> container = FabricLoader.getInstance().getModContainer(BigSignWriter.MOD_ID);
-            if (container.isEmpty()) throw new Exception("Failed to get mod container.");
+            getBuiltInFonts().forEach((path, font) -> {
+                FontFile fontDefaults = font.get();
+                Path target = configFonts.resolve(path + ".json");
+                ConfigInterface<FontFile> file = getFont(gson, target);
 
-            Optional<Path> path = container.get().findPath("assets/" + BigSignWriter.MOD_ID + "/fonts");
-            if (path.isEmpty()) throw new Exception("Failed to get built-in fonts folder.");
-            
-            File[] builtInFonts = path.get().toFile().listFiles();
-            if (builtInFonts == null) throw new Exception("Failed to get files from the built-in fonts folder.");
-            
-            for (File file : builtInFonts) {
-                Path target = configFonts.resolve(file.getName());
                 if (Files.notExists(target)) {
-                    Files.copy(new FileInputStream(file), target);
-                    BigSignWriter.LOGGER.info("Copied built-in font: {}", file.getName());
-                    continue;
+                    file.save(fontDefaults);
+                    BigSignWriter.LOGGER.info("Copied built-in font: {}", fontDefaults.name);
+                    return;
                 }
 
-                ConfigInterface<FontFile> existing = getFont(gson, target);
-                FontFile existingFont = existing.load();
-                FontFile builtIn = getFont(gson, file.toPath()).load();
-
+                FontFile existingFont = file.load();
                 ArrayList<Character> changed = new ArrayList<>();
-                for (char character : builtIn.characters.keySet()) {
+                for (char character : fontDefaults.characters.keySet()) {
                     if (existingFont.characters.containsKey(character)) continue;
 
-                    existingFont.characters.put(character, builtIn.characters.get(character));
+                    existingFont.characters.put(character, fontDefaults.characters.get(character));
                     changed.add(character);
                 }
 
                 if (!changed.isEmpty()) {
-                    existing.save(existingFont);
-                    BigSignWriter.LOGGER.info("Merged new characters from built-in font '{}': {}", builtIn.name, changed);
+                    file.save(existingFont);
+                    BigSignWriter.LOGGER.info("Merged new characters from built-in font '{}': {}", fontDefaults.name, changed);
                 }
-            }
+            });
         } catch (Exception e) {
             BigSignWriter.LOGGER.error("Error copying built-in fonts", e);
         }
@@ -167,10 +168,13 @@ public class BigSignWriterConfig {
         BigSignWriter.LOGGER.debug("Switched to font {} at index {}", SELECTED_FONT.name, SELECTED_FONT_INDEX);
     }
 
-    static {
-        copyBuiltInFonts();
-        reloadConfig();
-        reloadFonts();
+    public static class MainConfig {
+        public int buttonsX = 0;
+        public int buttonsY = 120;
+        public String defaultCharacterSeparator = " ";
+
+        public MainConfig() {
+        }
     }
 
     private record ConfigInterface<T>(Gson gson, TypeToken<T> typeToken, Path path, T defaultConfig) {

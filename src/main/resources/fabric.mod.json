@@ -30,6 +30,7 @@
     "minecraft": ">=${minecraft_version}"
   },
   "recommends": {
-    "fabric-resource-loader-v0": "*"
+    "fabric-resource-loader-v0": "*",
+    "yet_another_config_lib_v3": "*"
   }
 }
