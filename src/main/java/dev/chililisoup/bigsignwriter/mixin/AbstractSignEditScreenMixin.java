@@ -50,8 +50,8 @@ public abstract class AbstractSignEditScreenMixin {
         AbstractSignEditScreen editScreen = (AbstractSignEditScreen) (Object) this;
 
         ClickableButtonWidget toggleButton = new ClickableButtonWidget(
-                editScreen.width / 2 + MAIN_CONFIG.toggleButtonX - 100,
-                editScreen.height / 4 + MAIN_CONFIG.toggleButtonY,
+                editScreen.width / 2 + MAIN_CONFIG.buttonsX - 100,
+                editScreen.height / 4 + MAIN_CONFIG.buttonsY,
                 75,
                 20,
                 createToggleButtonText(),
@@ -62,8 +62,8 @@ public abstract class AbstractSignEditScreenMixin {
         );
 
         ClickableButtonWidget fontButton = new ClickableButtonWidget(
-                editScreen.width / 2 + MAIN_CONFIG.toggleButtonX - 25,
-                editScreen.height / 4 + MAIN_CONFIG.toggleButtonY,
+                editScreen.width / 2 + MAIN_CONFIG.buttonsX - 25,
+                editScreen.height / 4 + MAIN_CONFIG.buttonsY,
                 80,
                 20,
                 createFontButtonText(),
@@ -74,8 +74,8 @@ public abstract class AbstractSignEditScreenMixin {
         );
 
         ClickableButtonWidget reloadButton = new ClickableButtonWidget(
-                editScreen.width / 2 + MAIN_CONFIG.toggleButtonX + 55,
-                editScreen.height / 4 + MAIN_CONFIG.toggleButtonY,
+                editScreen.width / 2 + MAIN_CONFIG.buttonsX + 55,
+                editScreen.height / 4 + MAIN_CONFIG.buttonsY,
                 45,
                 20,
                 Text.translatableWithFallback("bigsignwriter.reload", "Reload"),
@@ -108,7 +108,7 @@ public abstract class AbstractSignEditScreenMixin {
 
             for (int i = 0; i < this.messages.length; i++) {
                 if (SELECTED_FONT.characterSeparator == null){
-                    SELECTED_FONT.characterSeparator = MAIN_CONFIG.characterSeparator;
+                    SELECTED_FONT.characterSeparator = MAIN_CONFIG.defaultCharacterSeparator;
                 }
                 if (i >= bigChar.length || bigChar[i] == null) continue;
                 String line = this.messages[i].concat(
