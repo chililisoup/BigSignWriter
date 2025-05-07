@@ -28,7 +28,7 @@ public class BigSignWriterConfig {
         public int buttonsX = 0;
         public int buttonsY = 120;
         public String defaultCharacterSeparator = " ";
-        MainConfig() {}
+        public MainConfig() {}
     }
 
     private static Path getConfigDir() {
@@ -132,19 +132,32 @@ public class BigSignWriterConfig {
         }
     }
 
-    public static void reloadConfig() {
+    private static ConfigInterface<MainConfig> getConfig() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Path configDir = getConfigDir();
-        ConfigInterface<MainConfig> mainConfig = new ConfigInterface<>(
+        return new ConfigInterface<>(
                 gson,
                 TypeToken.get(MainConfig.class),
                 configDir.resolve("config.json"),
                 new MainConfig()
         );
+    }
+
+    public static void saveConfig() {
+        ConfigInterface<MainConfig> mainConfig = getConfig();
+
+        mainConfig.save(MAIN_CONFIG);
+
+        BigSignWriter.LOGGER.info("Config saved!");
+    }
+
+    public static void reloadConfig() {
+        ConfigInterface<MainConfig> mainConfig = getConfig();
+
         MAIN_CONFIG = mainConfig.load();
         mainConfig.save(MAIN_CONFIG);
 
-        BigSignWriter.LOGGER.info("Configs loaded!");
+        BigSignWriter.LOGGER.info("Config loaded!");
     }
 
     public static void getNextFont() {
