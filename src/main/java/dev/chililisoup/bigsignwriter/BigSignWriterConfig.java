@@ -25,9 +25,9 @@ public class BigSignWriterConfig {
     public static MainConfig MAIN_CONFIG;
 
     public static class MainConfig {
-        public int toggleButtonX = 0;
-        public int toggleButtonY = 120;
-        public String characterSeparator = " ";
+        public int buttonsX = 0;
+        public int buttonsY = 120;
+        public String defaultCharacterSeparator = " ";
         MainConfig() {}
     }
 
