@@ -39,7 +39,7 @@ public abstract class YaclIntegration {
                                             BigSignWriterConfig.saveConfig();
                                         })
                                 .controller(opt -> IntegerSliderControllerBuilder.create(opt)
-                                        .range(-1000, 1000)
+                                        .range(-500, 500)
                                         .step(10)
                                         .formatValue(val -> Text.literal(val + "px")))
                                 .build())
@@ -58,7 +58,7 @@ public abstract class YaclIntegration {
                                             BigSignWriterConfig.saveConfig();
                                         })
                                 .controller(opt -> IntegerSliderControllerBuilder.create(opt)
-                                        .range(-1000, 1000)
+                                        .range(-500, 500)
                                         .step(10)
                                         .formatValue(val -> Text.literal(val + "px")))
                                 .build())

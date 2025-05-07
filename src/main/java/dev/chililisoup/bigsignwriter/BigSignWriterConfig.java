@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import dev.chililisoup.bigsignwriter.fonts.*;
+import dev.chililisoup.bigsignwriter.font.*;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,10 +15,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-
-import static java.util.Map.entry;
-
 
 public class BigSignWriterConfig {
     public static FontFile SELECTED_FONT;
@@ -33,7 +29,7 @@ public class BigSignWriterConfig {
     }
 
     private static Path getConfigDir() {
-        Path configDir = FabricLoader.getInstance().getConfigDir().resolve("bigsignwriter");
+        Path configDir = FabricLoader.getInstance().getConfigDir().resolve(BigSignWriter.MOD_ID);
         try {
             Files.createDirectories(configDir);
         } catch (IOException e) {
@@ -88,14 +84,6 @@ public class BigSignWriterConfig {
         );
     }
 
-    private static Map<String, FontInterface> getBuiltInFonts() {
-        return Map.ofEntries(
-                entry("default", new DefaultFont()),
-                entry("sharp", new SharpFont()),
-                entry("retro", new RetroFont())
-        );
-    }
-
     private static void copyBuiltInFonts() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Path configFonts = getFontsDir();
@@ -103,7 +91,7 @@ public class BigSignWriterConfig {
         try {
             Files.createDirectories(configFonts);
 
-            getBuiltInFonts().forEach((path, font) -> {
+            BuiltInFonts.get().forEach((path, font) -> {
                 FontFile fontDefaults = font.get();
                 Path target = configFonts.resolve(path + ".json");
                 ConfigInterface<FontFile> file = getFont(gson, target);
@@ -149,7 +137,7 @@ public class BigSignWriterConfig {
 
         mainConfig.save(MAIN_CONFIG);
 
-        BigSignWriter.LOGGER.debug("Config saved!");
+        BigSignWriter.LOGGER.info("Config saved!");
     }
 
     public static void reloadConfig() {

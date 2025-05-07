@@ -1,10 +1,12 @@
-package dev.chililisoup.bigsignwriter.fonts;
+package dev.chililisoup.bigsignwriter.font.supplier;
+
+import dev.chililisoup.bigsignwriter.font.FontFile;
 
 import java.util.Map;
 
 import static java.util.Map.entry;
 
-public class RetroFont implements FontInterface {
+public class RetroFont implements FontSupplier {
     @Override
     public FontFile get() {
         return new FontFile("Retro", "   ", Map.<Character, String[]>ofEntries(

@@ -27,7 +27,7 @@ The default fonts have large characters for all uppercase letters, all numbers, 
 <details>
 <summary>Configuration</summary>
 <br>
-The config and font files are loaded once at runtime, and are reloaded every time you hit the 'Reload' button in the sign editing screen.
+The config and font files are loaded once at runtime, and are reloaded every time you hit the 'Reload' button in the sign editing screen, or when you save with YACL.
 
 <hr>
 
