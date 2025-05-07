@@ -149,7 +149,7 @@ public class BigSignWriterConfig {
 
         mainConfig.save(MAIN_CONFIG);
 
-        BigSignWriter.LOGGER.info("Config saved!");
+        BigSignWriter.LOGGER.debug("Config saved!");
     }
 
     public static void reloadConfig() {
@@ -158,7 +158,7 @@ public class BigSignWriterConfig {
         MAIN_CONFIG = mainConfig.load();
         mainConfig.save(MAIN_CONFIG);
 
-        BigSignWriter.LOGGER.info("Config loaded!");
+        BigSignWriter.LOGGER.debug("Config loaded!");
     }
 
     public static void getNextFont() {
