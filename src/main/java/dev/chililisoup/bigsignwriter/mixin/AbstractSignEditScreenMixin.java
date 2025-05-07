@@ -31,7 +31,7 @@ public abstract class AbstractSignEditScreenMixin {
     }
     @Unique
     private static Text createFontButtonText() {
-        String fontName = (SELECTED_FONT.name == null) ? "Unknown" : SELECTED_FONT.name;
+        String fontName = (SELECTED_FONT == null || SELECTED_FONT.name == null) ? "Unknown" : SELECTED_FONT.name;
         return ScreenTexts.composeGenericOptionText(
                 Text.translatableWithFallback("bigsignwriter.font", "Font"),
                 Text.literal(fontName)
@@ -95,7 +95,7 @@ public abstract class AbstractSignEditScreenMixin {
     @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
     private void charTypedInject(char chr, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if (!BigSignWriter.ENABLED) return;
-        if (SELECTED_FONT.characters == null) {
+        if (SELECTED_FONT == null || SELECTED_FONT.characters == null) {
             cir.setReturnValue(true);
             return;
         }
