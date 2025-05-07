@@ -33,7 +33,7 @@ The config and font files are loaded once at runtime, and are reloaded every tim
 
 ### `config/bigsignwriter/config.json`
 Contains coordinates for where to place this mod's buttons in the sign edit gui, offset from the center of the screen.
-Also contains `defaultCharacterSeparator`, which sets the default separator string to place between characters, and is a single space by default.
+Also contains `defaultCharacterSeparator`, which sets the default separator string to place between characters, and is a single space by default. May be overridden by fonts.
 
 <hr>
 

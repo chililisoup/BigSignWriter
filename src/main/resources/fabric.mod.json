@@ -18,7 +18,9 @@
     "client": [
       "dev.chililisoup.bigsignwriter.BigSignWriter"
     ],
-    "main": []
+    "modmenu": [
+      "dev.chililisoup.bigsignwriter.compat.ModMenuIntegration"
+    ]
   },
   "mixins": [
     "bigsignwriter.mixins.json"
