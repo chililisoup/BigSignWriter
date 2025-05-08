@@ -40,8 +40,8 @@ dependencies {
     mappings("net.fabricmc:yarn:$mcVersion+build.${deps["yarn_build"]}:v2")
     modImplementation("net.fabricmc:fabric-loader:${deps["fabric_loader"]}")
 
-    modImplementation("com.terraformersmc:modmenu:${deps["modmenu"]}")
-    modImplementation("dev.isxander:yet-another-config-lib:${deps["yacl"]}")
+    modCompileOnlyApi("com.terraformersmc:modmenu:${deps["modmenu"]}")
+    modCompileOnly("dev.isxander:yet-another-config-lib:${deps["yacl"]}")
 }
 
 loom {
@@ -52,9 +52,17 @@ loom {
     }
 
     runConfigs.all {
-        ideConfigGenerated(true)
-        vmArgs("-Dmixin.debug.export=true")
-        runDir = "../../run"
+        ideConfigGenerated(false)
+    }
+
+    runs {
+        register("fabricClient") {
+            client()
+            name = "Fabric Client"
+            vmArgs("-Dmixin.debug.export=true")
+            runDir = "../../run"
+            ideConfigGenerated(true)
+        }
     }
 }
 
