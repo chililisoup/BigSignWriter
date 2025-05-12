@@ -7,7 +7,24 @@ fun prop(name: String, consumer: (prop: String) -> Unit) {
         ?.let(consumer)
 }
 
+class ModData {
+    val version = property("mod.version") as String
+    val group = property("mod.group") as String
+    val id = property("mod.id") as String
+    val name = property("mod.name") as String
+    val archiveName = property("mod.archive_name") as String
+    val authors = property("mod.authors") as String
+    val description = property("mod.description") as String
+    val homepage = property("mod.homepage") as String
+    val sources = property("mod.sources") as String
+    val issues = property("mod.issues") as String
+    val license = property("mod.license") as String
+}
+
+val mod = ModData()
 val minecraft = property("deps.minecraft") as String
+
+base { archivesName.set(mod.archiveName) }
 
 // Stonecutter constants for mod loaders.
 // See https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants
@@ -41,24 +58,22 @@ modstitch {
     // This metadata is used to fill out the information inside
     // the metadata files found in the templates folder.
     metadata {
-        prop("mod.id") { modId = it }
-        prop("mod.name") { modName = it }
-        prop("mod.version") { modVersion = it }
-        prop("mod.group") { modGroup = it }
-        prop("mod.authors") {
-            modAuthor = if (loader == "fabric") it.split(", ").joinToString("\",\"") else it
-        }
-        prop("mod.license") { modLicense = it }
-        prop("mod.description") { modDescription = it }
+        modId = mod.id
+        modName = mod.name
+        modVersion = "${mod.version}+$minecraft-$loader"
+        modGroup = mod.group
+        modAuthor = if (loader == "fabric") mod.authors.split(", ").joinToString("\",\"") else mod.authors
+        modLicense = mod.license
+        modDescription = mod.description
 
         fun <K, V> MapProperty<K, V>.populate(block: MapProperty<K, V>.() -> Unit) {
             block()
         }
 
         replacementProperties.populate {
-            prop("mod.homepage") { put("mod_homepage", it) }
-            prop("mod.sources") { put("mod_sources", it) }
-            prop("mod.issues") { put("mod_issues", it) }
+            put("mod_homepage", mod.homepage)
+            put("mod_sources", mod.sources)
+            put("mod_issues", mod.issues)
             prop("deps.minecraft_range") { put("minecraft_range", it) }
         }
     }
@@ -105,7 +120,7 @@ modstitch {
     mixin {
         if (loader != "fabric") {
             addMixinsToModManifest = true
-            prop("mod.id") { configs.register(it) }
+            configs.register(mod.id)
         } else {
             addMixinsToModManifest = false
         }
@@ -128,9 +143,25 @@ dependencies {
         compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1")!!)
         implementation("io.github.llamalad7:mixinextras-forge:0.4.1").jij()
         prop("deps.yacl") { compileOnly("dev.isxander:yet-another-config-lib:${it}-${loader}") }
+        compileOnly("org.jetbrains:annotations:20.1.0")
     } else {
         prop("deps.yacl") { modstitchModApi("dev.isxander:yet-another-config-lib:${it}-${loader}") }
     }
 
     // Anything else in the dependencies block will be used for all platforms.
+}
+
+val finalJarTasks = listOf(
+    modstitch.finalJarTask
+)
+tasks.register<Copy>("buildAndCollect") {
+    group = "build"
+
+    finalJarTasks.forEach { jar ->
+        dependsOn(jar)
+        from(jar.flatMap { it.archiveFile })
+    }
+
+    into(rootProject.layout.buildDirectory.file("libs/${mod.version}"))
+    dependsOn("build")
 }

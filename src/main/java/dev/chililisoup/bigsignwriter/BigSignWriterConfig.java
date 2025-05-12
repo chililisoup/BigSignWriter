@@ -9,10 +9,8 @@ import dev.chililisoup.bigsignwriter.font.*;
 import net.fabricmc.loader.api.FabricLoader;
 //? if neoforge
 /*import net.neoforged.fml.loading.FMLPaths;*/
-//? if forge {
-/*import net.minecraftforge.fml.loading.FMLPaths;
-import org.antlr.v4.runtime.misc.NotNull;
-*///?} else
+//? if forge
+/*import net.minecraftforge.fml.loading.FMLPaths;*/
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;

@@ -5,7 +5,7 @@ stonecutter active "1.21.3-fabric"
 
 stonecutter registerChiseled tasks.register("chiseledBuild", stonecutter.chiseled) {
     group = "project"
-    ofTask("build")
+    ofTask("buildAndCollect")
 }
 
 allprojects {
