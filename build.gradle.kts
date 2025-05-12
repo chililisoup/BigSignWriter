@@ -35,8 +35,6 @@ modstitch {
     // If parchment doesn't exist for a version yet, you can safely
     // omit the "deps.parchment" property from your versioned gradle.properties
     parchment {
-        // NOT ADDED TO ANY GRADLE.PROPERTIES YET.
-        // DO IT!!!!
         prop("deps.parchment") { mappingsVersion = it }
     }
 
@@ -119,11 +117,20 @@ modstitch {
 // If you want to create proxy configurations for more source sets, such as client source sets,
 // use the modstitch.createProxyConfigurations(sourceSets["client"]) function.
 dependencies {
-    modstitch.loom {
+    fun Dependency?.jij() = this?.also(::modstitchJiJ)
+
+    if (modstitch.isLoom) {
         prop("deps.fapi") { modstitchModApi("net.fabricmc.fabric-api:fabric-api:${it}") }
         prop("deps.modmenu") { modstitchModApi("com.terraformersmc:modmenu:${it}") }
     }
 
+    if (modstitch.isModDevGradleLegacy) {
+        compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1")!!)
+        implementation("io.github.llamalad7:mixinextras-forge:0.4.1").jij()
+        prop("deps.yacl") { compileOnly("dev.isxander:yet-another-config-lib:${it}-${loader}") }
+    } else {
+        prop("deps.yacl") { modstitchModApi("dev.isxander:yet-another-config-lib:${it}-${loader}") }
+    }
+
     // Anything else in the dependencies block will be used for all platforms.
-    prop("deps.yacl") { modstitchModApi("dev.isxander:yet-another-config-lib:${it}-${loader}") }
 }

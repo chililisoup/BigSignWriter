@@ -3,24 +3,22 @@
 
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.compat.YaclIntegration;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 @Mod(BigSignWriter.MOD_ID)
 public class NeoforgeEntrypoint {
-    public NeoforgeEntrypoint() {
+    public NeoforgeEntrypoint(ModContainer container) {
         BigSignWriter.initialize();
-    }
 
-    @SubscribeEvent
-    public static void onFMLClientSetupEvent(FMLClientSetupEvent event) {
-        ModLoadingContext.get().registerExtensionPoint(
-                IConfigScreenFactory.class,
-                () -> (modContainer, parentScreen) -> YaclIntegration.generateScreen(parentScreen)
-        );
+        if (ModList.get().isLoaded("yet_another_config_lib_v3")) {
+            container.registerExtensionPoint(
+                    IConfigScreenFactory.class,
+                    (modContainer, parentScreen) -> YaclIntegration.generateScreen(parentScreen)
+            );
+        }
     }
 }
 *///?}
