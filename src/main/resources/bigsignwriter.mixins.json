@@ -2,8 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "dev.chililisoup.bigsignwriter.mixin",
-  "compatibilityLevel": "${javaCompat}",
-  "mixins": [],
+  "compatibilityLevel": "JAVA_17",
   "client": [
     "AbstractSignEditScreenMixin"
   ],

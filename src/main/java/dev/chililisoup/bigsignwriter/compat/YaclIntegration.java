@@ -7,15 +7,15 @@ import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.YetAnotherConfigLib;
 import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.StringControllerBuilder;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.MAIN_CONFIG;
 
 public abstract class YaclIntegration {
     public static Screen generateScreen(Screen parentScreen) {
         BigSignWriterConfig.MainConfig defaults = new BigSignWriterConfig.MainConfig();
-        Text name = Text.translatableWithFallback(
+        Component name = Component.translatableWithFallback(
                 "bigsignwriter.config",
                 "Big Sign Writer Config"
         );
@@ -25,10 +25,10 @@ public abstract class YaclIntegration {
                 .category(ConfigCategory.createBuilder()
                         .name(name)
                         .option(Option.<Integer>createBuilder()
-                                .name(Text.translatableWithFallback(
+                                .name(Component.translatableWithFallback(
                                         "bigsignwriter.config.buttonsX",
                                         "Buttons X"))
-                                .description(OptionDescription.of(Text.translatableWithFallback(
+                                .description(OptionDescription.of(Component.translatableWithFallback(
                                         "bigsignwriter.config.buttonsX.desc",
                                         "Horizontal offset for mod buttons, from center of screen.")))
                                 .binding(
@@ -41,13 +41,13 @@ public abstract class YaclIntegration {
                                 .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                         .range(-500, 500)
                                         .step(10)
-                                        .formatValue(val -> Text.literal(val + "px")))
+                                        .formatValue(val -> Component.literal(val + "px")))
                                 .build())
                         .option(Option.<Integer>createBuilder()
-                                .name(Text.translatableWithFallback(
+                                .name(Component.translatableWithFallback(
                                         "bigsignwriter.config.buttonsY",
                                         "Buttons Y"))
-                                .description(OptionDescription.of(Text.translatableWithFallback(
+                                .description(OptionDescription.of(Component.translatableWithFallback(
                                         "bigsignwriter.config.buttonsY.desc",
                                         "Vertical offset for mod buttons, from center of screen.")))
                                 .binding(
@@ -60,13 +60,13 @@ public abstract class YaclIntegration {
                                 .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                         .range(-500, 500)
                                         .step(10)
-                                        .formatValue(val -> Text.literal(val + "px")))
+                                        .formatValue(val -> Component.literal(val + "px")))
                                 .build())
                         .option(Option.<String>createBuilder()
-                                .name(Text.translatableWithFallback(
+                                .name(Component.translatableWithFallback(
                                         "bigsignwriter.config.defaultCharacterSeparator",
                                         "Default Character Separator"))
-                                .description(OptionDescription.of(Text.translatableWithFallback(
+                                .description(OptionDescription.of(Component.translatableWithFallback(
                                         "bigsignwriter.config.defaultCharacterSeparator.desc",
                                         "Default separator string to place between characters. May be overridden by fonts.")))
                                 .binding(

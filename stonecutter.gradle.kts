@@ -1,17 +1,33 @@
 plugins {
     id("dev.kikugie.stonecutter")
-    id("fabric-loom") version "1.10-SNAPSHOT" apply false
 }
-stonecutter active "1.21.3"
+stonecutter active "1.21.3-fabric"
 
 stonecutter registerChiseled tasks.register("chiseledBuild", stonecutter.chiseled) {
     group = "project"
-    ofTask("buildAndCollect")
+    ofTask("build")
 }
 
-stonecutter parameters {
-    /*
-    See src/main/java/com/example/TemplateMod.java
-    and https://stonecutter.kikugie.dev/
-    */
+allprojects {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven("https://maven.neoforged.net/releases")
+        maven("https://maven.fabricmc.net/")
+        maven {
+            name = "Xander Maven"
+            url = uri("https://maven.isxander.dev/releases")
+        }
+        maven {
+            name = "Terraformers"
+            url = uri("https://maven.terraformersmc.com/")
+        }
+        maven {
+            name = "Kotlin for Forge"
+            url = uri("https://thedarkcolour.github.io/KotlinForForge/")
+            content {
+                includeGroup("thedarkcolour")
+            }
+        }
+    }
 }

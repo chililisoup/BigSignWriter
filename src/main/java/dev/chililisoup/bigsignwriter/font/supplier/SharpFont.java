@@ -327,8 +327,13 @@ public class SharpFont implements FontSupplier {
                         "▀",
                         "▄",
                         "▀"
+                }),
+                entry('.', new String[]{
+                        "  ",
+                        "  ",
+                        "  ",
+                        "█"
                 })
-        )
-        );
+        ));
     }
 }

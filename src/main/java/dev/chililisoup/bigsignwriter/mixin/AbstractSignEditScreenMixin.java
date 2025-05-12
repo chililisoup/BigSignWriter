@@ -5,17 +5,19 @@ import com.llamalad7.mixinextras.sugar.Local;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.ClickableButtonWidget;
-import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import org.spongepowered.asm.mixin.Mixin;
-import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.SelectionManager;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.font.TextFieldHelper;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -26,27 +28,27 @@ import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.MAIN_CONFIG;
 
 @Mixin(AbstractSignEditScreen.class)
 public abstract class AbstractSignEditScreenMixin extends Screen {
-    protected AbstractSignEditScreenMixin(Text title) { super(title); }
+    protected AbstractSignEditScreenMixin(Component title) { super(title); }
 
     @Unique
-    private static Text createToggleButtonText() {
-        return ScreenTexts.composeToggleText(Text.translatableWithFallback("bigsignwriter.enabled", "Big Text"), BigSignWriter.ENABLED);
+    private static Component bigSignWriter$createToggleButtonText() {
+        return CommonComponents.optionStatus(Component.translatableWithFallback("bigsignwriter.enabled", "Big Component"), BigSignWriter.ENABLED);
     }
 
     @Unique
-    private static Text createFontButtonText() {
+    private static Component bigSignWriter$createFontButtonText() {
         String fontName = (SELECTED_FONT == null || SELECTED_FONT.name == null) ? "Unknown" : SELECTED_FONT.name;
-        return ScreenTexts.composeGenericOptionText(
-                Text.translatableWithFallback("bigsignwriter.font", "Font"),
-                Text.literal(fontName)
+        return CommonComponents.optionNameValue(
+                Component.translatableWithFallback("bigsignwriter.font", "Font"),
+                Component.literal(fontName)
         );
     }
 
-    @Shadow /*? if >=1.21.2 {*/ protected /*?} else {*//* private *//*?}*/ @Final SignBlockEntity blockEntity;
+    @Shadow /*? if >=1.21.2 {*/ protected /*?} else {*/ /*private *//*?}*/ @Final SignBlockEntity sign;
     @Shadow private @Final String[] messages;
-    @Shadow private void setCurrentRowMessage(String message) {}
-    @Shadow private int currentRow;
-    @Shadow @Nullable private SelectionManager selectionManager;
+    @Shadow private void setMessage(String string) {}
+    @Shadow private int line;
+    @Shadow @Nullable private TextFieldHelper signField;
 
     @Inject(method = "init", at = @At("HEAD"))
     private void addButtons(CallbackInfo ci) {
@@ -55,10 +57,10 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 this.height / 4 + MAIN_CONFIG.buttonsY,
                 75,
                 20,
-                createToggleButtonText(),
+                bigSignWriter$createToggleButtonText(),
                 button -> {
                     BigSignWriter.toggleEnabled();
-                    button.setMessage(createToggleButtonText());
+                    button.setMessage(bigSignWriter$createToggleButtonText());
                 }
         );
 
@@ -67,10 +69,10 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 this.height / 4 + MAIN_CONFIG.buttonsY,
                 80,
                 20,
-                createFontButtonText(),
+                bigSignWriter$createFontButtonText(),
                 button -> {
                     BigSignWriterConfig.getNextFont();
-                    button.setMessage(createFontButtonText());
+                    button.setMessage(bigSignWriter$createFontButtonText());
                 }
         );
 
@@ -79,17 +81,17 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 this.height / 4 + MAIN_CONFIG.buttonsY,
                 45,
                 20,
-                Text.translatableWithFallback("bigsignwriter.reload", "Reload"),
+                Component.translatableWithFallback("bigsignwriter.reload", "Reload"),
                 button -> {
                     BigSignWriterConfig.reloadConfig();
                     BigSignWriterConfig.reloadFonts();
-                    fontButton.setMessage(createFontButtonText());
+                    fontButton.setMessage(bigSignWriter$createFontButtonText());
                 }
         );
 
-        this.addDrawableChild(toggleButton);
-        this.addDrawableChild(fontButton);
-        this.addDrawableChild(reloadButton);
+        this.addRenderableWidget(toggleButton);
+        this.addRenderableWidget(fontButton);
+        this.addRenderableWidget(reloadButton);
     }
 
     @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
@@ -113,19 +115,19 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
         for (int i = 0; i < this.messages.length; i++) {
             if (i >= bigChar.length || bigChar[i] == null) continue;
-            String line = this.messages[i].concat(
+            String string = this.messages[i].concat(
                     (this.messages[i].isEmpty() ? "" : characterSeparator).concat(bigChar[i])
             );
 
-            if (this.textRenderer.getWidth(line) > this.blockEntity.getMaxTextWidth())
+            if (this.font.width(string) > this.sign.getMaxTextLineWidth())
                 continue;
 
-            this.currentRow = i;
-            this.setCurrentRowMessage(line);
+            this.line = i;
+            this.setMessage(string);
         }
 
-        if (this.selectionManager != null)
-            this.selectionManager.putCursorAtEnd();
+        if (this.signField != null)
+            this.signField.setCursorToEnd();
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
@@ -134,8 +136,8 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         if (keyCode != 259) return;
 
         for (int i = 0; i < this.messages.length; i++) {
-            this.currentRow = i;
-            this.setCurrentRowMessage("");
+            this.line = i;
+            this.setMessage("");
         }
 
         cir.setReturnValue(true);
@@ -143,28 +145,28 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
     @Inject(
             method = "renderSignText",
-            at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/ingame/AbstractSignEditScreen;messages:[Ljava/lang/String;", ordinal = 2),
+            at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractSignEditScreen;messages:[Ljava/lang/String;", ordinal = 2),
             cancellable = true
     )
     private void drawExtraLines(
-            DrawContext context,
+            GuiGraphics guiGraphics,
             CallbackInfo ci,
             @Local boolean blink,
             @Local(ordinal = 0) int color
     ) {
         if (!BigSignWriter.ENABLED) return;
 
-        int lineHeight = this.blockEntity.getTextLineHeight();
-        int opaqueColor = -16777216 | color; // Same as ColorHelper.fullAlpha(color) for 1.21.2+
+        int lineHeight = this.sign.getTextLineHeight();
+        int opaqueColor = -16777216 | color;
 
         for (int i = 0; i < this.messages.length; i++) {
             if (!blink) continue;
 
             String string = this.messages[i] == null ? "" : this.messages[i];
-            int lineX = this.textRenderer.getWidth(string) / 2;
+            int lineX = this.font.width(string) / 2;
             int lineY = (i - 2) * lineHeight;
 
-            context.fill(lineX, lineY - 1, lineX + 1, lineY + lineHeight, opaqueColor);
+            guiGraphics.fill(lineX, lineY - 1, lineX + 1, lineY + lineHeight, opaqueColor);
         }
 
         ci.cancel();
@@ -172,9 +174,9 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
     @WrapWithCondition(
             method = "renderSignText",
-            at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/client/gui/DrawContext;drawText(Lnet/minecraft/client/font/TextRenderer;Ljava/lang/String;IIIZ)I")
+            at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I")
     )
-    private boolean hideUnderscore(DrawContext instance, TextRenderer textRenderer, String text, int x, int y, int color, boolean shadow) {
+    private boolean hideUnderscore(GuiGraphics instance, Font font, String string, int i, int j, int k, boolean bl) {
         return !BigSignWriter.ENABLED;
     }
 }

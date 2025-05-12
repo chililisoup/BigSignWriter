@@ -327,6 +327,12 @@ public class DefaultFont implements FontSupplier {
                         "▀",
                         "▄",
                         "▀"
+                }),
+                entry('.', new String[]{
+                        "  ",
+                        "  ",
+                        "  ",
+                        "█"
                 })
         ));
     }

@@ -1,108 +1,129 @@
 plugins {
-    `maven-publish`
-    id("fabric-loom")
+    id("dev.isxander.modstitch.base") version "0.5.12"
 }
 
-class ModData {
-    val id = property("mod.id").toString()
-    val name = property("mod.name").toString()
-    val archiveName = property("mod.archive_name").toString()
-    val version = property("mod.version").toString()
-    val group = property("mod.group").toString()
+fun prop(name: String, consumer: (prop: String) -> Unit) {
+    (findProperty(name) as? String?)
+        ?.let(consumer)
 }
 
-class ModDependencies {
-    operator fun get(name: String) = property("deps.$name").toString()
-}
+val minecraft = property("deps.minecraft") as String
 
-val mod = ModData()
-val deps = ModDependencies()
-val mcVersion = stonecutter.current.version
-val mcDep = property("mod.mc_dep").toString()
-
-version = "${mod.version}+$mcVersion"
-group = mod.group
-base { archivesName.set(mod.archiveName) }
-
-repositories {
-    maven {
-        name = "Xander Maven"
-        url = uri("https://maven.isxander.dev/releases")
-    }
-    maven {
-        name = "Terraformers"
-        url = uri("https://maven.terraformersmc.com/")
-    }
-}
-
-dependencies {
-    minecraft("com.mojang:minecraft:$mcVersion")
-    mappings("net.fabricmc:yarn:$mcVersion+build.${deps["yarn_build"]}:v2")
-    modImplementation("net.fabricmc:fabric-loader:${deps["fabric_loader"]}")
-
-    modCompileOnlyApi("com.terraformersmc:modmenu:${deps["modmenu"]}")
-    modCompileOnly("dev.isxander:yet-another-config-lib:${deps["yacl"]}")
-}
-
-loom {
-    decompilers {
-        get("vineflower").apply { // Adds names to lambdas - useful for mixins
-            options.put("mark-corresponding-synthetics", "1")
-        }
-    }
-
-    runConfigs.all {
-        ideConfigGenerated(false)
-    }
-
-    runs {
-        register("fabricClient") {
-            client()
-            name = "Fabric Client"
-            vmArgs("-Dmixin.debug.export=true")
-            runDir = "../../run"
-            ideConfigGenerated(true)
-        }
-    }
-}
-
-java {
-    val java = when {
-        stonecutter.eval(stonecutter.current.version, ">=1.20.5") -> JavaVersion.VERSION_21
-        else -> JavaVersion.VERSION_17
-    }
-
-    targetCompatibility = java
-    sourceCompatibility = java
-}
-
-tasks.processResources {
-    val javaCompat = when {
-        stonecutter.eval(stonecutter.current.version, ">=1.20.5") -> "JAVA_21"
-        else -> "JAVA_17"
-    }
-
-    inputs.property("id", mod.id)
-    inputs.property("name", mod.name)
-    inputs.property("version", mod.version)
-    inputs.property("mcDep", mcDep)
-    inputs.property("javaCompat", javaCompat)
-
-    val map = mapOf(
-        "id" to mod.id,
-        "name" to mod.name,
-        "version" to mod.version,
-        "mcDep" to mcDep,
-        "javaCompat" to javaCompat
+// Stonecutter constants for mod loaders.
+// See https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants
+var loader: String = name.split("-")[1]
+stonecutter {
+    consts(
+        "fabric" to (loader == "fabric"),
+        "neoforge" to (loader == "neoforge"),
+        "forge" to (loader == "forge")
     )
-
-    filesMatching("fabric.mod.json") { expand(map) }
-    filesMatching("*.mixins.json") { expand(map) }
 }
 
-tasks.register<Copy>("buildAndCollect") {
-    group = "build"
-    from(tasks.remapJar.get().archiveFile)
-    into(rootProject.layout.buildDirectory.file("libs/${mod.version}"))
-    dependsOn("build")
+modstitch {
+    minecraftVersion = minecraft
+
+    // Alternatively use stonecutter.eval if you have a lot of versions to target.
+    // https://stonecutter.kikugie.dev/stonecutter/guide/setup#checking-versions
+    javaTarget = when (minecraft) {
+        "1.20.1" -> 17
+        "1.21.1" -> 21
+        "1.21.3" -> 21
+        else -> throw IllegalArgumentException("Please store the java version for ${property("deps.minecraft")} in build.gradle.kts!")
+    }
+
+    // If parchment doesn't exist for a version yet, you can safely
+    // omit the "deps.parchment" property from your versioned gradle.properties
+    parchment {
+        // NOT ADDED TO ANY GRADLE.PROPERTIES YET.
+        // DO IT!!!!
+        prop("deps.parchment") { mappingsVersion = it }
+    }
+
+    // This metadata is used to fill out the information inside
+    // the metadata files found in the templates folder.
+    metadata {
+        prop("mod.id") { modId = it }
+        prop("mod.name") { modName = it }
+        prop("mod.version") { modVersion = it }
+        prop("mod.group") { modGroup = it }
+        prop("mod.authors") {
+            modAuthor = if (loader == "fabric") it.split(", ").joinToString("\",\"") else it
+        }
+        prop("mod.license") { modLicense = it }
+        prop("mod.description") { modDescription = it }
+
+        fun <K, V> MapProperty<K, V>.populate(block: MapProperty<K, V>.() -> Unit) {
+            block()
+        }
+
+        replacementProperties.populate {
+            prop("mod.homepage") { put("mod_homepage", it) }
+            prop("mod.sources") { put("mod_sources", it) }
+            prop("mod.issues") { put("mod_issues", it) }
+            prop("deps.minecraft_range") { put("minecraft_range", it) }
+        }
+    }
+
+    // Fabric Loom (Fabric)
+    loom {
+        prop("deps.fabric_loader") { fabricLoaderVersion = it }
+
+        // Configure loom like normal in this block.
+        configureLoom {
+            runConfigs.all {
+                ideConfigGenerated(false)
+            }
+
+            runs {
+                register("fabricClient") {
+                    client()
+                    name = "Fabric Client"
+                    vmArgs("-Dmixin.debug.export=true")
+                    runDir = "../../run"
+                    ideConfigGenerated(true)
+                }
+            }
+        }
+    }
+
+    // ModDevGradle (NeoForge, Forge, Forgelike)
+    moddevgradle {
+        enable {
+            prop("deps.forge") { forgeVersion = it }
+            prop("deps.neoforge") { neoForgeVersion = it }
+        }
+
+        configureNeoforge {
+            runs {
+                register("neoforgeClient") {
+                    client()
+                    gameDirectory = layout.projectDirectory.dir("../../run")
+                }
+            }
+        }
+    }
+
+    mixin {
+        if (loader != "fabric") {
+            addMixinsToModManifest = true
+            prop("mod.id") { configs.register(it) }
+        } else {
+            addMixinsToModManifest = false
+        }
+    }
+}
+
+// All dependencies should be specified through modstitch's proxy configuration.
+// Wondering where the "repositories" block is? Go to "stonecutter.gradle.kts"
+// If you want to create proxy configurations for more source sets, such as client source sets,
+// use the modstitch.createProxyConfigurations(sourceSets["client"]) function.
+dependencies {
+    modstitch.loom {
+        prop("deps.fapi") { modstitchModApi("net.fabricmc.fabric-api:fabric-api:${it}") }
+        prop("deps.modmenu") { modstitchModApi("com.terraformersmc:modmenu:${it}") }
+    }
+
+    // Anything else in the dependencies block will be used for all platforms.
+    prop("deps.yacl") { modstitchModApi("dev.isxander:yet-another-config-lib:${it}-${loader}") }
 }

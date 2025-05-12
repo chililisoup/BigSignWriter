@@ -1,11 +1,11 @@
 package dev.chililisoup.bigsignwriter;
 
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.Component;
 
-public class ClickableButtonWidget extends ButtonWidget {
-    public ClickableButtonWidget(int x, int y, int width, int height, Text message, PressAction onPress) {
-        super(x, y, width, height, message, onPress, ButtonWidget.DEFAULT_NARRATION_SUPPLIER);
+public class ClickableButtonWidget extends Button {
+    public ClickableButtonWidget(int x, int y, int width, int height, Component message, OnPress onPress) {
+        super(x, y, width, height, message, onPress, Button.DEFAULT_NARRATION);
     }
 
     @Override

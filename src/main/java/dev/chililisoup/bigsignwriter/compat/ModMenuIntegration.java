@@ -1,3 +1,4 @@
+//? if fabric {
 package dev.chililisoup.bigsignwriter.compat;
 
 import com.terraformersmc.modmenu.api.ModMenuApi;
@@ -13,3 +14,4 @@ public class ModMenuIntegration implements ModMenuApi {
         return (screen) -> null;
     }
 }
+//?}

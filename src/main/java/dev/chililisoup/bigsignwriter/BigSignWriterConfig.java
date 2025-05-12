@@ -5,7 +5,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import dev.chililisoup.bigsignwriter.font.*;
+//? if fabric
 import net.fabricmc.loader.api.FabricLoader;
+//? if neoforge
+/*import net.neoforged.fml.loading.FMLPaths;*/
+//? if forge
+/*import net.minecraftforge.fml.loading.FMLPaths;*/
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -22,6 +27,8 @@ public class BigSignWriterConfig {
     public static MainConfig MAIN_CONFIG;
     private static int SELECTED_FONT_INDEX;
 
+    public static void noop() {}
+
     static {
         copyBuiltInFonts();
         reloadConfig();
@@ -29,7 +36,11 @@ public class BigSignWriterConfig {
     }
 
     private static Path getConfigDir() {
+        //? if fabric {
         Path configDir = FabricLoader.getInstance().getConfigDir().resolve(BigSignWriter.MOD_ID);
+        //?} else
+        /*Path configDir = FMLPaths.CONFIGDIR.get().resolve(BigSignWriter.MOD_ID);*/
+        
         try {
             Files.createDirectories(configDir);
         } catch (IOException e) {
