@@ -1,4 +1,5 @@
 plugins {
+    id("dev.kikugie.stonecutter")
     id("dev.isxander.modstitch.base") version "0.5.12"
 }
 
@@ -30,11 +31,9 @@ base { archivesName.set(mod.archiveName) }
 // See https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants
 var loader: String = name.split("-")[1]
 stonecutter {
-    consts(
-        "fabric" to (loader == "fabric"),
-        "neoforge" to (loader == "neoforge"),
-        "forge" to (loader == "forge")
-    )
+    constants {
+        match(loader, "fabric", "forge", "neoforge")
+    }
 }
 
 modstitch {
@@ -151,6 +150,15 @@ dependencies {
     // Anything else in the dependencies block will be used for all platforms.
 }
 
+tasks.named("generateModMetadata") {
+    dependsOn("stonecutterGenerate")
+}
+modstitch.moddevgradle {
+    tasks.named("createMinecraftArtifacts") {
+        dependsOn("stonecutterGenerate")
+    }
+}
+
 val finalJarTasks = listOf(
     modstitch.finalJarTask
 )
@@ -164,4 +172,13 @@ tasks.register<Copy>("buildAndCollect") {
 
     into(rootProject.layout.buildDirectory.file("libs/${mod.version}"))
     dependsOn("build")
+}
+
+tasks.register<Delete>("buildCollectAndClean") {
+    group = "build"
+
+    delete(layout.buildDirectory.dir("libs"))
+    delete(layout.buildDirectory.dir("devlibs"))
+
+    dependsOn("buildAndCollect")
 }

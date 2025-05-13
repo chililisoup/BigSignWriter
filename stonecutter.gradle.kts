@@ -3,11 +3,6 @@ plugins {
 }
 stonecutter active "1.21.3-fabric"
 
-stonecutter registerChiseled tasks.register("chiseledBuild", stonecutter.chiseled) {
-    group = "project"
-    ofTask("buildAndCollect")
-}
-
 allprojects {
     repositories {
         mavenCentral()
