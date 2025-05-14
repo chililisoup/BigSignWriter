@@ -36,7 +36,7 @@ Contains coordinates for where to place this mod's buttons in the sign edit gui,
 
 Also contains `defaultCharacterSeparator`, which sets the default separator string to place between characters, and is a single space by default. May be overridden by fonts.
 
-These settings can be modified in-game when both [YACL](https://modrinth.com/mod/yacl) and [Mod Menu](https://modrinth.com/mod/modmenu) are installed.
+These settings can be modified in-game when [YACL](https://modrinth.com/mod/yacl) (and [Mod Menu](https://modrinth.com/mod/modmenu) for the Fabric version) are installed.
 
 <hr>
 

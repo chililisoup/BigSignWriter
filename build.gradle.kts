@@ -1,6 +1,6 @@
 plugins {
     id("dev.kikugie.stonecutter")
-    id("dev.isxander.modstitch.base") version "0.5.12"
+    id("dev.isxander.modstitch.base")
 }
 
 fun prop(name: String, consumer: (prop: String) -> Unit) {
@@ -13,7 +13,6 @@ class ModData {
     val group = property("mod.group") as String
     val id = property("mod.id") as String
     val name = property("mod.name") as String
-    val archiveName = property("mod.archive_name") as String
     val authors = property("mod.authors") as String
     val description = property("mod.description") as String
     val homepage = property("mod.homepage") as String
@@ -24,8 +23,6 @@ class ModData {
 
 val mod = ModData()
 val minecraft = property("deps.minecraft") as String
-
-base { archivesName.set(mod.archiveName) }
 
 // Stonecutter constants for mod loaders.
 // See https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants
@@ -61,7 +58,7 @@ modstitch {
         modName = mod.name
         modVersion = "${mod.version}+$minecraft-$loader"
         modGroup = mod.group
-        modAuthor = if (loader == "fabric") mod.authors.split(", ").joinToString("\",\"") else mod.authors
+        modAuthor = mod.authors
         modLicense = mod.license
         modDescription = mod.description
 
@@ -73,6 +70,7 @@ modstitch {
             put("mod_homepage", mod.homepage)
             put("mod_sources", mod.sources)
             put("mod_issues", mod.issues)
+            put("mod_author_list", mod.authors.split(", ").joinToString("\",\""))
             prop("deps.minecraft_range") { put("minecraft_range", it) }
         }
     }
@@ -88,9 +86,9 @@ modstitch {
             }
 
             runs {
-                register("fabricClient") {
+                register("testClient") {
                     client()
-                    name = "Fabric Client"
+                    name = "Test Client"
                     vmArgs("-Dmixin.debug.export=true")
                     runDir = "../../run"
                     ideConfigGenerated(true)
@@ -108,7 +106,7 @@ modstitch {
 
         configureNeoforge {
             runs {
-                register("neoforgeClient") {
+                register("testClient") {
                     client()
                     gameDirectory = layout.projectDirectory.dir("../../run")
                 }
@@ -117,12 +115,8 @@ modstitch {
     }
 
     mixin {
-        if (loader != "fabric") {
-            addMixinsToModManifest = true
-            configs.register(mod.id)
-        } else {
-            addMixinsToModManifest = false
-        }
+        addMixinsToModManifest = true
+        configs.register(mod.id)
     }
 }
 
@@ -181,4 +175,10 @@ tasks.register<Delete>("buildCollectAndClean") {
     delete(layout.buildDirectory.dir("devlibs"))
 
     dependsOn("buildAndCollect")
+}
+
+tasks.register<Delete>("deleteBuildCache") {
+    group = "build"
+
+    delete(layout.buildDirectory)
 }

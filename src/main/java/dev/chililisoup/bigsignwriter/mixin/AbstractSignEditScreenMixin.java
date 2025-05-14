@@ -32,7 +32,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
     @Unique
     private static Component bigSignWriter$createToggleButtonText() {
-        return CommonComponents.optionStatus(Component.translatableWithFallback("bigsignwriter.enabled", "Big Component"), BigSignWriter.ENABLED);
+        return CommonComponents.optionStatus(Component.translatableWithFallback("bigsignwriter.enabled", "Big Text"), BigSignWriter.ENABLED);
     }
 
     @Unique

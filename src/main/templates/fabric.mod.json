@@ -4,7 +4,7 @@
   "version": "${mod_version}",
   "name": "${mod_name}",
   "description": "${mod_description}",
-  "authors": [ "${mod_author}" ],
+  "authors": [ "${mod_author_list}" ],
   "contact": {
     "homepage": "${mod_homepage}",
     "sources": "${mod_sources}",
@@ -21,9 +21,6 @@
       "dev.chililisoup.bigsignwriter.compat.ModMenuIntegration"
     ]
   },
-  "mixins": [
-    "bigsignwriter.mixins.json"
-  ],
   "depends": {
     "fabricloader": ">=0.15",
     "minecraft": "${minecraft_range}"
