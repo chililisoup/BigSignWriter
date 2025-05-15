@@ -187,8 +187,8 @@ public class DefaultFont implements FontSupplier {
                 entry('2', new String[]{
                         "▗▆█▆▖",
                         "▔🬏▄▌🬉",
-                        "🬓▌▀🬁 ",
-                        "█▋▋█"
+                        "🬓▌▀🬁 ",
+                        "█▋▏▋█"
                 }),
                 entry('3', new String[]{
                         "▗▆█▆▖",
@@ -333,6 +333,96 @@ public class DefaultFont implements FontSupplier {
                         "  ",
                         "  ",
                         "█"
+                }),
+                entry('|', new String[]{
+                        "█",
+                        "█",
+                        "█",
+                        "█"
+                }),
+                entry(',', new String[]{
+                        "  ",
+                        "  ",
+                        "▄",
+                        "\uD83E\uDF0F▋\uD83E\uDF04"
+                }),
+                entry(';', new String[]{
+                        "  ",
+                        "█",
+                        "▄",
+                        "\uD83E\uDF0F▋\uD83E\uDF04"
+                }),
+                entry('\'', new String[]{
+                        "█",
+                        "▀",
+                        "  ",
+                        "  "
+                }),
+                entry('"', new String[]{
+                        "██",
+                        "▀▀",
+                        "    ",
+                        "    "
+                }),
+                entry('`', new String[]{
+                        "▜▙ ",
+                        " ▀",
+                        "   ",
+                        "   "
+                }),
+                entry('<', new String[]{
+                        "  \uD83E\uDF0F\uD83E\uDF13▋▋\uD83E\uDF04\uD83E\uDF00",
+                        "\uD83E\uDF0F\uD83E\uDF13▋▋\uD83E\uDF04\uD83E\uDF00  ",
+                        "\uD83E\uDF00\uD83E\uDF04▋▋\uD83E\uDF13\uD83E\uDF0F  ",
+                        "  \uD83E\uDF00\uD83E\uDF04▋▋\uD83E\uDF13\uD83E\uDF0F"
+                }),
+                entry('>', new String[]{
+                        "\uD83E\uDF00\uD83E\uDF04▋▋\uD83E\uDF13\uD83E\uDF0F  ",
+                        "  \uD83E\uDF00\uD83E\uDF04▋▋\uD83E\uDF13\uD83E\uDF0F",
+                        "  \uD83E\uDF0F\uD83E\uDF13▋▋\uD83E\uDF04\uD83E\uDF00",
+                        "\uD83E\uDF0F\uD83E\uDF13▋▋\uD83E\uDF04\uD83E\uDF00  "
+                }),
+                entry('{', new String[]{
+                        "▟▉▛",
+                        "\uD83E\uDF37▉ ",
+                        "\uD83E\uDF28▉ ",
+                        "▜▉▙"
+                }),
+                entry('}', new String[]{
+                        "▜▉▙",
+                        " ▉\uD83E\uDF32",
+                        " ▉\uD83E\uDF15",
+                        "▟▉▛"
+                }),
+                entry('~', new String[]{
+                        "      ",
+                        "\uD83E\uDF0F▄\uD83E\uDF0F,,,\uD83E\uDF0F▖",
+                        "▘\uD83E\uDF01'''\uD83E\uDF01▀\uD83E\uDF01",
+                        "      "
+                }),
+                entry('#', new String[]{
+                        " \uD83E\uDF13\uD83E\uDF13 \uD83E\uDF13\uD83E\uDF13 ",
+                        "\uD83E\uDF0E▋▋\uD83E\uDF0E▋▋\uD83E\uDF0E",
+                        "\uD83E\uDF39▋▋\uD83E\uDF39▋▋\uD83E\uDF39",
+                        " \uD83E\uDF04\uD83E\uDF04 \uD83E\uDF04\uD83E\uDF04 "
+                }),
+                entry('%', new String[]{
+                        "\uD83E\uDF14\uD83E\uDF27 ,▟\uD83E\uDF1D",
+                        "\uD83E\uDF08\uD83E\uDF05,▟▛ ",
+                        " ▟▛'\uD83E\uDF16\uD83E\uDF22",
+                        "▟▛' \uD83E\uDF23\uD83E\uDF18"
+                }),
+                entry('@', new String[]{
+                        "▟▉█▉▙",
+                        "▉ ▄ ▉",
+                        "▉ ▜▄▉",
+                        "▜▙▄  "
+                }),
+                entry('&', new String[]{
+                        "▟▘▘▙  ",
+                        "▜▖▖▛ ▟",
+                        "▟▛▜▌▛",
+                        "▜▙▟▜▙"
                 })
         ));
     }
