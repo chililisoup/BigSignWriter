@@ -24,6 +24,7 @@ import java.util.List;
 public class BigSignWriterConfig {
     public static FontFile SELECTED_FONT;
     public static List<FontFile> AVAILABLE_FONTS;
+    public static FontFile DEFAULT_FONT;
     public static MainConfig MAIN_CONFIG;
     private static int SELECTED_FONT_INDEX;
 
@@ -126,6 +127,9 @@ public class BigSignWriterConfig {
                     file.save(existingFont);
                     BigSignWriter.LOGGER.info("Merged new characters from built-in font '{}': {}", fontDefaults.name, changed);
                 }
+
+                if (existingFont.name.equals("Default"))
+                    DEFAULT_FONT = existingFont;
             });
         } catch (Exception e) {
             BigSignWriter.LOGGER.error("Error copying built-in fonts", e);

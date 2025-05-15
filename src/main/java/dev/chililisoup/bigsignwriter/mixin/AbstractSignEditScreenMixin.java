@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.ClickableButtonWidget;
+import dev.chililisoup.bigsignwriter.font.FontFile;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.font.TextFieldHelper;
@@ -23,8 +24,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.SELECTED_FONT;
-import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.MAIN_CONFIG;
+import java.util.Optional;
+
+import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.*;
 
 @Mixin(AbstractSignEditScreen.class)
 public abstract class AbstractSignEditScreenMixin extends Screen {
@@ -42,6 +44,31 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 Component.translatableWithFallback("bigsignwriter.font", "Font"),
                 Component.literal(fontName)
         );
+    }
+
+    @Unique
+    private static Optional<String[]> bigSignWriter$getBigChar(char chr) {
+        FontFile usedFont = (SELECTED_FONT == null || SELECTED_FONT.characters == null) ? DEFAULT_FONT : SELECTED_FONT;
+        if (usedFont == null || usedFont.characters == null)
+            return Optional.empty();
+
+        if (usedFont.characters.containsKey(chr))
+            return Optional.of(usedFont.characters.get(chr));
+
+        char upper = Character.toUpperCase(chr);
+        if (usedFont.characters.containsKey(upper))
+            return Optional.of(usedFont.characters.get(upper));
+
+        if (usedFont == DEFAULT_FONT)
+            return Optional.empty();
+
+        if (DEFAULT_FONT.characters.containsKey(chr))
+            return Optional.of(DEFAULT_FONT.characters.get(chr));
+
+        if (DEFAULT_FONT.characters.containsKey(upper))
+            return Optional.of(DEFAULT_FONT.characters.get(upper));
+
+        return Optional.empty();
     }
 
     @Shadow /*? if >=1.21.2 {*/ protected /*?} else {*/ /*private *//*?}*/ @Final SignBlockEntity sign;
@@ -99,16 +126,10 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         if (!BigSignWriter.ENABLED) return;
 
         cir.setReturnValue(true);
-        if (SELECTED_FONT == null || SELECTED_FONT.characters == null)
-            return;
 
-        if (!SELECTED_FONT.characters.containsKey(chr))
-            chr = Character.toUpperCase(chr);
+        String[] bigChar = bigSignWriter$getBigChar(chr).orElse(new String[]{});
+        if (bigChar.length == 0) return;
 
-        if (!SELECTED_FONT.characters.containsKey(chr))
-            return;
-
-        String[] bigChar = SELECTED_FONT.characters.get(chr);
         String characterSeparator = SELECTED_FONT.characterSeparator == null ?
                 MAIN_CONFIG.defaultCharacterSeparator :
                 SELECTED_FONT.characterSeparator;
