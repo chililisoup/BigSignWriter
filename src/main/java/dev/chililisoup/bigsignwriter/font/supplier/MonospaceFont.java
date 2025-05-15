@@ -10,6 +10,30 @@ public class MonospaceFont implements FontSupplier {
     @Override
     public FontFile get() {
         return new FontFile("Monospace", Map.<Character, String[]>ofEntries(
+                entry('I', new String[]{
+                        "███",
+                        "  █  ",
+                        "  █  ",
+                        "███"
+                }),
+                entry('i', new String[]{
+                        "  █  ",
+                        "  ▄  ",
+                        "  █  ",
+                        "  █  "
+                }),
+                entry('L', new String[]{
+                        "█    ",
+                        "█    ",
+                        "█    ",
+                        "███"
+                }),
+                entry('l', new String[]{
+                        " █   ",
+                        " █   ",
+                        " █   ",
+                        " ▜▉▄ "
+                }),
                 entry('!', new String[]{
                         "  █  ",
                         "  █  ",

@@ -5,7 +5,6 @@ import com.llamalad7.mixinextras.sugar.Local;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.ClickableButtonWidget;
-import dev.chililisoup.bigsignwriter.font.FontFile;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.font.TextFieldHelper;
@@ -48,18 +47,20 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
     @Unique
     private static Optional<String[]> bigSignWriter$getBigChar(char chr) {
-        FontFile usedFont = (SELECTED_FONT == null || SELECTED_FONT.characters == null) ? DEFAULT_FONT : SELECTED_FONT;
-        if (usedFont == null || usedFont.characters == null)
+        if (SELECTED_FONT == null)
             return Optional.empty();
 
-        if (usedFont.characters.containsKey(chr))
-            return Optional.of(usedFont.characters.get(chr));
+        if (SELECTED_FONT.characters == null)
+            return Optional.empty();
+
+        if (SELECTED_FONT.characters.containsKey(chr))
+            return Optional.of(SELECTED_FONT.characters.get(chr));
 
         char upper = Character.toUpperCase(chr);
-        if (usedFont.characters.containsKey(upper))
-            return Optional.of(usedFont.characters.get(upper));
+        if (SELECTED_FONT.characters.containsKey(upper))
+            return Optional.of(SELECTED_FONT.characters.get(upper));
 
-        if (usedFont == DEFAULT_FONT)
+        if (DEFAULT_FONT == null || SELECTED_FONT.name.equals("Default"))
             return Optional.empty();
 
         if (DEFAULT_FONT.characters.containsKey(chr))

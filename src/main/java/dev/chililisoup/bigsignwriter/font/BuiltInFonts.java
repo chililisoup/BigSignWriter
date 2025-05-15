@@ -12,7 +12,7 @@ public class BuiltInFonts {
                 entry("default", new DefaultFont()),
                 entry("sharp", new SharpFont()),
                 entry("retro", new RetroFont()),
-                entry("monospace", new MonospaceFont())
+                entry("monospace", new MonospaceFont()) // Makes heavy use of default font fallback
         );
     }
 }

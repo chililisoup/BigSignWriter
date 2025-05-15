@@ -111,6 +111,8 @@ public class BigSignWriterConfig {
                 if (Files.notExists(target)) {
                     file.save(fontDefaults);
                     BigSignWriter.LOGGER.info("Copied built-in font: {}", fontDefaults.name);
+                    if (fontDefaults.name.equals("Default"))
+                        DEFAULT_FONT = fontDefaults;
                     return;
                 }
 
