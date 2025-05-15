@@ -3,7 +3,6 @@ package dev.chililisoup.bigsignwriter.mixin;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
-import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.ClickableButtonWidget;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -23,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Optional;
+import java.util.*;
 
 import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.*;
 
@@ -99,7 +98,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 20,
                 bigSignWriter$createFontButtonText(),
                 button -> {
-                    BigSignWriterConfig.getNextFont();
+                    getNextFont();
                     button.setMessage(bigSignWriter$createFontButtonText());
                 }
         );
@@ -111,8 +110,8 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 20,
                 Component.translatableWithFallback("bigsignwriter.reload", "Reload"),
                 button -> {
-                    BigSignWriterConfig.reloadConfig();
-                    BigSignWriterConfig.reloadFonts();
+                    reloadConfig();
+                    reloadFonts();
                     fontButton.setMessage(bigSignWriter$createFontButtonText());
                 }
         );
@@ -153,16 +152,88 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-    private void clearSign(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+    private void deleteChar(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if (!BigSignWriter.ENABLED) return;
         if (keyCode != 259) return;
 
-        for (int i = 0; i < this.messages.length; i++) {
-            this.line = i;
-            this.setMessage("");
+        cir.setReturnValue(true);
+
+        String characterSeparator = SELECTED_FONT.characterSeparator == null ?
+                MAIN_CONFIG.defaultCharacterSeparator :
+                SELECTED_FONT.characterSeparator;
+
+        boolean allMatch = true;
+        if (Screen.hasControlDown() || characterSeparator.isEmpty()) allMatch = false;
+        else {
+            int firstWidth = 0;
+            for (int i = 0; i < this.messages.length; i++) {
+                int width = this.font.width(this.messages[i]);
+                if (i == 0) firstWidth = width;
+                else if (firstWidth != width) {
+                    allMatch = false;
+                    break;
+                }
+            }
         }
 
-        cir.setReturnValue(true);
+        if (!allMatch) {
+            for (int i = 0; i < this.messages.length; i++) {
+                this.line = i;
+                this.setMessage("");
+            }
+
+            if (this.signField != null)
+                this.signField.setCursorToEnd();
+            return;
+        }
+
+        HashMap<Integer, HashMap<Integer, Integer>> separatorIndices = new HashMap<>();
+        for (int i = 0; i < this.messages.length; i++) {
+            String message = this.messages[i];
+            HashMap<Integer, Integer> indices = new HashMap<>();
+
+            for (
+                    int index = message.indexOf(characterSeparator);
+                    index >= 0;
+                    index = message.indexOf(characterSeparator, index + 1)
+            ) {
+                indices.put(this.font.width(message.substring(index)), index);
+            }
+
+            separatorIndices.put(i, indices);
+        }
+
+        ArrayList<Integer> matchingSeparatorLengths = new ArrayList<>();
+        for (int length : separatorIndices.get(0).keySet()) {
+            if (separatorIndices.values().stream().allMatch(
+                    map -> map.containsKey(length)
+            )) matchingSeparatorLengths.add(length);
+        }
+
+        if (matchingSeparatorLengths.isEmpty()) {
+            for (int i = 0; i < this.messages.length; i++) {
+                this.line = i;
+                this.setMessage("");
+            }
+
+            if (this.signField != null)
+                this.signField.setCursorToEnd();
+            return;
+        }
+
+        int index = Collections.min(matchingSeparatorLengths);
+        for (int i = 0; i < this.messages.length; i++) {
+            String message = this.messages[i];
+
+            this.line = i;
+            this.setMessage(message.substring(
+                    0,
+                    separatorIndices.get(i).get(index)
+            ));
+        }
+
+        if (this.signField != null)
+            this.signField.setCursorToEnd();
     }
 
     @Inject(
