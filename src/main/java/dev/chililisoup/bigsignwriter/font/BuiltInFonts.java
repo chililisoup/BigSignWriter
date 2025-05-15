@@ -1,9 +1,6 @@
 package dev.chililisoup.bigsignwriter.font;
 
-import dev.chililisoup.bigsignwriter.font.supplier.DefaultFont;
-import dev.chililisoup.bigsignwriter.font.supplier.FontSupplier;
-import dev.chililisoup.bigsignwriter.font.supplier.RetroFont;
-import dev.chililisoup.bigsignwriter.font.supplier.SharpFont;
+import dev.chililisoup.bigsignwriter.font.supplier.*;
 
 import java.util.Map;
 
@@ -14,7 +11,8 @@ public class BuiltInFonts {
         return Map.ofEntries(
                 entry("default", new DefaultFont()),
                 entry("sharp", new SharpFont()),
-                entry("retro", new RetroFont())
+                entry("retro", new RetroFont()),
+                entry("monospace", new MonospaceFont())
         );
     }
 }
