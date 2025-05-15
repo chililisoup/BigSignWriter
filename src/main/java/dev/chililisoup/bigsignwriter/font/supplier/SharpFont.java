@@ -23,10 +23,10 @@ public class SharpFont implements FontSupplier {
                         "█"
                 }),
                 entry('$', new String[]{
-                        "◢▉ ▎ ▉◣",
-                        "◥▉ ▎ ▀",
-                        "▄ ▎ ▉◣",
-                        "◥▉ ▎ ▉◤"
+                        "◢▋│ ▉◣",
+                        "◥▋│ ▀",
+                        "▄│ ▋◣",
+                        "◥▉│ ▋◤"
                 }),
                 entry('*', new String[]{
                         "◥▏◣◢▏◤",
@@ -335,5 +335,19 @@ public class SharpFont implements FontSupplier {
                         "█"
                 })
         ));
+    }
+
+    @Override
+    public Map<Character, String[][]> patches() {
+        return Map.ofEntries(
+                entry('$', new String[][]{
+                        new String[]{
+                                "◢▉ ▎ ▉◣",
+                                "◥▉ ▎ ▀",
+                                "▄ ▎ ▉◣",
+                                "◥▉ ▎ ▉◤"
+                        }
+                })
+        );
     }
 }
