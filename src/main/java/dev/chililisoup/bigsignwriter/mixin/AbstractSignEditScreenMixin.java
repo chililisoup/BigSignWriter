@@ -71,6 +71,17 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         return Optional.empty();
     }
 
+    @Unique
+    private void bigSignWriter$clearSign() {
+        for (int i = 0; i < this.messages.length; i++) {
+            this.line = i;
+            this.setMessage("");
+        }
+
+        if (this.signField != null)
+            this.signField.setCursorToEnd();
+    }
+
     @Shadow /*? if >=1.21.2 {*/ protected /*?} else {*/ /*private *//*?}*/ @Final SignBlockEntity sign;
     @Shadow private @Final String[] messages;
     @Shadow private void setMessage(String string) {}
@@ -130,14 +141,10 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         String[] bigChar = bigSignWriter$getBigChar(chr).orElse(new String[]{});
         if (bigChar.length == 0) return;
 
-        String characterSeparator = SELECTED_FONT.characterSeparator == null ?
-                MAIN_CONFIG.defaultCharacterSeparator :
-                SELECTED_FONT.characterSeparator;
-
         for (int i = 0; i < this.messages.length; i++) {
             if (i >= bigChar.length || bigChar[i] == null) continue;
             String string = this.messages[i].concat(
-                    (this.messages[i].isEmpty() ? "" : characterSeparator).concat(bigChar[i])
+                    (this.messages[i].isEmpty() ? "" : CHARACTER_SEPARATOR).concat(bigChar[i])
             );
 
             if (this.font.width(string) > this.sign.getMaxTextLineWidth())
@@ -158,66 +165,40 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
         cir.setReturnValue(true);
 
-        String characterSeparator = SELECTED_FONT.characterSeparator == null ?
-                MAIN_CONFIG.defaultCharacterSeparator :
-                SELECTED_FONT.characterSeparator;
-
-        boolean allMatch = true;
-        if (Screen.hasControlDown() || characterSeparator.isEmpty()) allMatch = false;
-        else {
-            int firstWidth = 0;
-            for (int i = 0; i < this.messages.length; i++) {
-                int width = this.font.width(this.messages[i]);
-                if (i == 0) firstWidth = width;
-                else if (firstWidth != width) {
-                    allMatch = false;
-                    break;
-                }
-            }
-        }
-
-        if (!allMatch) {
-            for (int i = 0; i < this.messages.length; i++) {
-                this.line = i;
-                this.setMessage("");
-            }
-
-            if (this.signField != null)
-                this.signField.setCursorToEnd();
+        if (Screen.hasControlDown() || CHARACTER_SEPARATOR.isEmpty()) {
+            this.bigSignWriter$clearSign();
             return;
         }
 
-        HashMap<Integer, HashMap<Integer, Integer>> separatorIndices = new HashMap<>();
-        for (int i = 0; i < this.messages.length; i++) {
-            String message = this.messages[i];
+        int firstWidth = this.font.width(this.messages[0]);
+        for (int i = 1; i < this.messages.length; i++) {
+            if (firstWidth != this.font.width(this.messages[i])) {
+                this.bigSignWriter$clearSign();
+                return;
+            }
+        }
+
+        List<HashMap<Integer, Integer>> separatorIndices = Arrays.stream(this.messages).map(message -> {
             HashMap<Integer, Integer> indices = new HashMap<>();
 
-            for (
-                    int index = message.indexOf(characterSeparator);
-                    index >= 0;
-                    index = message.indexOf(characterSeparator, index + 1)
+            for (int index = message.indexOf(CHARACTER_SEPARATOR);
+                 index >= 0;
+                 index = message.indexOf(CHARACTER_SEPARATOR, index + 1)
             ) {
                 indices.put(this.font.width(message.substring(index)), index);
             }
 
-            separatorIndices.put(i, indices);
-        }
+            return indices;
+        }).toList();
 
-        ArrayList<Integer> matchingSeparatorLengths = new ArrayList<>();
-        for (int length : separatorIndices.get(0).keySet()) {
-            if (separatorIndices.values().stream().allMatch(
-                    map -> map.containsKey(length)
-            )) matchingSeparatorLengths.add(length);
-        }
+        List<Integer> matchingSeparatorLengths = separatorIndices.getFirst().keySet().stream().filter(
+                length -> separatorIndices.stream().allMatch(
+                        map -> map.containsKey(length)
+                )
+        ).toList();
 
         if (matchingSeparatorLengths.isEmpty()) {
-            for (int i = 0; i < this.messages.length; i++) {
-                this.line = i;
-                this.setMessage("");
-            }
-
-            if (this.signField != null)
-                this.signField.setCursorToEnd();
+            this.bigSignWriter$clearSign();
             return;
         }
 

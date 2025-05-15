@@ -24,6 +24,7 @@ import java.util.Map;
 
 public class BigSignWriterConfig {
     public static FontFile SELECTED_FONT;
+    public static String CHARACTER_SEPARATOR;
     public static List<FontFile> AVAILABLE_FONTS;
     public static FontFile DEFAULT_FONT;
     public static MainConfig MAIN_CONFIG;
@@ -76,10 +77,7 @@ public class BigSignWriterConfig {
         Arrays.sort(jsonFiles, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
 
         AVAILABLE_FONTS = Arrays.stream(jsonFiles).map(file -> getFont(gson, file.toPath()).load()).toList();
-
-        SELECTED_FONT_INDEX = SELECTED_FONT_INDEX >= AVAILABLE_FONTS.size() ? 0 : SELECTED_FONT_INDEX;
-        SELECTED_FONT = AVAILABLE_FONTS.get(SELECTED_FONT_INDEX);
-
+        selectFont(SELECTED_FONT_INDEX >= AVAILABLE_FONTS.size() ? 0 : SELECTED_FONT_INDEX);
         BigSignWriter.LOGGER.info("Fonts loaded!");
     }
 
@@ -169,6 +167,7 @@ public class BigSignWriterConfig {
         ConfigInterface<MainConfig> mainConfig = getConfig();
 
         mainConfig.save(MAIN_CONFIG);
+        selectFont(SELECTED_FONT_INDEX);
 
         BigSignWriter.LOGGER.info("Config saved!");
     }
@@ -182,10 +181,16 @@ public class BigSignWriterConfig {
         BigSignWriter.LOGGER.debug("Config loaded!");
     }
 
-    public static void getNextFont() {
-        SELECTED_FONT_INDEX = (SELECTED_FONT_INDEX + 1) % AVAILABLE_FONTS.size();
+    private static void selectFont(int index) {
+        SELECTED_FONT_INDEX = index % AVAILABLE_FONTS.size();
         SELECTED_FONT = AVAILABLE_FONTS.get(SELECTED_FONT_INDEX);
+        CHARACTER_SEPARATOR = SELECTED_FONT.characterSeparator == null ?
+                MAIN_CONFIG.defaultCharacterSeparator :
+                SELECTED_FONT.characterSeparator;
+    }
 
+    public static void getNextFont() {
+        selectFont(SELECTED_FONT_INDEX + 1);
         BigSignWriter.LOGGER.debug("Switched to font {} at index {}", SELECTED_FONT.name, SELECTED_FONT_INDEX);
     }
 
