@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class BigSignWriterConfig {
     public static FontFile SELECTED_FONT;
@@ -31,7 +32,6 @@ public class BigSignWriterConfig {
     public static void noop() {}
 
     static {
-        copyBuiltInFonts();
         reloadConfig();
         reloadFonts();
     }
@@ -61,19 +61,16 @@ public class BigSignWriterConfig {
     }
 
     public static void reloadFonts() {
+        copyBuiltInFonts();
+
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         Path fontsDir = getFontsDir();
         File[] jsonFiles = fontsDir.toFile().listFiles((dir, name) -> name.endsWith(".json"));
 
         if (jsonFiles == null || jsonFiles.length == 0) {
-            BigSignWriter.LOGGER.error("No fonts found. Recreating built-in fonts.");
-            copyBuiltInFonts();
-            jsonFiles = fontsDir.toFile().listFiles((dir, name) -> name.endsWith(".json"));
-            if (jsonFiles == null || jsonFiles.length == 0) {
-                BigSignWriter.LOGGER.error("Built-in font recreation failed to produce new font files. Mod behavior from here is undefined. Please report!");
-                return;
-            }
+            BigSignWriter.LOGGER.error("Failed to load or create any font files. Mod behavior from here is undefined. Please report!");
+            return;
         }
 
         Arrays.sort(jsonFiles, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
@@ -117,17 +114,36 @@ public class BigSignWriterConfig {
                 }
 
                 FontFile existingFont = file.load();
+                Map<Character, String[][]> patches = font.patches();
                 ArrayList<Character> changed = new ArrayList<>();
+                ArrayList<Character> patched = new ArrayList<>();
                 for (char character : fontDefaults.characters.keySet()) {
-                    if (existingFont.characters.containsKey(character)) continue;
+                    if (existingFont.characters.containsKey(character)) {
+                        if (!patches.containsKey(character)) continue;
+
+                        String existing = String.join("\n", existingFont.characters.get(character));
+                        for (String[] patch : patches.get(character)) {
+                            if (String.join("\n", patch).matches(existing)) {
+                                existingFont.characters.put(character, fontDefaults.characters.get(character));
+                                patched.add(character);
+                                break;
+                            }
+                        }
+
+                        continue;
+                    }
 
                     existingFont.characters.put(character, fontDefaults.characters.get(character));
                     changed.add(character);
                 }
 
-                if (!changed.isEmpty()) {
+                if (!changed.isEmpty() || !patched.isEmpty()) {
                     file.save(existingFont);
-                    BigSignWriter.LOGGER.info("Merged new characters from built-in font '{}': {}", fontDefaults.name, changed);
+
+                    if (!changed.isEmpty())
+                        BigSignWriter.LOGGER.info("Merged new characters from built-in font '{}': {}", fontDefaults.name, changed);
+                    if (!patched.isEmpty())
+                        BigSignWriter.LOGGER.info("Patched outdated characters from built-in font '{}': {}", fontDefaults.name, patched);
                 }
 
                 if (existingFont.name.equals("Default"))

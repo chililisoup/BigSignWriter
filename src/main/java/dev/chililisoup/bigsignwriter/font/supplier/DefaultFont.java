@@ -582,4 +582,18 @@ public class DefaultFont implements FontSupplier {
                 })
         ));
     }
+
+    @Override
+    public Map<Character, String[][]> patches() {
+        return Map.ofEntries(
+                entry('2', new String[][]{
+                        new String[]{
+                                "▗▆█▆▖",
+                                "▔🬏▄▌🬉",
+                                "🬓▌▀🬁 ",
+                                "█▋▋█"
+                        }
+                })
+        );
+    }
 }
