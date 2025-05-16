@@ -191,7 +191,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             return indices;
         }).toList();
 
-        List<Integer> matchingSeparatorLengths = separatorIndices./*? if forge {*/ /*get(0) *//*?} else {*/ getFirst() /*?}*/
+        List<Integer> matchingSeparatorLengths = separatorIndices./*? if >=1.20.5 {*/ getFirst() /*?} else {*/ /*get(0) *//*?}*/
                 .keySet().stream().filter(length -> separatorIndices.stream().allMatch(
                         map -> map.containsKey(length)
                 )
