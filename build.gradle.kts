@@ -153,6 +153,18 @@ modstitch.moddevgradle {
     }
 }
 
+tasks.named("jar") {
+    dependsOn("filterArtifacts")
+}
+tasks.register<Delete>("filterArtifacts") {
+    if (modstitch.isLoom)
+        delete(layout.buildDirectory.dir("resources/main/META-INF"))
+    else if (modstitch.isModDevGradleRegular)
+        delete(layout.buildDirectory.file("resources/main/META-INF/mods.toml"))
+    else
+        delete(layout.buildDirectory.file("resources/main/META-INF/neoforge.mods.toml"))
+}
+
 val finalJarTasks = listOf(
     modstitch.finalJarTask
 )
