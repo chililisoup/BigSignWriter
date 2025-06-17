@@ -248,7 +248,14 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
     @WrapWithCondition(
             method = "renderSignText",
-            at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I")
+            at = @At(
+                    value = "INVOKE",
+                    ordinal = 1,
+                    //? if >= 1.21.6 {
+                    target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V"
+                    //?} else
+                    /*target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I"*/
+            )
     )
     private boolean hideUnderscore(GuiGraphics instance, Font font, String string, int i, int j, int k, boolean bl) {
         return !BigSignWriter.ENABLED;
