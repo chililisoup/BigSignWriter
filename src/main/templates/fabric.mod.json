@@ -5,6 +5,7 @@
   "name": "${mod_name}",
   "description": "${mod_description}",
   "authors": [ "${mod_author_list}" ],
+  "contributors": [ "${mod_contributor_list}" ],
   "contact": {
     "homepage": "${mod_homepage}",
     "sources": "${mod_sources}",

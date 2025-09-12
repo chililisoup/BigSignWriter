@@ -14,6 +14,7 @@ class ModData {
     val id = property("mod.id") as String
     val name = property("mod.name") as String
     val authors = property("mod.authors") as String
+    val contributors = property("mod.contributors") as String
     val description = property("mod.description") as String
     val homepage = property("mod.homepage") as String
     val sources = property("mod.sources") as String
@@ -38,7 +39,7 @@ modstitch {
 
     // Alternatively use stonecutter.eval if you have a lot of versions to target.
     // https://stonecutter.kikugie.dev/stonecutter/guide/setup#checking-versions
-    javaTarget = when (minecraft) {
+    javaVersion = when (minecraft) {
         "1.20.1" -> 17
         "1.21.1" -> 21
         "1.21.3" -> 21
@@ -60,6 +61,7 @@ modstitch {
         modVersion = "${mod.version}+$minecraft-$loader"
         modGroup = mod.group
         modAuthor = mod.authors
+        modCredits = mod.contributors
         modLicense = mod.license
         modDescription = mod.description
 
@@ -72,6 +74,7 @@ modstitch {
             put("mod_sources", mod.sources)
             put("mod_issues", mod.issues)
             put("mod_author_list", mod.authors.split(", ").joinToString("\",\""))
+            put("mod_contributor_list", mod.contributors.split(", ").joinToString("\",\""))
             prop("deps.minecraft_range") { put("minecraft_range", it) }
         }
     }
@@ -100,12 +103,10 @@ modstitch {
 
     // ModDevGradle (NeoForge, Forge, Forgelike)
     moddevgradle {
-        enable {
-            prop("deps.forge") { forgeVersion = it }
-            prop("deps.neoforge") { neoForgeVersion = it }
-        }
+        prop("deps.forge") { forgeVersion = it }
+        prop("deps.neoforge") { neoForgeVersion = it }
 
-        configureNeoforge {
+        configureNeoForge {
             runs {
                 register("testClient") {
                     client()
@@ -145,13 +146,32 @@ dependencies {
     // Anything else in the dependencies block will be used for all platforms.
 }
 
+modstitch.onEnable {
+    modstitch.moddevgradle {
+        tasks.named("createMinecraftArtifacts") {
+            dependsOn("stonecutterGenerate")
+        }
+    }
+
+    val finalJarTasks = listOf(
+        modstitch.finalJarTask
+    )
+
+    tasks.register<Copy>("buildAndCollect") {
+        group = "build"
+
+        finalJarTasks.forEach { jar ->
+            dependsOn(jar)
+            from(jar.flatMap { it.archiveFile })
+        }
+
+        into(rootProject.layout.buildDirectory.file("libs/${mod.version}"))
+        dependsOn("build")
+    }
+}
+
 tasks.named("generateModMetadata") {
     dependsOn("stonecutterGenerate")
-}
-modstitch.moddevgradle {
-    tasks.named("createMinecraftArtifacts") {
-        dependsOn("stonecutterGenerate")
-    }
 }
 
 tasks.named("jar") {
@@ -166,21 +186,6 @@ tasks.register<Delete>("filterArtifacts") {
         delete(layout.buildDirectory.file("resources/main/META-INF/neoforge.mods.toml"))
 }
 
-val finalJarTasks = listOf(
-    modstitch.finalJarTask
-)
-tasks.register<Copy>("buildAndCollect") {
-    group = "build"
-
-    finalJarTasks.forEach { jar ->
-        dependsOn(jar)
-        from(jar.flatMap { it.archiveFile })
-    }
-
-    into(rootProject.layout.buildDirectory.file("libs/${mod.version}"))
-    dependsOn("build")
-}
-
 tasks.register<Delete>("buildCollectAndClean") {
     group = "build"
 
@@ -188,10 +193,4 @@ tasks.register<Delete>("buildCollectAndClean") {
     delete(layout.buildDirectory.dir("devlibs"))
 
     dependsOn("buildAndCollect")
-}
-
-tasks.register<Delete>("deleteBuildCache") {
-    group = "build"
-
-    delete(layout.buildDirectory)
 }

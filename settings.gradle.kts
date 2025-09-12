@@ -19,7 +19,7 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.7-alpha.16"
+    id("dev.kikugie.stonecutter") version "0.7.10"
 }
 
 stonecutter {
@@ -32,7 +32,7 @@ stonecutter {
          * @param loaders A list of loaders to target, supports "fabric" (1.14+), "neoforge"(1.20.6+), "vanilla"(any) or "forge"(<=1.20.1)
          */
         fun mc(mcVersion: String, name: String = mcVersion, loaders: Iterable<String>) =
-            loaders.forEach { vers("$name-$it", mcVersion) }
+            loaders.forEach { version("$name-$it", mcVersion) }
 
         // Configure your targets here!
         mc("1.21.6", loaders = listOf("fabric", "neoforge"))

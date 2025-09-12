@@ -26,7 +26,7 @@ import java.util.*;
 
 import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.*;
 
-@Mixin(AbstractSignEditScreen.class)
+@Mixin(value = AbstractSignEditScreen.class, priority = 999)
 public abstract class AbstractSignEditScreenMixin extends Screen {
     protected AbstractSignEditScreenMixin(Component title) { super(title); }
 
