@@ -197,6 +197,8 @@ public class BigSignWriterConfig {
     public static class MainConfig {
         public int buttonsX = 0;
         public int buttonsY = 120;
+        public double buttonsAlignmentX = 0.5;
+        public double buttonsAlignmentY = 0.25;
         public String defaultCharacterSeparator = " ";
 
         public MainConfig() {

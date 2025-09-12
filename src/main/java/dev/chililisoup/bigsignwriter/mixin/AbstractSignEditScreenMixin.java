@@ -91,8 +91,8 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     @Inject(method = "init", at = @At("HEAD"))
     private void addButtons(CallbackInfo ci) {
         ClickableButtonWidget toggleButton = new ClickableButtonWidget(
-                this.width / 2 + MAIN_CONFIG.buttonsX - 100,
-                this.height / 4 + MAIN_CONFIG.buttonsY,
+                (int) (this.width * MAIN_CONFIG.buttonsAlignmentX + MAIN_CONFIG.buttonsX - 100),
+                (int) (this.height * MAIN_CONFIG.buttonsAlignmentY + MAIN_CONFIG.buttonsY),
                 75,
                 20,
                 bigSignWriter$createToggleButtonText(),
@@ -103,8 +103,8 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         );
 
         ClickableButtonWidget fontButton = new ClickableButtonWidget(
-                this.width / 2 + MAIN_CONFIG.buttonsX - 25,
-                this.height / 4 + MAIN_CONFIG.buttonsY,
+                (int) (this.width * MAIN_CONFIG.buttonsAlignmentX + MAIN_CONFIG.buttonsX - 25),
+                (int) (this.height * MAIN_CONFIG.buttonsAlignmentY + MAIN_CONFIG.buttonsY),
                 80,
                 20,
                 bigSignWriter$createFontButtonText(),
@@ -115,8 +115,8 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         );
 
         ClickableButtonWidget reloadButton = new ClickableButtonWidget(
-                this.width / 2 + MAIN_CONFIG.buttonsX + 55,
-                this.height / 4 + MAIN_CONFIG.buttonsY,
+                (int) (this.width * MAIN_CONFIG.buttonsAlignmentX + MAIN_CONFIG.buttonsX + 55),
+                (int) (this.height * MAIN_CONFIG.buttonsAlignmentY + MAIN_CONFIG.buttonsY),
                 45,
                 20,
                 Component.translatableWithFallback("bigsignwriter.reload", "Reload"),

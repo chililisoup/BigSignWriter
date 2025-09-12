@@ -5,6 +5,7 @@ import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.YetAnotherConfigLib;
+import dev.isxander.yacl3.api.controller.DoubleSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.StringControllerBuilder;
 import net.minecraft.client.gui.screens.Screen;
@@ -40,7 +41,7 @@ public abstract class YaclIntegration {
                                         })
                                 .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                         .range(-500, 500)
-                                        .step(10)
+                                        .step(5)
                                         .formatValue(val -> Component.literal(val + "px")))
                                 .build())
                         .option(Option.<Integer>createBuilder()
@@ -59,8 +60,46 @@ public abstract class YaclIntegration {
                                         })
                                 .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                         .range(-500, 500)
-                                        .step(10)
+                                        .step(5)
                                         .formatValue(val -> Component.literal(val + "px")))
+                                .build())
+                        .option(Option.<Double>createBuilder()
+                                .name(Component.translatableWithFallback(
+                                        "bigsignwriter.config.buttonsAlignmentX",
+                                        "Buttons Alignment X"))
+                                .description(OptionDescription.of(Component.translatableWithFallback(
+                                        "bigsignwriter.config.buttonsAlignmentX.desc",
+                                        "Horizontal screen alignment for mod buttons (0%: left, 100%: right)")))
+                                .binding(
+                                        defaults.buttonsAlignmentX,
+                                        () -> MAIN_CONFIG.buttonsAlignmentX,
+                                        newVal -> {
+                                            MAIN_CONFIG.buttonsAlignmentX = newVal;
+                                            BigSignWriterConfig.saveConfig();
+                                        })
+                                .controller(opt -> DoubleSliderControllerBuilder.create(opt)
+                                        .range(0.0, 1.0)
+                                        .step(0.05)
+                                        .formatValue(val -> Component.literal((int) (val * 100) + "%")))
+                                .build())
+                        .option(Option.<Double>createBuilder()
+                                .name(Component.translatableWithFallback(
+                                        "bigsignwriter.config.buttonsAlignmentY",
+                                        "Buttons Alignment Y"))
+                                .description(OptionDescription.of(Component.translatableWithFallback(
+                                        "bigsignwriter.config.buttonsAlignmentY.desc",
+                                        "Vertical screen alignment for mod buttons (0%: top, 100%: bottom)")))
+                                .binding(
+                                        defaults.buttonsAlignmentY,
+                                        () -> MAIN_CONFIG.buttonsAlignmentY,
+                                        newVal -> {
+                                            MAIN_CONFIG.buttonsAlignmentY = newVal;
+                                            BigSignWriterConfig.saveConfig();
+                                        })
+                                .controller(opt -> DoubleSliderControllerBuilder.create(opt)
+                                        .range(0.0, 1.0)
+                                        .step(0.05)
+                                        .formatValue(val -> Component.literal((int) (val * 100) + "%")))
                                 .build())
                         .option(Option.<String>createBuilder()
                                 .name(Component.translatableWithFallback(

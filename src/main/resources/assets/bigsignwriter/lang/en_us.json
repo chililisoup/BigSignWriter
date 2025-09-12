@@ -7,6 +7,10 @@
   "bigsignwriter.config.buttonsX.desc": "Horizontal offset for mod buttons, from center of screen.",
   "bigsignwriter.config.buttonsY": "Buttons Y",
   "bigsignwriter.config.buttonsY.desc": "Vertical offset for mod buttons, from center of screen.",
+  "bigsignwriter.config.buttonsAlignmentX": "Buttons Anchor X",
+  "bigsignwriter.config.buttonsAlignmentX.desc": "Horizontal screen alignment for mod buttons (0%: left, 100%: right)",
+  "bigsignwriter.config.buttonsAlignmentY": "Buttons Anchor Y",
+  "bigsignwriter.config.buttonsAlignmentY.desc": "Vertical screen alignment for mod buttons (0%: top, 100%: bottom)",
   "bigsignwriter.config.defaultCharacterSeparator": "Default Character Separator",
   "bigsignwriter.config.defaultCharacterSeparator.desc": "Default separator string to place between characters. May be overridden by fonts."
 }
