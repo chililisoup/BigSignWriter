@@ -5,8 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import dev.chililisoup.bigsignwriter.font.*;
-//? if fabric
 import dev.chililisoup.bigsignwriter.font.supplier.FontSupplier;
+//? if fabric
 import net.fabricmc.loader.api.FabricLoader;
 //? if neoforge
 /*import net.neoforged.fml.loading.FMLPaths;*/
