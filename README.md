@@ -46,7 +46,7 @@ These contain a `"name":""` field, an optional `"characterSeparator":""` field, 
 
 When editing/creating large characters, it is important that each line is the exact same width to maintain alignment. Different fonts will have different widths for different characters, so it is a good idea to make these directly inside Minecraft, and then copy each line into the config file.
 
-The default 'T' is a good example, the top line is 3 blocks, which are 9 pixels wide each, making for a total of 27 pixels. Each subsequent line has one block, then on both sides of the block there is 1 space (4 pixels wide), and 1 "thin space" (5 pixels wide), bringing the total in line at 27.
+The default 'T' is a good example, the top line is 3 blocks, which are 9 pixels wide each, making for a total of 27 pixels. Each subsequent line has one block, then on both sides of the block there is 1 space (4 pixels wide), and 1 "no-break space" (5 pixels wide), bringing the total in line at 27.
 
 To check that your alignment is good, I like to copy three blocks `███` onto both sides of each line, then modify each line until all the blocks are in line with each other.
 

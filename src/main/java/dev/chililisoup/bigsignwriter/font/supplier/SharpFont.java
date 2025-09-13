@@ -2,7 +2,9 @@ package dev.chililisoup.bigsignwriter.font.supplier;
 
 import dev.chililisoup.bigsignwriter.font.FontFile;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static java.util.Map.entry;
 
@@ -11,10 +13,10 @@ public class SharpFont implements FontSupplier {
     public FontFile get() {
         return new FontFile("Sharp", Map.<Character, String[]>ofEntries(
                 entry(' ', new String[]{
-                        "      ",
-                        "      ",
-                        "      ",
-                        "      "
+                        "      ",
+                        "      ",
+                        "      ",
+                        "      "
                 }),
                 entry('!', new String[]{
                         "█",
@@ -31,26 +33,26 @@ public class SharpFont implements FontSupplier {
                 entry('*', new String[]{
                         "◥▏◣◢▏◤",
                         "◢▏◤◥▏◣",
-                        "     ",
-                        "     "
+                        "     ",
+                        "     "
                 }),
                 entry('+', new String[]{
-                        "  ▄  ",
+                        "  ▄  ",
                         "▄█▄",
                         "▀█▀",
-                        "  ▀  "
+                        "  ▀  "
                 }),
                 entry('-', new String[]{
-                        "      ",
+                        "      ",
                         "▄▄▄",
                         "▀▀▀",
-                        "      "
+                        "      "
                 }),
                 entry('/', new String[]{
-                        "   ◢▊◤",
-                        "  ◢▊◤ ",
-                        " ◢▊◤  ",
-                        "◢▊◤   "
+                        "   ◢▊◤",
+                        "  ◢▊◤ ",
+                        " ◢▊◤  ",
+                        "◢▊◤   "
                 }),
                 entry('0', new String[]{
                         "◢▉█▉◣",
@@ -59,9 +61,9 @@ public class SharpFont implements FontSupplier {
                         "◥▉█▉◤"
                 }),
                 entry('1', new String[]{
-                        "◢▉█  ",
-                        "  █  ",
-                        "  █  ",
+                        "◢▉█  ",
+                        "  █  ",
+                        "  █  ",
                         "███"
                 }),
                 entry('2', new String[]{
@@ -72,15 +74,15 @@ public class SharpFont implements FontSupplier {
                 }),
                 entry('3', new String[]{
                         "◢▉█▉◣",
-                        "  ▄▉◤",
-                        "  ▀▉◣",
+                        "  ▄▉◤",
+                        "  ▀▉◣",
                         "◥▉█▉◤"
                 }),
                 entry('4', new String[]{
-                        " ◢▉ █",
+                        " ◢▉ █",
                         "◢▉▄█",
                         "▀▀█",
-                        "    █"
+                        "    █"
                 }),
                 entry('5', new String[]{
                         "███",
@@ -96,9 +98,9 @@ public class SharpFont implements FontSupplier {
                 }),
                 entry('7', new String[]{
                         "██▉◤",
-                        "  ◢▊◤ ",
-                        " ◢▊◤  ",
-                        "◢▊◤   "
+                        "  ◢▊◤ ",
+                        " ◢▊◤  ",
+                        "◢▊◤   "
                 }),
                 entry('8', new String[]{
                         "◢▉█▉◣",
@@ -109,8 +111,8 @@ public class SharpFont implements FontSupplier {
                 entry('9', new String[]{
                         "◢▉█▉◣",
                         "◥▉▄█",
-                        "   ◢▊◤",
-                        "  ◢▊◤ "
+                        "   ◢▊◤",
+                        "  ◢▊◤ "
                 }),
                 entry('=', new String[]{
                         "▄▄▄",
@@ -121,14 +123,14 @@ public class SharpFont implements FontSupplier {
                 entry('?', new String[]{
                         "◢▉█▉◣",
                         "▀ ◢▉◤",
-                        "  ▀  ",
-                        "  █  "
+                        "  ▀  ",
+                        "  █  "
                 }),
                 entry('A', new String[]{
                         "◢▉█▉◣",
-                        "█  █",
+                        "█  █",
                         "█▀█",
-                        "█  █"
+                        "█  █"
                 }),
                 entry('B', new String[]{
                         "██▉◣",
@@ -138,69 +140,69 @@ public class SharpFont implements FontSupplier {
                 }),
                 entry('C', new String[]{
                         "◢▉█▉◣",
-                        "█  ▀",
-                        "█  ▄",
+                        "█  ▀",
+                        "█  ▄",
                         "◥▉█▉◤"
                 }),
                 entry('D', new String[]{
                         "██▉◣",
-                        "█  ▉▉",
-                        "█  ▉▉",
+                        "█  ▉▉",
+                        "█  ▉▉",
                         "██▉◤"
                 }),
                 entry('E', new String[]{
                         "███",
-                        "█▄  ",
-                        "█▀  ",
+                        "█▄  ",
+                        "█▀  ",
                         "███"
                 }),
                 entry('F', new String[]{
                         "███",
-                        "█▄  ",
-                        "█▀  ",
-                        "█    "
+                        "█▄  ",
+                        "█▀  ",
+                        "█    "
                 }),
                 entry('G', new String[]{
                         "◢▉█▉◣",
-                        "█  ▀",
+                        "█  ▀",
                         "█ ◥█",
                         "◥▉██"
                 }),
                 entry('H', new String[]{
-                        "█  █",
+                        "█  █",
                         "█▄█",
                         "█▀█",
-                        "█  █"
+                        "█  █"
                 }),
                 entry('I', new String[]{
                         "███",
-                        "  █  ",
-                        "  █  ",
+                        "  █  ",
+                        "  █  ",
                         "███"
                 }),
                 entry('J', new String[]{
-                        "    █",
-                        "    █",
-                        "▄  █",
+                        "    █",
+                        "    █",
+                        "▄  █",
                         "◥▉█▉◤"
                 }),
                 entry('K', new String[]{
-                        "█  ▉▉",
+                        "█  ▉▉",
                         "█▄▉◤",
                         "█▀▉◣",
-                        "█  ▉▉"
+                        "█  ▉▉"
                 }),
                 entry('L', new String[]{
-                        "█    ",
-                        "█    ",
-                        "█    ",
+                        "█    ",
+                        "█    ",
+                        "█    ",
                         "███"
                 }),
                 entry('M', new String[]{
-                        "▉◣  ◢▉",
+                        "▉◣  ◢▉",
                         "█◣◢▉▉",
                         "█◥◤▉▉",
-                        "█  ▉▉"
+                        "█  ▉▉"
                 }),
                 entry('N', new String[]{
                         "█◣ █",
@@ -210,19 +212,19 @@ public class SharpFont implements FontSupplier {
                 }),
                 entry('O', new String[]{
                         "◢▉█▉◣",
-                        "█  █",
-                        "█  █",
+                        "█  █",
+                        "█  █",
                         "◥▉█▉◤"
                 }),
                 entry('P', new String[]{
                         "██▉◣",
-                        "█  ▌▋",
+                        "█  ▌▋",
                         "██▉◤",
-                        "█    "
+                        "█    "
                 }),
                 entry('Q', new String[]{
                         "◢▉█▉◣",
-                        "█  █",
+                        "█  █",
                         "█ ◥▊◤",
                         "◥▋▋◤◥▏◣"
                 }),
@@ -230,7 +232,7 @@ public class SharpFont implements FontSupplier {
                         "██▉◣",
                         "█▄▉◤",
                         "█▀▉◣",
-                        "█  ▉▉"
+                        "█  ▉▉"
                 }),
                 entry('S', new String[]{
                         "◢▊█▊◣",
@@ -240,25 +242,25 @@ public class SharpFont implements FontSupplier {
                 }),
                 entry('T', new String[]{
                         "███",
-                        "  █  ",
-                        "  █  ",
-                        "  █  "
+                        "  █  ",
+                        "  █  ",
+                        "  █  "
                 }),
                 entry('U', new String[]{
-                        "█  █",
-                        "█  █",
-                        "█  █",
+                        "█  █",
+                        "█  █",
+                        "█  █",
                         "◥▉█▉◤"
                 }),
                 entry('V', new String[]{
-                        "█  █",
-                        "█  █",
+                        "█  █",
+                        "█  █",
                         "◥▋◣ܼ◢▋◤",
                         " ◥█◤ "
                 }),
                 entry('W', new String[]{
-                        "█  ▉▉",
-                        "█  ▉▉",
+                        "█  ▉▉",
+                        "█  ▉▉",
                         "█◢◣▉▉",
                         "█◤◥▉▉"
                 }),
@@ -271,56 +273,56 @@ public class SharpFont implements FontSupplier {
                 entry('Y', new String[]{
                         "◥▊◣◢▏▎◤",
                         " ◥█◤ ",
-                        "  █  ",
-                        "  █  "
+                        "  █  ",
+                        "  █  "
                 }),
                 entry('Z', new String[]{
                         "██▋◤",
-                        "  ◢▎◤ ",
-                        " ◢▎◤  ",
+                        "  ◢▎◤ ",
+                        " ◢▎◤  ",
                         "◢▋██"
                 }),
                 entry('[', new String[]{
                         "██",
-                        "█  ",
-                        "█  ",
+                        "█  ",
+                        "█  ",
                         "██"
                 }),
                 entry('\\', new String[]{
-                        "◥▊◣   ",
-                        " ◥▊◣  ",
-                        "  ◥▊◣ ",
-                        "   ◥▊◣"
+                        "◥▊◣   ",
+                        " ◥▊◣  ",
+                        "  ◥▊◣ ",
+                        "   ◥▊◣"
                 }),
                 entry(']', new String[]{
                         "██",
-                        "  █",
-                        "  █",
+                        "  █",
+                        "  █",
                         "██"
                 }),
                 entry('_', new String[]{
-                        "      ",
-                        "      ",
-                        "      ",
+                        "      ",
+                        "      ",
+                        "      ",
                         "███"
                 }),
                 entry('(', new String[]{
                         "◢▊█",
-                        "█  ",
-                        "█  ",
+                        "█  ",
+                        "█  ",
                         "◥▊█"
                 }),
                 entry(')', new String[]{
                         "█▊◣",
-                        "  █",
-                        "  █",
+                        "  █",
+                        "  █",
                         "█▊◤"
                 }),
                 entry('^', new String[]{
                         " ◢▉▉◣ ",
                         "◢▋◤◥▋◣",
-                        "      ",
-                        "      "
+                        "      ",
+                        "      "
                 }),
                 entry(':', new String[]{
                         "▄",
@@ -329,25 +331,28 @@ public class SharpFont implements FontSupplier {
                         "▀"
                 }),
                 entry('.', new String[]{
-                        "  ",
-                        "  ",
-                        "  ",
+                        "  ",
+                        "  ",
+                        "  ",
                         "█"
                 })
         ));
     }
 
     @Override
-    public Map<Character, String[][]> patches() {
-        return Map.ofEntries(
-                entry('$', new String[][]{
-                        new String[]{
+    public Map<Character, Set<PatchCharacter>> patches() {
+        HashMap<Character, Set<PatchCharacter>> baseMap = new HashMap<>(Map.ofEntries(
+                entry('$', Set.of(
+                        PatchCharacter.of(
                                 "◢▉ ▎ ▉◣",
                                 "◥▉ ▎ ▀",
                                 "▄ ▎ ▉◣",
                                 "◥▉ ▎ ▉◤"
-                        }
-                })
-        );
+                        )
+                ))
+        ));
+
+        this.appendRecolourfulContainersGuiFix(baseMap);
+        return baseMap;
     }
 }

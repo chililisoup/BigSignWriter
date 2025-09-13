@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import dev.chililisoup.bigsignwriter.font.*;
 //? if fabric
+import dev.chililisoup.bigsignwriter.font.supplier.FontSupplier;
 import net.fabricmc.loader.api.FabricLoader;
 //? if neoforge
 /*import net.neoforged.fml.loading.FMLPaths;*/
@@ -17,10 +18,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BigSignWriterConfig {
     public static FontFile SELECTED_FONT;
@@ -112,7 +110,7 @@ public class BigSignWriterConfig {
                 }
 
                 FontFile existingFont = file.load();
-                Map<Character, String[][]> patches = font.patches();
+                Map<Character, Set<FontSupplier.PatchCharacter>> patches = font.patches();
                 ArrayList<Character> changed = new ArrayList<>();
                 ArrayList<Character> patched = new ArrayList<>();
                 for (char character : fontDefaults.characters.keySet()) {
@@ -120,8 +118,8 @@ public class BigSignWriterConfig {
                         if (!patches.containsKey(character)) continue;
 
                         String existing = String.join("\n", existingFont.characters.get(character));
-                        for (String[] patch : patches.get(character)) {
-                            if (String.join("\n", patch).matches(existing)) {
+                        for (FontSupplier.PatchCharacter patch : patches.get(character)) {
+                            if (String.join("\n", patch.lines()).matches(existing)) {
                                 existingFont.characters.put(character, fontDefaults.characters.get(character));
                                 patched.add(character);
                                 break;

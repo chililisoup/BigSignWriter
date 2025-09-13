@@ -12,117 +12,117 @@ public class MonospaceFont implements FontSupplier {
         return new FontFile("Monospace", Map.<Character, String[]>ofEntries(
                 entry('I', new String[]{
                         "███",
-                        "  █  ",
-                        "  █  ",
+                        "  █  ",
+                        "  █  ",
                         "███"
                 }),
                 entry('i', new String[]{
-                        "  █  ",
-                        "  ▄  ",
-                        "  █  ",
-                        "  █  "
+                        "  █  ",
+                        "  ▄  ",
+                        "  █  ",
+                        "  █  "
                 }),
                 entry('L', new String[]{
-                        "█    ",
-                        "█    ",
-                        "█    ",
+                        "█    ",
+                        "█    ",
+                        "█    ",
                         "███"
                 }),
                 entry('l', new String[]{
-                        " █   ",
-                        " █   ",
-                        " █   ",
-                        " ▜▉▄ "
+                        " █   ",
+                        " █   ",
+                        " █   ",
+                        " ▜▉▄ "
                 }),
                 entry('!', new String[]{
-                        "  █  ",
-                        "  █  ",
-                        "  ▀  ",
-                        "  █  "
+                        "  █  ",
+                        "  █  ",
+                        "  ▀  ",
+                        "  █  "
                 }),
                 entry('[', new String[]{
-                        " ██ ",
-                        " █   ",
-                        " █   ",
-                        " ██ "
+                        " ██ ",
+                        " █   ",
+                        " █   ",
+                        " ██ "
                 }),
                 entry(']', new String[]{
-                        " ██ ",
-                        "   █ ",
-                        "   █ ",
-                        " ██ "
+                        " ██ ",
+                        "   █ ",
+                        "   █ ",
+                        " ██ "
                 }),
                 entry('(', new String[]{
-                        " ▟▉▛ ",
-                        " █  ",
-                        " █  ",
-                        " ▜▉▙ "
+                        " ▟▉▛ ",
+                        " █  ",
+                        " █  ",
+                        " ▜▉▙ "
                 }),
                 entry(')', new String[]{
-                        " ▜▉▙ ",
-                        "  █ ",
-                        "  █ ",
-                        " ▟▉▛ "
+                        " ▜▉▙ ",
+                        "  █ ",
+                        "  █ ",
+                        " ▟▉▛ "
                 }),
                 entry(':', new String[]{
-                        "  ▄  ",
-                        "  ▀  ",
-                        "  ▄  ",
-                        "  ▀  "
+                        "  ▄  ",
+                        "  ▀  ",
+                        "  ▄  ",
+                        "  ▀  "
                 }),
                 entry('.', new String[]{
-                        "      ",
-                        "      ",
-                        "      ",
-                        "  █  "
+                        "      ",
+                        "      ",
+                        "      ",
+                        "  █  "
                 }),
                 entry('|', new String[]{
-                        "  █  ",
-                        "  █  ",
-                        "  █  ",
-                        "  █  "
+                        "  █  ",
+                        "  █  ",
+                        "  █  ",
+                        "  █  "
                 }),
                 entry(',', new String[]{
-                        "      ",
-                        "      ",
-                        "  ▄  ",
-                        "  \uD83E\uDF0F▋\uD83E\uDF04  "
+                        "      ",
+                        "      ",
+                        "  ▄  ",
+                        "  \uD83E\uDF0F▋\uD83E\uDF04  "
                 }),
                 entry(';', new String[]{
-                        "      ",
-                        "  █  ",
-                        "  ▄  ",
-                        "  \uD83E\uDF0F▋\uD83E\uDF04  "
+                        "      ",
+                        "  █  ",
+                        "  ▄  ",
+                        "  \uD83E\uDF0F▋\uD83E\uDF04  "
                 }),
                 entry('\'', new String[]{
-                        "  █  ",
-                        "  ▀  ",
-                        "      ",
-                        "      "
+                        "  █  ",
+                        "  ▀  ",
+                        "      ",
+                        "      "
                 }),
                 entry('"', new String[]{
-                        " ██ ",
-                        " ▀▀ ",
-                        "      ",
-                        "      "
+                        " ██ ",
+                        " ▀▀ ",
+                        "      ",
+                        "      "
                 }),
                 entry('`', new String[]{
-                        "  ▜▙  ",
-                        "   ▀ ",
-                        "      ",
-                        "      "
+                        "  ▜▙  ",
+                        "   ▀ ",
+                        "      ",
+                        "      "
                 }),
                 entry('{', new String[]{
-                        " ▟▉▛ ",
-                        " \uD83E\uDF37▉  ",
-                        " \uD83E\uDF28▉  ",
-                        " ▜▉▙ "
+                        " ▟▉▛ ",
+                        " \uD83E\uDF37▉  ",
+                        " \uD83E\uDF28▉  ",
+                        " ▜▉▙ "
                 }),
                 entry('}', new String[]{
-                        " ▜▉▙ ",
-                        "  ▉\uD83E\uDF32 ",
-                        "  ▉\uD83E\uDF15 ",
-                        " ▟▉▛ "
+                        " ▜▉▙ ",
+                        "  ▉\uD83E\uDF32 ",
+                        "  ▉\uD83E\uDF15 ",
+                        " ▟▉▛ "
                 })
         ));
     }
