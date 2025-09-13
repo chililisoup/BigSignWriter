@@ -1,3 +1,7 @@
+/* TODO
+ - Fix forge setting refmap name to 'unnamed_mod'
+ */
+
 plugins {
     id("dev.kikugie.stonecutter")
     id("dev.isxander.modstitch.base")
