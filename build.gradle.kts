@@ -48,6 +48,7 @@ modstitch {
         "1.21.1" -> 21
         "1.21.3" -> 21
         "1.21.6" -> 21
+        "1.21.9" -> 21
         else -> throw IllegalArgumentException("Please store the java version for ${property("deps.minecraft")} in build.gradle.kts!")
     }
 
@@ -135,7 +136,12 @@ dependencies {
 
     if (modstitch.isLoom) {
         prop("deps.fapi") { modstitchModApi("net.fabricmc.fabric-api:fabric-api:${it}") }
-        prop("deps.modmenu") { modstitchModApi("com.terraformersmc:modmenu:${it}") }
+        prop("deps.modmenu") {
+            if (stonecutter.eval(minecraft, "<1.21.9"))
+                modstitchModApi("com.terraformersmc:modmenu:${it}")
+            else
+                modstitchModCompileOnly("com.terraformersmc:modmenu:${it}")
+        }
     }
 
     if (modstitch.isModDevGradleLegacy) {

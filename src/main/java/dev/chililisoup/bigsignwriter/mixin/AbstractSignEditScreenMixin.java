@@ -22,6 +22,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+//? if >= 1.21.9 {
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+//?}
+
 import java.util.*;
 
 import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.*;
@@ -82,7 +87,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             this.signField.setCursorToEnd();
     }
 
-    @Shadow /*? if >=1.21.2 {*/ protected /*?} else {*/ /*private *//*?}*/ @Final SignBlockEntity sign;
+    @Shadow /*? if >= 1.21.2 {*/ protected /*?} else {*//* private *//*?}*/ @Final SignBlockEntity sign;
     @Shadow private @Final String[] messages;
     @Shadow private void setMessage(String string) {}
     @Shadow private int line;
@@ -133,11 +138,16 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     }
 
     @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
-    private void charTypedInject(char chr, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+    //? if < 1.21.9 {
+    /*private void charTypedInject(char chr, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+    *///?} else
+    private void charTypedInject(CharacterEvent characterEvent, CallbackInfoReturnable<Boolean> cir) {
         if (!BigSignWriter.ENABLED) return;
 
         cir.setReturnValue(true);
 
+        //? if >= 1.21.9
+        char chr = Character.toChars(characterEvent.codepoint())[0];
         String[] bigChar = bigSignWriter$getBigChar(chr).orElse(new String[]{});
         if (bigChar.length == 0) return;
 
@@ -159,13 +169,23 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-    private void deleteChar(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+    //? if < 1.21.9 {
+    /*private void deleteChar(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+    *///?} else
+    private void deleteChar(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
         if (!BigSignWriter.ENABLED) return;
-        if (keyCode != 259) return;
+        if (/*? if >= 1.21.9 {*/ keyEvent.key() /*?} else {*//* keyCode *//*?}*/ != 259)
+            return;
 
         cir.setReturnValue(true);
 
-        if (Screen.hasControlDown() || CHARACTER_SEPARATOR.isEmpty()) {
+        if (
+                //? if < 1.21.9 {
+                /*Screen.hasControlDown() ||
+                *///?} else
+                keyEvent.hasControlDown() ||
+                CHARACTER_SEPARATOR.isEmpty()
+        ) {
             this.bigSignWriter$clearSign();
             return;
         }
