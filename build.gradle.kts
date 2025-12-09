@@ -49,6 +49,7 @@ modstitch {
         "1.21.3" -> 21
         "1.21.6" -> 21
         "1.21.9" -> 21
+        "1.21.11" -> 21
         else -> throw IllegalArgumentException("Please store the java version for ${property("deps.minecraft")} in build.gradle.kts!")
     }
 
