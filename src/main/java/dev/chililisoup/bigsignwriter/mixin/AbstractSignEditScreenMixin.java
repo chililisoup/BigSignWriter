@@ -125,6 +125,8 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                     BigSignWriter.toggleEnabled();
                     if (BigSignWriter.ENABLED)
                         this.line = Math.min(this.line, this.bigSignWriter$getEffectiveBottomLine());
+                    else if (this.signField != null)
+                        this.signField.setCursorToEnd();
                     button.setMessage(bigSignWriter$createToggleButtonText());
                 }
         );
@@ -206,13 +208,17 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         int keyCode = keyEvent.key();
 
         if (keyCode == 265) {
-            this.line = this.line - 1 & this.bigSignWriter$getEffectiveBottomLine();
+            this.line--;
+            if (this.line < 0)
+                this.line = this.bigSignWriter$getEffectiveBottomLine();
             if (this.signField != null)
                 this.signField.setCursorToEnd();
             cir.setReturnValue(true);
             return;
         } else if (keyCode == 264 || keyCode == 257 || keyCode == 335) {
-            this.line = this.line + 1 & this.bigSignWriter$getEffectiveBottomLine();
+            this.line++;
+            if (this.line > this.bigSignWriter$getEffectiveBottomLine())
+                this.line = 0;
             if (this.signField != null)
                 this.signField.setCursorToEnd();
             cir.setReturnValue(true);
