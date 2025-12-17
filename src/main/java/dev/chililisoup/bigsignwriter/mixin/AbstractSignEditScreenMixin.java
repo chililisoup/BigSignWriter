@@ -50,6 +50,12 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     }
 
     @Unique
+    private static int bigSignWriter$getHeight() {
+        return (SELECTED_FONT == null || SELECTED_FONT.height <= 0) ?
+                4 : SELECTED_FONT.height;
+    }
+
+    @Unique
     private static Optional<String[]> bigSignWriter$getBigChar(char chr) {
         if (SELECTED_FONT == null)
             return Optional.empty();
@@ -64,7 +70,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         if (SELECTED_FONT.characters.containsKey(upper))
             return Optional.of(SELECTED_FONT.characters.get(upper));
 
-        if (DEFAULT_FONT == null || SELECTED_FONT.name.equals("Default"))
+        if (DEFAULT_FONT == null || SELECTED_FONT.name.equals("Default") || (SELECTED_FONT.height > 0 && SELECTED_FONT.height != 4))
             return Optional.empty();
 
         if (DEFAULT_FONT.characters.containsKey(chr))
@@ -78,13 +84,27 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
     @Unique
     private void bigSignWriter$clearSign() {
-        for (int i = 0; i < this.messages.length; i++) {
+        int startLine = this.line;
+        int endLine = this.bigSignWriter$getEndLine();
+        for (int i = startLine; i < endLine; i++) {
+            //noinspection UnusedAssignment
             this.line = i;
             this.setMessage("");
         }
+        this.line = startLine;
 
         if (this.signField != null)
             this.signField.setCursorToEnd();
+    }
+
+    @Unique
+    private int bigSignWriter$getEndLine() {
+        return Math.min(bigSignWriter$getHeight() + this.line, this.messages.length);
+    }
+
+    @Unique
+    private int bigSignWriter$getEffectiveBottomLine() {
+        return Math.max(this.messages.length - bigSignWriter$getHeight(), 0);
     }
 
     @Shadow /*? if >= 1.21.2 {*/ protected /*?} else {*//* private *//*?}*/ @Final SignBlockEntity sign;
@@ -103,6 +123,8 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 bigSignWriter$createToggleButtonText(),
                 button -> {
                     BigSignWriter.toggleEnabled();
+                    if (BigSignWriter.ENABLED)
+                        this.line = Math.min(this.line, this.bigSignWriter$getEffectiveBottomLine());
                     button.setMessage(bigSignWriter$createToggleButtonText());
                 }
         );
@@ -115,6 +137,8 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 bigSignWriter$createFontButtonText(),
                 button -> {
                     getNextFont();
+                    if (BigSignWriter.ENABLED)
+                        this.line = Math.min(this.line, this.bigSignWriter$getEffectiveBottomLine());
                     button.setMessage(bigSignWriter$createFontButtonText());
                 }
         );
@@ -151,10 +175,13 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         String[] bigChar = bigSignWriter$getBigChar(chr).orElse(new String[]{});
         if (bigChar.length == 0) return;
 
-        for (int i = 0; i < this.messages.length; i++) {
-            if (i >= bigChar.length || bigChar[i] == null) continue;
+        int startLine = this.line;
+        int endLine = this.bigSignWriter$getEndLine();
+        for (int i = startLine; i < endLine; i++) {
+            int charLine = i - startLine;
+            if (charLine >= bigChar.length || bigChar[charLine] == null) continue;
             String string = this.messages[i].concat(
-                    (this.messages[i].isEmpty() ? "" : CHARACTER_SEPARATOR).concat(bigChar[i])
+                    (this.messages[i].isEmpty() ? "" : CHARACTER_SEPARATOR).concat(bigChar[charLine])
             );
 
             if (this.font.width(string) > this.sign.getMaxTextLineWidth())
@@ -163,6 +190,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             this.line = i;
             this.setMessage(string);
         }
+        this.line = startLine;
 
         if (this.signField != null)
             this.signField.setCursorToEnd();
@@ -170,13 +198,28 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     //? if < 1.21.9 {
-    /*private void deleteChar(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+    /*private void deleteOrClamp(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
     *///?} else
-    private void deleteChar(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
+    private void deleteOrClamp(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
         if (!BigSignWriter.ENABLED) return;
-        if (/*? if >= 1.21.9 {*/ keyEvent.key() /*?} else {*//* keyCode *//*?}*/ != 259)
-            return;
+        //? if >= 1.21.9
+        int keyCode = keyEvent.key();
 
+        if (keyCode == 265) {
+            this.line = this.line - 1 & this.bigSignWriter$getEffectiveBottomLine();
+            if (this.signField != null)
+                this.signField.setCursorToEnd();
+            cir.setReturnValue(true);
+            return;
+        } else if (keyCode == 264 || keyCode == 257 || keyCode == 335) {
+            this.line = this.line + 1 & this.bigSignWriter$getEffectiveBottomLine();
+            if (this.signField != null)
+                this.signField.setCursorToEnd();
+            cir.setReturnValue(true);
+            return;
+        }
+
+        if (keyCode != 259) return;
         cir.setReturnValue(true);
 
         if (
@@ -190,15 +233,19 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             return;
         }
 
-        int firstWidth = this.font.width(this.messages[0]);
-        for (int i = 1; i < this.messages.length; i++) {
+        int startLine = this.line;
+        int endLine = this.bigSignWriter$getEndLine();
+        int firstWidth = this.font.width(this.messages[startLine]);
+        for (int i = startLine + 1; i < endLine; i++) {
             if (firstWidth != this.font.width(this.messages[i])) {
                 this.bigSignWriter$clearSign();
                 return;
             }
         }
 
-        List<HashMap<Integer, Integer>> separatorIndices = Arrays.stream(this.messages).map(message -> {
+        List<HashMap<Integer, Integer>> separatorIndices = Arrays.stream(
+                Arrays.copyOfRange(this.messages, startLine, endLine)
+        ).map(message -> {
             HashMap<Integer, Integer> indices = new HashMap<>();
 
             for (int index = message.indexOf(CHARACTER_SEPARATOR);
@@ -223,15 +270,17 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         }
 
         int index = Collections.min(matchingSeparatorLengths);
-        for (int i = 0; i < this.messages.length; i++) {
+
+        for (int i = startLine; i < endLine; i++) {
             String message = this.messages[i];
 
             this.line = i;
             this.setMessage(message.substring(
                     0,
-                    separatorIndices.get(i).get(index)
+                    separatorIndices.get(i - startLine).get(index)
             ));
         }
+        this.line = startLine;
 
         if (this.signField != null)
             this.signField.setCursorToEnd();
@@ -253,7 +302,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         int lineHeight = this.sign.getTextLineHeight();
         int opaqueColor = -16777216 | color;
 
-        for (int i = 0; i < this.messages.length; i++) {
+        for (int i = this.line; i < this.bigSignWriter$getEndLine(); i++) {
             if (!blink) continue;
 
             String string = this.messages[i] == null ? "" : this.messages[i];

@@ -2,6 +2,7 @@ package dev.chililisoup.bigsignwriter.font.supplier;
 
 import com.google.common.collect.ImmutableSet;
 import dev.chililisoup.bigsignwriter.font.FontFile;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,7 +30,7 @@ public interface FontSupplier {
                                     .toArray(String[]::new)
                     )),
                     (baseSet, fixSet) -> {
-                        ImmutableSet.Builder<PatchCharacter> builder = ImmutableSet.builder();
+                        ImmutableSet.Builder<@NotNull PatchCharacter> builder = ImmutableSet.builder();
                         builder.add(baseSet.toArray(PatchCharacter[]::new));
                         builder.add(fixSet.toArray(PatchCharacter[]::new));
                         return builder.build();

@@ -13,15 +13,17 @@ import net.fabricmc.loader.api.FabricLoader;
 //? if forge
 /*import net.minecraftforge.fml.loading.FMLPaths;*/
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class BigSignWriterConfig {
-    public static FontFile SELECTED_FONT;
+    public static @Nullable FontFile SELECTED_FONT;
     public static String CHARACTER_SEPARATOR;
     public static List<FontFile> AVAILABLE_FONTS;
     public static FontFile DEFAULT_FONT;
@@ -117,7 +119,7 @@ public class BigSignWriterConfig {
                     if (existingFont.characters.containsKey(character)) {
                         if (!patches.containsKey(character)) continue;
 
-                        String existing = String.join("\n", existingFont.characters.get(character));
+                        String existing = Pattern.quote(String.join("\n", existingFont.characters.get(character)));
                         for (FontSupplier.PatchCharacter patch : patches.get(character)) {
                             if (String.join("\n", patch.lines()).matches(existing)) {
                                 existingFont.characters.put(character, fontDefaults.characters.get(character));
@@ -189,7 +191,8 @@ public class BigSignWriterConfig {
 
     public static void getNextFont() {
         selectFont(SELECTED_FONT_INDEX + 1);
-        BigSignWriter.LOGGER.debug("Switched to font {} at index {}", SELECTED_FONT.name, SELECTED_FONT_INDEX);
+        if (SELECTED_FONT == null) BigSignWriter.LOGGER.error("Attempted to switch to font at index {}, but no font is present!", SELECTED_FONT_INDEX);
+        else BigSignWriter.LOGGER.debug("Switched to font {} at index {}", SELECTED_FONT.name, SELECTED_FONT_INDEX);
     }
 
     public static class MainConfig {

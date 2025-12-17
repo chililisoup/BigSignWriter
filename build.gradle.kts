@@ -82,6 +82,7 @@ modstitch {
             put("mod_author_list", mod.authors.split(", ").joinToString("\",\""))
             put("mod_contributor_list", mod.contributors.split(", ").joinToString("\",\""))
             prop("deps.minecraft_range") { put("minecraft_range", it) }
+            prop("deps.neoforge_range") { put("neoforge_range", it) }
         }
     }
 

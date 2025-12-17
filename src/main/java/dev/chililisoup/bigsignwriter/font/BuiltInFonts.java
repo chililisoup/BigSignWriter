@@ -12,7 +12,8 @@ public class BuiltInFonts {
                 entry("default", new DefaultFont()),
                 entry("sharp", new SharpFont()),
                 entry("retro", new RetroFont()),
-                entry("monospace", new MonospaceFont()) // Makes heavy use of default font fallback
+                entry("monospace", new MonospaceFont()), // Makes heavy use of default font fallback
+                entry("thin", new ThinFont()) // Makes heavy use of default font fallback
         );
     }
 }
