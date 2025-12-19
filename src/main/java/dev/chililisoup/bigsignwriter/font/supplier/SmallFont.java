@@ -9,7 +9,7 @@ import static java.util.Map.entry;
 public class SmallFont implements FontSupplier {
     @Override
     public FontFile get() {
-        return new FontFile("Small", 2, " ", Map.<Character, String[]>ofEntries(
+        return new FontFile("Small", 2, "", Map.<Character, String[]>ofEntries(
                 entry(' ', new String[]{
                         "  ",
                         "  "
@@ -180,7 +180,7 @@ public class SmallFont implements FontSupplier {
                 }),
                 entry('u', new String[]{
                         "\uD83E\uDF0F \uD83E\uDF1E",
-                        "\uD83E\uDF23\uD83E\uDF18"
+                        "\uD83E\uDF23\uD83E\uDF37"
                 }),
                 entry('V', new String[]{
                         "❙ ❙",
