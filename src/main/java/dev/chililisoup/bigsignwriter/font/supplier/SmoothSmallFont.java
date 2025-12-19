@@ -3,7 +3,9 @@ package dev.chililisoup.bigsignwriter.font.supplier;
 
 import dev.chililisoup.bigsignwriter.font.FontFile;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static java.util.Map.entry;
 
@@ -40,8 +42,8 @@ public class SmoothSmallFont implements FontSupplier {
                         "\uD833\uDC39\uD833\uDC3E"
                 }),
                 entry('D', new String[]{
-                        "|▔\uD833\uDC36",
-                        "|▁\uD833\uDC3A"
+                        "┃▔\uD833\uDC36",
+                        "┃▁\uD833\uDC3A"
                 }),
                 entry('d', new String[]{
                         "ܼ︵ܼ┃",
@@ -391,6 +393,18 @@ public class SmoothSmallFont implements FontSupplier {
                         "\uD83E\uDC37\uD83E\uDC37",
                         "  "
                 })
+        ));
+    }
+
+    @Override
+    public Map<Character, Set<PatchCharacter>> patches() {
+        return new HashMap<>(Map.ofEntries(
+                entry('D', Set.of(
+                        PatchCharacter.of(
+                                "|▔\uD833\uDC36",
+                                "|▁\uD833\uDC3A"
+                        )
+                ))
         ));
     }
 }
