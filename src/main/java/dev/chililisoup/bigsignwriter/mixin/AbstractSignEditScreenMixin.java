@@ -13,6 +13,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -107,7 +108,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         return Math.max(this.messages.length - bigSignWriter$getHeight(), 0);
     }
 
-    @Shadow /*? if >= 1.21.2 {*/ protected /*?} else {*//* private *//*?}*/ @Final SignBlockEntity sign;
+    @Shadow /*? if >= 1.21.2 {*/ protected /*?} else {*/ /*private *//*?}*/ @Final SignBlockEntity sign;
     @Shadow private @Final String[] messages;
     @Shadow private void setMessage(String string) {}
     @Shadow private int line;
@@ -294,7 +295,12 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
     @Inject(
             method = "renderSignText",
-            at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractSignEditScreen;messages:[Ljava/lang/String;", ordinal = 2),
+            at = @At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/client/gui/screens/inventory/AbstractSignEditScreen;messages:[Ljava/lang/String;",
+                    ordinal = 2,
+                    opcode = Opcodes.GETFIELD
+            ),
             cancellable = true
     )
     private void drawExtraLines(
@@ -329,7 +335,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                     //? if >= 1.21.6 {
                     target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V"
                     //?} else
-                    /*target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I"*/
+                    //target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I"
             )
     )
     private boolean hideUnderscore(GuiGraphics instance, Font font, String string, int i, int j, int k, boolean bl) {

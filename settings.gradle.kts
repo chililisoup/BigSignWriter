@@ -19,7 +19,7 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.7.10"
+    id("dev.kikugie.stonecutter") version "0.8.3"
 }
 
 stonecutter {
@@ -44,7 +44,7 @@ stonecutter {
 
         // This is the default target.
         // https://stonecutter.kikugie.dev/stonecutter/guide/setup#settings-settings-gradle-kts
-        vcsVersion = "1.21.9-fabric"
+        vcsVersion = "1.21.11-fabric"
     }
 }
 

@@ -11,7 +11,7 @@ import net.fabricmc.loader.api.FabricLoader;
 //? if neoforge
 /*import net.neoforged.fml.loading.FMLPaths;*/
 //? if forge
-/*import net.minecraftforge.fml.loading.FMLPaths;*/
+//import net.minecraftforge.fml.loading.FMLPaths;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,7 +41,7 @@ public class BigSignWriterConfig {
         //? if fabric {
         Path configDir = FabricLoader.getInstance().getConfigDir().resolve(BigSignWriter.MOD_ID);
         //?} else
-        /*Path configDir = FMLPaths.CONFIGDIR.get().resolve(BigSignWriter.MOD_ID);*/
+        //Path configDir = FMLPaths.CONFIGDIR.get().resolve(BigSignWriter.MOD_ID);
         
         try {
             Files.createDirectories(configDir);
