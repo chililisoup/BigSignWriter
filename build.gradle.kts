@@ -1,7 +1,3 @@
-/* TODO
- - Fix forge setting refmap name to 'unnamed_mod'
- */
-
 plugins {
     id("dev.kikugie.stonecutter")
     id("dev.isxander.modstitch.base")
@@ -34,7 +30,7 @@ val minecraft = property("deps.minecraft") as String
 var loader: String = name.split("-")[1]
 stonecutter {
     constants {
-        match(loader, "fabric", "forge", "neoforge")
+        match(loader, "fabric", "neoforge")
     }
 }
 
@@ -44,7 +40,6 @@ modstitch {
     // Alternatively use stonecutter.eval if you have a lot of versions to target.
     // https://stonecutter.kikugie.dev/stonecutter/guide/setup#checking-versions
     javaVersion = when (minecraft) {
-        "1.20.1" -> 17
         "1.21.1" -> 21
         "1.21.3" -> 21
         "1.21.6" -> 21
@@ -105,12 +100,13 @@ modstitch {
                     ideConfigGenerated(true)
                 }
             }
+
+            mixin.useLegacyMixinAp = false
         }
     }
 
     // ModDevGradle (NeoForge, Forge, Forgelike)
     moddevgradle {
-        prop("deps.forge") { forgeVersion = it }
         prop("deps.neoforge") { neoForgeVersion = it }
 
         configureNeoForge {
@@ -134,8 +130,6 @@ modstitch {
 // If you want to create proxy configurations for more source sets, such as client source sets,
 // use the modstitch.createProxyConfigurations(sourceSets["client"]) function.
 dependencies {
-    fun Dependency?.jij() = this?.also(::modstitchJiJ)
-
     if (modstitch.isLoom) {
         prop("deps.fapi") { modstitchModApi("net.fabricmc.fabric-api:fabric-api:${it}") }
         prop("deps.modmenu") {
@@ -146,14 +140,7 @@ dependencies {
         }
     }
 
-    if (modstitch.isModDevGradleLegacy) {
-        compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1")!!)
-        implementation("io.github.llamalad7:mixinextras-forge:0.4.1").jij()
-        prop("deps.yacl") { compileOnly("dev.isxander:yet-another-config-lib:${it}-${loader}") }
-        compileOnly("org.jetbrains:annotations:20.1.0")
-    } else {
-        prop("deps.yacl") { modstitchModApi("dev.isxander:yet-another-config-lib:${it}-${loader}") }
-    }
+    prop("deps.yacl") { modstitchModApi("dev.isxander:yet-another-config-lib:${it}-${loader}") }
 
     // Anything else in the dependencies block will be used for all platforms.
 }

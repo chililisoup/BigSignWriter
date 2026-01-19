@@ -15,7 +15,6 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import org.jetbrains.annotations.Nullable;
@@ -43,39 +42,34 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     protected AbstractSignEditScreenMixin(Component title) { super(title); }
 
     @Unique
-    private static Component bigSignWriter$createToggleButtonText() {
-        return CommonComponents.optionStatus(Component.translatableWithFallback("bigsignwriter.enabled", "Big Text"), BigSignWriter.ENABLED);
-    }
-
-    @Unique
     private static int bigSignWriter$getHeight() {
-        return (SELECTED_FONT == null || SELECTED_FONT.height <= 0) ?
-                4 : SELECTED_FONT.height;
+        return (BigSignWriter.SELECTED_FONT == null || BigSignWriter.SELECTED_FONT.height <= 0) ?
+                4 : BigSignWriter.SELECTED_FONT.height;
     }
 
     @Unique
     private static Optional<String[]> bigSignWriter$getBigChar(char chr) {
-        if (SELECTED_FONT == null)
+        if (BigSignWriter.SELECTED_FONT == null)
             return Optional.empty();
 
-        if (SELECTED_FONT.characters == null)
+        if (BigSignWriter.SELECTED_FONT.characters == null)
             return Optional.empty();
 
-        if (SELECTED_FONT.characters.containsKey(chr))
-            return Optional.of(SELECTED_FONT.characters.get(chr));
+        if (BigSignWriter.SELECTED_FONT.characters.containsKey(chr))
+            return Optional.of(BigSignWriter.SELECTED_FONT.characters.get(chr));
 
         char upper = Character.toUpperCase(chr);
-        if (SELECTED_FONT.characters.containsKey(upper))
-            return Optional.of(SELECTED_FONT.characters.get(upper));
+        if (BigSignWriter.SELECTED_FONT.characters.containsKey(upper))
+            return Optional.of(BigSignWriter.SELECTED_FONT.characters.get(upper));
 
-        if (DEFAULT_FONT == null || SELECTED_FONT.name.equals("Default") || (SELECTED_FONT.height > 0 && SELECTED_FONT.height != 4))
+        if (BigSignWriter.DEFAULT_FONT == null || BigSignWriter.SELECTED_FONT.name.equals("Default") || (BigSignWriter.SELECTED_FONT.height > 0 && BigSignWriter.SELECTED_FONT.height != 4))
             return Optional.empty();
 
-        if (DEFAULT_FONT.characters.containsKey(chr))
-            return Optional.of(DEFAULT_FONT.characters.get(chr));
+        if (BigSignWriter.DEFAULT_FONT.characters.containsKey(chr))
+            return Optional.of(BigSignWriter.DEFAULT_FONT.characters.get(chr));
 
-        if (DEFAULT_FONT.characters.containsKey(upper))
-            return Optional.of(DEFAULT_FONT.characters.get(upper));
+        if (BigSignWriter.DEFAULT_FONT.characters.containsKey(upper))
+            return Optional.of(BigSignWriter.DEFAULT_FONT.characters.get(upper));
 
         return Optional.empty();
     }
@@ -128,39 +122,27 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
     @Inject(method = "init", at = @At("TAIL"))
     private void addButtons(CallbackInfo ci) {
-        ClickableButtonWidget toggleButton = new ClickableButtonWidget(
-                (int) (this.width * MAIN_CONFIG.buttonsAlignmentX + MAIN_CONFIG.buttonsX - 100),
-                (int) (this.height * MAIN_CONFIG.buttonsAlignmentY + MAIN_CONFIG.buttonsY),
-                75,
-                20,
-                bigSignWriter$createToggleButtonText(),
-                button -> {
-                    BigSignWriter.toggleEnabled();
-                    if (BigSignWriter.ENABLED)
+        int x = (int) (this.width * MAIN_CONFIG.buttonsAlignmentX + MAIN_CONFIG.buttonsX);
+        int y = (int) (this.height * MAIN_CONFIG.buttonsAlignmentY + MAIN_CONFIG.buttonsY);
+
+        FontSelectionWidget fontSelector = new FontSelectionWidget(
+                this.minecraft,
+                MAIN_CONFIG.showReloadButton ? 179 : 200,
+                Math.min(150, this.height - y - 5),
+                x - 100,
+                y,
+                15,
+                () -> {
+                    if (BigSignWriter.enabled())
                         this.line = Math.min(this.line, this.bigSignWriter$getEffectiveBottomLine());
                     else if (this.signField != null)
                         this.signField.setCursorToEnd();
-                    button.setMessage(bigSignWriter$createToggleButtonText());
-                }
-        );
-
-        int fontButtonY = (int) (this.height * MAIN_CONFIG.buttonsAlignmentY + MAIN_CONFIG.buttonsY);
-        FontSelectionWidget fontSelector = new FontSelectionWidget(
-                this.minecraft,
-                124,
-                Math.min(150, this.height - fontButtonY - 5),
-                (int) (this.width * MAIN_CONFIG.buttonsAlignmentX + MAIN_CONFIG.buttonsX - 24),
-                fontButtonY,
-                15,
-                () -> {
-                    if (BigSignWriter.ENABLED)
-                        this.line = Math.min(this.line, this.bigSignWriter$getEffectiveBottomLine());
                 }
         );
 
         ClickableButtonWidget fontSelectorToggleButton = new ClickableButtonWidget(
-                (int) (this.width * MAIN_CONFIG.buttonsAlignmentX + MAIN_CONFIG.buttonsX - 23),
-                (int) (this.height * MAIN_CONFIG.buttonsAlignmentY + MAIN_CONFIG.buttonsY + 2),
+                x - 99,
+                y + 2,
                 14,
                 15,
                 Component.literal("▶"),
@@ -171,21 +153,20 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 }
         );
 
-        this.addRenderableWidget(toggleButton);
         this.addWidget(fontSelectorToggleButton);
         this.addRenderableWidget(fontSelector);
         this.addRenderableOnly(fontSelectorToggleButton);
 
         if (MAIN_CONFIG.showReloadButton) {
             ClickableButtonWidget reloadButton = new ClickableButtonWidget(
-                    (int) (this.width * MAIN_CONFIG.buttonsAlignmentX + MAIN_CONFIG.buttonsX + 101),
-                    (int) (this.height * MAIN_CONFIG.buttonsAlignmentY + MAIN_CONFIG.buttonsY),
+                    x + 80,
+                    y,
                     20,
                     20,
                     Component.literal("\uD83D\uDDD8"),
                     button -> {
                         reloadConfig();
-                        reloadFonts();
+                        BigSignWriter.reloadFonts();
                         fontSelector.updateEntries();
                     }
             );
@@ -199,7 +180,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     /*private void charTypedInject(char chr, int modifiers, CallbackInfoReturnable<Boolean> cir) {
     *///?} else
     private void charTypedInject(CharacterEvent characterEvent, CallbackInfoReturnable<Boolean> cir) {
-        if (!BigSignWriter.ENABLED) return;
+        if (!BigSignWriter.enabled()) return;
 
         cir.setReturnValue(true);
 
@@ -214,7 +195,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             int charLine = i - startLine;
             if (charLine >= bigChar.length || bigChar[charLine] == null) continue;
             String string = this.messages[i].concat(
-                    (this.messages[i].isEmpty() ? "" : CHARACTER_SEPARATOR).concat(bigChar[charLine])
+                    (this.messages[i].isEmpty() ? "" : BigSignWriter.CHARACTER_SEPARATOR).concat(bigChar[charLine])
             );
 
             if (this.font.width(string) > this.sign.getMaxTextLineWidth())
@@ -234,7 +215,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     /*private void deleteOrClamp(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
     *///?} else
     private void deleteOrClamp(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
-        if (!BigSignWriter.ENABLED) return;
+        if (!BigSignWriter.enabled()) return;
         //? if >= 1.21.9
         int keyCode = keyEvent.key();
 
@@ -266,7 +247,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 /*Screen.hasControlDown() ||
                 *///?} else
                 keyEvent.hasControlDown() ||
-                CHARACTER_SEPARATOR.isEmpty()
+                BigSignWriter.CHARACTER_SEPARATOR.isEmpty()
         ) {
             this.bigSignWriter$clearSign();
             return;
@@ -287,9 +268,9 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         ).map(message -> {
             HashMap<Integer, Integer> indices = new HashMap<>();
 
-            for (int index = message.indexOf(CHARACTER_SEPARATOR);
+            for (int index = message.indexOf(BigSignWriter.CHARACTER_SEPARATOR);
                  index >= 0;
-                 index = message.indexOf(CHARACTER_SEPARATOR, index + 1)
+                 index = message.indexOf(BigSignWriter.CHARACTER_SEPARATOR, index + 1)
             ) {
                 indices.put(this.font.width(message.substring(index)), index);
             }
@@ -297,7 +278,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             return indices;
         }).toList();
 
-        List<Integer> matchingSeparatorLengths = separatorIndices./*? if >=1.20.5 {*/ getFirst() /*?} else {*/ /*get(0) *//*?}*/
+        List<Integer> matchingSeparatorLengths = separatorIndices.getFirst()
                 .keySet().stream().filter(length -> separatorIndices.stream().allMatch(
                         map -> map.containsKey(length)
                 )
@@ -341,7 +322,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             @Local boolean blink,
             @Local(ordinal = 0) int color
     ) {
-        if (!BigSignWriter.ENABLED) return;
+        if (!BigSignWriter.enabled()) return;
 
         int lineHeight = this.sign.getTextLineHeight();
         int opaqueColor = -16777216 | color;
@@ -371,6 +352,6 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             )
     )
     private boolean hideUnderscore(GuiGraphics instance, Font font, String string, int i, int j, int k, boolean bl) {
-        return !BigSignWriter.ENABLED;
+        return !BigSignWriter.enabled();
     }
 }

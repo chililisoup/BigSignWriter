@@ -1,7 +1,7 @@
 {
-  "bigsignwriter.enabled": "Big Text",
   "bigsignwriter.reload": "Reload Fonts",
   "bigsignwriter.font": "Font",
+  "bigsignwriter.no_font": "None (Vanilla)",
   "bigsignwriter.config": "Big Sign Writer Config",
   "bigsignwriter.config.buttonsX": "Buttons X",
   "bigsignwriter.config.buttonsX.desc": "Horizontal offset for mod buttons, from center of screen.",
