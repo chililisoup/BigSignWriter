@@ -44,7 +44,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
 
     //? if <= 1.21.3 {
     /*private int contentHeight() {
-        return this.getItemCount() * this.itemHeight;
+        return this.getItemCount() * this.itemHeight + 4;
     }
     *///?}
 

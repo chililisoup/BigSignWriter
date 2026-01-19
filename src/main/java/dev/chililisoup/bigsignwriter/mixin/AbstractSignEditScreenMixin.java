@@ -242,12 +242,16 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         if (keyCode != 259) return;
         cir.setReturnValue(true);
 
+        String characterSeparator = BigSignWriter.CHARACTER_SEPARATOR.isEmpty() ?
+                bigSignWriter$getBigChar(' ').orElse(new String[]{""})[0] :
+                BigSignWriter.CHARACTER_SEPARATOR;
+
         if (
                 //? if < 1.21.9 {
                 /*Screen.hasControlDown() ||
                 *///?} else
                 keyEvent.hasControlDown() ||
-                BigSignWriter.CHARACTER_SEPARATOR.isEmpty()
+                characterSeparator.isEmpty()
         ) {
             this.bigSignWriter$clearSign();
             return;
@@ -268,9 +272,9 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         ).map(message -> {
             HashMap<Integer, Integer> indices = new HashMap<>();
 
-            for (int index = message.indexOf(BigSignWriter.CHARACTER_SEPARATOR);
+            for (int index = message.indexOf(characterSeparator);
                  index >= 0;
-                 index = message.indexOf(BigSignWriter.CHARACTER_SEPARATOR, index + 1)
+                 index = message.indexOf(characterSeparator, index + 1)
             ) {
                 indices.put(this.font.width(message.substring(index)), index);
             }
