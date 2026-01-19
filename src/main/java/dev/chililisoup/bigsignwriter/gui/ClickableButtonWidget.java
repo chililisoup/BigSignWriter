@@ -1,4 +1,4 @@
-package dev.chililisoup.bigsignwriter;
+package dev.chililisoup.bigsignwriter.gui;
 
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;

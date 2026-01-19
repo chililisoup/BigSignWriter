@@ -181,18 +181,17 @@ public class BigSignWriterConfig {
         BigSignWriter.LOGGER.debug("Config loaded!");
     }
 
+    public static void selectFont(FontFile fontFile) {
+        int index = AVAILABLE_FONTS.indexOf(fontFile);
+        if (index >= 0) selectFont(index);
+    }
+
     private static void selectFont(int index) {
         SELECTED_FONT_INDEX = index % AVAILABLE_FONTS.size();
         SELECTED_FONT = AVAILABLE_FONTS.get(SELECTED_FONT_INDEX);
         CHARACTER_SEPARATOR = SELECTED_FONT.characterSeparator == null ?
                 MAIN_CONFIG.defaultCharacterSeparator :
                 SELECTED_FONT.characterSeparator;
-    }
-
-    public static void getNextFont() {
-        selectFont(SELECTED_FONT_INDEX + 1);
-        if (SELECTED_FONT == null) BigSignWriter.LOGGER.error("Attempted to switch to font at index {}, but no font is present!", SELECTED_FONT_INDEX);
-        else BigSignWriter.LOGGER.debug("Switched to font {} at index {}", SELECTED_FONT.name, SELECTED_FONT_INDEX);
     }
 
     public static class MainConfig {

@@ -1,12 +1,17 @@
 package dev.chililisoup.bigsignwriter.mixin;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
-import dev.chililisoup.bigsignwriter.ClickableButtonWidget;
+import dev.chililisoup.bigsignwriter.gui.ClickableButtonWidget;
+import dev.chililisoup.bigsignwriter.gui.FontSelectionWidget;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
@@ -40,15 +45,6 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     @Unique
     private static Component bigSignWriter$createToggleButtonText() {
         return CommonComponents.optionStatus(Component.translatableWithFallback("bigsignwriter.enabled", "Big Text"), BigSignWriter.ENABLED);
-    }
-
-    @Unique
-    private static Component bigSignWriter$createFontButtonText() {
-        String fontName = (SELECTED_FONT == null || SELECTED_FONT.name == null) ? "Unknown" : SELECTED_FONT.name;
-        return CommonComponents.optionNameValue(
-                Component.translatableWithFallback("bigsignwriter.font", "Font"),
-                Component.literal(fontName)
-        );
     }
 
     @Unique
@@ -109,13 +105,28 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         return Math.max(this.messages.length - bigSignWriter$getHeight(), 0);
     }
 
+    @Unique private @Nullable Button doneButton;
+
     @Shadow /*? if >= 1.21.2 {*/ protected /*?} else {*/ /*private *//*?}*/ @Final SignBlockEntity sign;
     @Shadow private @Final String[] messages;
     @Shadow private void setMessage(String string) {}
     @Shadow private int line;
-    @Shadow @Nullable private TextFieldHelper signField;
+    @Shadow private @Nullable TextFieldHelper signField;
 
-    @Inject(method = "init", at = @At("HEAD"))
+    @WrapOperation(
+            method = "init",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/gui/screens/inventory/AbstractSignEditScreen;addRenderableWidget(Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;"
+            )
+    )
+    private GuiEventListener grabDoneButton(AbstractSignEditScreen instance, GuiEventListener guiEventListener, Operation<GuiEventListener> original) {
+        GuiEventListener doneButton = original.call(instance, guiEventListener);
+        if (doneButton instanceof Button button) this.doneButton = button;
+        return doneButton;
+    }
+
+    @Inject(method = "init", at = @At("TAIL"))
     private void addButtons(CallbackInfo ci) {
         ClickableButtonWidget toggleButton = new ClickableButtonWidget(
                 (int) (this.width * MAIN_CONFIG.buttonsAlignmentX + MAIN_CONFIG.buttonsX - 100),
@@ -133,26 +144,41 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 }
         );
 
-        ClickableButtonWidget fontButton = new ClickableButtonWidget(
-                (int) (this.width * MAIN_CONFIG.buttonsAlignmentX + MAIN_CONFIG.buttonsX - 25),
-                (int) (this.height * MAIN_CONFIG.buttonsAlignmentY + MAIN_CONFIG.buttonsY),
-                125,
-                20,
-                bigSignWriter$createFontButtonText(),
-                button -> {
-                    getNextFont();
+        int fontButtonY = (int) (this.height * MAIN_CONFIG.buttonsAlignmentY + MAIN_CONFIG.buttonsY);
+        FontSelectionWidget fontSelector = new FontSelectionWidget(
+                this.minecraft,
+                124,
+                Math.min(150, this.height - fontButtonY - 5),
+                (int) (this.width * MAIN_CONFIG.buttonsAlignmentX + MAIN_CONFIG.buttonsX - 24),
+                fontButtonY,
+                15,
+                () -> {
                     if (BigSignWriter.ENABLED)
                         this.line = Math.min(this.line, this.bigSignWriter$getEffectiveBottomLine());
-                    button.setMessage(bigSignWriter$createFontButtonText());
+                }
+        );
+
+        ClickableButtonWidget fontSelectorToggleButton = new ClickableButtonWidget(
+                (int) (this.width * MAIN_CONFIG.buttonsAlignmentX + MAIN_CONFIG.buttonsX - 23),
+                (int) (this.height * MAIN_CONFIG.buttonsAlignmentY + MAIN_CONFIG.buttonsY + 2),
+                14,
+                15,
+                Component.literal("▶"),
+                button -> {
+                    fontSelector.open = !fontSelector.open;
+                    button.setMessage(Component.literal(fontSelector.open ? "▼" : "▶"));
+                    if (this.doneButton != null) this.doneButton.active = !fontSelector.open;
                 }
         );
 
         this.addRenderableWidget(toggleButton);
-        this.addRenderableWidget(fontButton);
+        this.addWidget(fontSelectorToggleButton);
+        this.addRenderableWidget(fontSelector);
+        this.addRenderableOnly(fontSelectorToggleButton);
 
         if (MAIN_CONFIG.showReloadButton) {
             ClickableButtonWidget reloadButton = new ClickableButtonWidget(
-                    (int) (this.width * MAIN_CONFIG.buttonsAlignmentX + MAIN_CONFIG.buttonsX + 100),
+                    (int) (this.width * MAIN_CONFIG.buttonsAlignmentX + MAIN_CONFIG.buttonsX + 101),
                     (int) (this.height * MAIN_CONFIG.buttonsAlignmentY + MAIN_CONFIG.buttonsY),
                     20,
                     20,
@@ -160,7 +186,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                     button -> {
                         reloadConfig();
                         reloadFonts();
-                        fontButton.setMessage(bigSignWriter$createFontButtonText());
+                        fontSelector.updateEntries();
                     }
             );
             reloadButton.setTooltip(Tooltip.create(Component.translatableWithFallback("bigsignwriter.reload", "Reload Fonts")));
