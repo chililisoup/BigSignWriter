@@ -228,9 +228,12 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             cir.setReturnValue(true);
             return;
         } else if (keyCode == 264 || keyCode == 257 || keyCode == 335) {
-            this.line += keyCode == 264 ?
-                    1 : // Arrow key down
-                    bigSignWriter$getHeight(); // Enter
+            if (keyCode == 264) this.line++; // Arrow key down
+            else { // Enter
+                if (this.line == 0 && bigSignWriter$getHeight() * 2 > this.messages.length)
+                    this.line = this.bigSignWriter$getEffectiveBottomLine();
+                else this.line += bigSignWriter$getHeight();
+            }
             if (this.line > this.bigSignWriter$getEffectiveBottomLine())
                 this.line = 0;
             if (this.signField != null)
