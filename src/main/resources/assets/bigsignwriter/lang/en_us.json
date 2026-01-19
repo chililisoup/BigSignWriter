@@ -1,6 +1,6 @@
 {
   "bigsignwriter.enabled": "Big Text",
-  "bigsignwriter.reload": "Reload",
+  "bigsignwriter.reload": "Reload Fonts",
   "bigsignwriter.font": "Font",
   "bigsignwriter.config": "Big Sign Writer Config",
   "bigsignwriter.config.buttonsX": "Buttons X",
@@ -11,6 +11,8 @@
   "bigsignwriter.config.buttonsAlignmentX.desc": "Horizontal screen alignment for mod buttons (0%: left, 100%: right)",
   "bigsignwriter.config.buttonsAlignmentY": "Buttons Anchor Y",
   "bigsignwriter.config.buttonsAlignmentY.desc": "Vertical screen alignment for mod buttons (0%: top, 100%: bottom)",
+  "bigsignwriter.config.showReloadButton": "Show Reload Button",
+  "bigsignwriter.config.showReloadButton.desc": "Whether to show the Reload Fonts button",
   "bigsignwriter.config.defaultCharacterSeparator": "Default Character Separator",
   "bigsignwriter.config.defaultCharacterSeparator.desc": "Default separator string to place between characters. May be overridden by fonts."
 }

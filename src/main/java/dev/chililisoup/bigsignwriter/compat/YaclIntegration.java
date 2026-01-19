@@ -8,6 +8,7 @@ import dev.isxander.yacl3.api.YetAnotherConfigLib;
 import dev.isxander.yacl3.api.controller.DoubleSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.StringControllerBuilder;
+import dev.isxander.yacl3.api.controller.TickBoxControllerBuilder;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -100,6 +101,22 @@ public abstract class YaclIntegration {
                                         .range(0.0, 1.0)
                                         .step(0.05)
                                         .formatValue(val -> Component.literal((int) (val * 100) + "%")))
+                                .build())
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Component.translatableWithFallback(
+                                        "bigsignwriter.config.showReloadButton",
+                                        "Show Reload Button"))
+                                .description(OptionDescription.of(Component.translatableWithFallback(
+                                        "bigsignwriter.config.showReloadButton.desc",
+                                        "Whether to show the Reload Fonts button")))
+                                .binding(
+                                        defaults.showReloadButton,
+                                        () -> MAIN_CONFIG.showReloadButton,
+                                        newVal -> {
+                                            MAIN_CONFIG.showReloadButton = newVal;
+                                            BigSignWriterConfig.saveConfig();
+                                        })
+                                .controller(TickBoxControllerBuilder::create)
                                 .build())
                         .option(Option.<String>createBuilder()
                                 .name(Component.translatableWithFallback(

@@ -6,6 +6,7 @@ import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.ClickableButtonWidget;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
@@ -135,7 +136,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         ClickableButtonWidget fontButton = new ClickableButtonWidget(
                 (int) (this.width * MAIN_CONFIG.buttonsAlignmentX + MAIN_CONFIG.buttonsX - 25),
                 (int) (this.height * MAIN_CONFIG.buttonsAlignmentY + MAIN_CONFIG.buttonsY),
-                80,
+                125,
                 20,
                 bigSignWriter$createFontButtonText(),
                 button -> {
@@ -146,22 +147,25 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 }
         );
 
-        ClickableButtonWidget reloadButton = new ClickableButtonWidget(
-                (int) (this.width * MAIN_CONFIG.buttonsAlignmentX + MAIN_CONFIG.buttonsX + 55),
-                (int) (this.height * MAIN_CONFIG.buttonsAlignmentY + MAIN_CONFIG.buttonsY),
-                45,
-                20,
-                Component.translatableWithFallback("bigsignwriter.reload", "Reload"),
-                button -> {
-                    reloadConfig();
-                    reloadFonts();
-                    fontButton.setMessage(bigSignWriter$createFontButtonText());
-                }
-        );
-
         this.addRenderableWidget(toggleButton);
         this.addRenderableWidget(fontButton);
-        this.addRenderableWidget(reloadButton);
+
+        if (MAIN_CONFIG.showReloadButton) {
+            ClickableButtonWidget reloadButton = new ClickableButtonWidget(
+                    (int) (this.width * MAIN_CONFIG.buttonsAlignmentX + MAIN_CONFIG.buttonsX + 100),
+                    (int) (this.height * MAIN_CONFIG.buttonsAlignmentY + MAIN_CONFIG.buttonsY),
+                    20,
+                    20,
+                    Component.literal("\uD83D\uDDD8"),
+                    button -> {
+                        reloadConfig();
+                        reloadFonts();
+                        fontButton.setMessage(bigSignWriter$createFontButtonText());
+                    }
+            );
+            reloadButton.setTooltip(Tooltip.create(Component.translatableWithFallback("bigsignwriter.reload", "Reload Fonts")));
+            this.addRenderableWidget(reloadButton);
+        }
     }
 
     @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
