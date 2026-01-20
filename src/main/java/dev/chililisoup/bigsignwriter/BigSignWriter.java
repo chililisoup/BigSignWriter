@@ -36,6 +36,36 @@ public class BigSignWriter {
         return SELECTED_FONT != null;
     }
 
+    public static Optional<String[]> getBigChar(char chr, @Nullable FontFile fontFile) {
+        if (fontFile == null)
+            return Optional.empty();
+
+        if (fontFile.characters == null)
+            return Optional.empty();
+
+        if (fontFile.characters.containsKey(chr))
+            return Optional.of(fontFile.characters.get(chr));
+
+        char upper = Character.toUpperCase(chr);
+        if (fontFile.characters.containsKey(upper))
+            return Optional.of(fontFile.characters.get(upper));
+
+        if (DEFAULT_FONT == null || fontFile.name.equals("Default") || (fontFile.height > 0 && fontFile.height != 4))
+            return Optional.empty();
+
+        if (DEFAULT_FONT.characters.containsKey(chr))
+            return Optional.of(DEFAULT_FONT.characters.get(chr));
+
+        if (DEFAULT_FONT.characters.containsKey(upper))
+            return Optional.of(DEFAULT_FONT.characters.get(upper));
+
+        return Optional.empty();
+    }
+
+    public static Optional<String[]> getBigChar(char chr) {
+        return getBigChar(chr, SELECTED_FONT);
+    }
+
     public static void selectFont(@Nullable FontFile fontFile) {
         SELECTED_FONT = (fontFile != null && AVAILABLE_FONTS.contains(fontFile)) ?
                 fontFile : null;

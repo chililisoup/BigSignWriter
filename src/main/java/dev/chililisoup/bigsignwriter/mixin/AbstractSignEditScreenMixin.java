@@ -42,36 +42,14 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     protected AbstractSignEditScreenMixin(Component title) { super(title); }
 
     @Unique
-    private static int bigSignWriter$getHeight() {
-        return (BigSignWriter.SELECTED_FONT == null || BigSignWriter.SELECTED_FONT.height <= 0) ?
-                4 : BigSignWriter.SELECTED_FONT.height;
+    private static Component bigSignWriter$getDropdownLabel(boolean open) {
+        return Component.literal(open ? "▼" : "▶");
     }
 
     @Unique
-    private static Optional<String[]> bigSignWriter$getBigChar(char chr) {
-        if (BigSignWriter.SELECTED_FONT == null)
-            return Optional.empty();
-
-        if (BigSignWriter.SELECTED_FONT.characters == null)
-            return Optional.empty();
-
-        if (BigSignWriter.SELECTED_FONT.characters.containsKey(chr))
-            return Optional.of(BigSignWriter.SELECTED_FONT.characters.get(chr));
-
-        char upper = Character.toUpperCase(chr);
-        if (BigSignWriter.SELECTED_FONT.characters.containsKey(upper))
-            return Optional.of(BigSignWriter.SELECTED_FONT.characters.get(upper));
-
-        if (BigSignWriter.DEFAULT_FONT == null || BigSignWriter.SELECTED_FONT.name.equals("Default") || (BigSignWriter.SELECTED_FONT.height > 0 && BigSignWriter.SELECTED_FONT.height != 4))
-            return Optional.empty();
-
-        if (BigSignWriter.DEFAULT_FONT.characters.containsKey(chr))
-            return Optional.of(BigSignWriter.DEFAULT_FONT.characters.get(chr));
-
-        if (BigSignWriter.DEFAULT_FONT.characters.containsKey(upper))
-            return Optional.of(BigSignWriter.DEFAULT_FONT.characters.get(upper));
-
-        return Optional.empty();
+    private static int bigSignWriter$getHeight() {
+        return (BigSignWriter.SELECTED_FONT != null && BigSignWriter.SELECTED_FONT.height > 0) ?
+                BigSignWriter.SELECTED_FONT.height : 4;
     }
 
     @Unique
@@ -128,10 +106,10 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         FontSelectionWidget fontSelector = new FontSelectionWidget(
                 this.minecraft,
                 MAIN_CONFIG.showReloadButton ? 179 : 200,
-                Math.min(150, this.height - y - 5),
+                Math.min(200, this.height - y - 5),
                 x - 100,
                 y,
-                15,
+                20,
                 () -> {
                     if (BigSignWriter.enabled())
                         this.line = Math.min(this.line, this.bigSignWriter$getEffectiveBottomLine());
@@ -142,16 +120,17 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
         ClickableButtonWidget fontSelectorToggleButton = new ClickableButtonWidget(
                 x - 99,
-                y + 2,
+                y + 3,
                 14,
-                15,
-                Component.literal("▶"),
-                button -> {
-                    fontSelector.open = !fontSelector.open;
-                    button.setMessage(Component.literal(fontSelector.open ? "▼" : "▶"));
-                    if (this.doneButton != null) this.doneButton.active = !fontSelector.open;
-                }
+                14,
+                bigSignWriter$getDropdownLabel(fontSelector.isOpen()),
+                button -> fontSelector.setOpen(!fontSelector.isOpen())
         );
+
+        fontSelector.setOnOpenChanged(instance -> {
+            fontSelectorToggleButton.setMessage(bigSignWriter$getDropdownLabel(instance.isOpen()));
+            if (this.doneButton != null) this.doneButton.active = !instance.isOpen();
+        });
 
         this.addWidget(fontSelectorToggleButton);
         this.addRenderableWidget(fontSelector);
@@ -186,7 +165,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
         //? if >= 1.21.9
         char chr = Character.toChars(characterEvent.codepoint())[0];
-        String[] bigChar = bigSignWriter$getBigChar(chr).orElse(new String[]{});
+        String[] bigChar = BigSignWriter.getBigChar(chr).orElse(new String[]{});
         if (bigChar.length == 0) return;
 
         int startLine = this.line;
@@ -246,7 +225,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         cir.setReturnValue(true);
 
         String characterSeparator = BigSignWriter.CHARACTER_SEPARATOR.isEmpty() ?
-                bigSignWriter$getBigChar(' ').orElse(new String[]{""})[0] :
+                BigSignWriter.getBigChar(' ').orElse(new String[]{""})[0] :
                 BigSignWriter.CHARACTER_SEPARATOR;
 
         if (
