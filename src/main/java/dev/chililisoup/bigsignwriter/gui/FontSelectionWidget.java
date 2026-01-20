@@ -18,7 +18,12 @@ import java.util.function.Consumer;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import net.minecraft.client.input.MouseButtonEvent;
-//?}
+//?} else {
+/*import net.minecraft.Util;
+import net.minecraft.client.gui.Font;
+import net.minecraft.util.Mth;
+import org.joml.Vector3f;
+*///?}
 
 public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget.Entry> {
     private final int maxHeight;
@@ -70,6 +75,44 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
         this.setHeight(Math.min(this.maxHeight, this.contentHeight()));
     }
 
+    private static void drawScrollingString(GuiGraphics guiGraphics, Component text, int left, int top, int right, int bottom) {
+        //? if < 1.21.11 {
+        /*Font font = Minecraft.getInstance().font;
+        int width = font.width(text);
+        int middleY = (top + bottom - 9) / 2 + 1;
+        int maxWidth = right - left;
+        if (width <= maxWidth) guiGraphics.drawString(font, text, left, middleY, -1);
+        else  {
+            int hiddenWidth = width - maxWidth;
+            double time = Util.getMillis() / 1000.0;
+            double speed = Math.max(hiddenWidth * 0.5, 3.0);
+            double scrollEnd = Math.sin((Math.PI / 2) * Math.cos((Math.PI * 2) * time / speed)) / 2.0 + 0.5;
+            double scrollPos = Mth.lerp(scrollEnd, 0.0, hiddenWidth);
+
+            Vector3f scale = guiGraphics.pose().last().pose().getScale(new Vector3f());
+            Vector3f translation = guiGraphics.pose().last().pose().getTranslation(new Vector3f());
+
+            guiGraphics.enableScissor(
+                    (int) (left * scale.x + translation.x),
+                    (int) (top * scale.y + translation.y),
+                    (int) (right * scale.x + translation.x),
+                    (int) (bottom * scale.y + translation.y)
+            );
+            guiGraphics.drawString(font, text, left - (int) scrollPos, middleY, -1);
+            guiGraphics.disableScissor();
+        }
+        *///?} else {
+        guiGraphics.textRenderer().acceptScrolling(
+                text,
+                left,
+                left,
+                right,
+                top,
+                bottom
+        );
+        //?}
+    }
+
     //? if <= 1.21.3 {
     /*private int contentHeight() {
         return this.getItemCount() * this.itemHeight + 4;
@@ -114,28 +157,16 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
             }
 
             Entry selected = this.getSelected();
-            //? if < 1.21.11 {
-            /*renderScrollingString(
+            drawScrollingString(
                     guiGraphics,
-                    this.minecraft.font,
-            *///?} else
-            guiGraphics.textRenderer().acceptScrolling(
                     CommonComponents.optionNameValue(
                             Component.translatableWithFallback("bigsignwriter.font", "Font"),
                             selected != null ? selected.name : Component.literal("Unknown")
                     ),
                     this.getX() + 19,
-                    this.getX() + 19,
-                    //? if < 1.21.11 {
-                    /*this.getY(),
-                    this.getRight() - 3,
-                    this.getBottom(),
-                    -1
-                    *///?} else {
-                    this.getRight() - 3,
                     this.getY(),
+                    this.getRight() - 3,
                     this.getBottom()
-                    //?}
             );
             return;
         }
@@ -200,9 +231,9 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
     }
     *///?}
 
-    public class Entry extends ObjectSelectionList.Entry<FontSelectionWidget.Entry> {
+    public static class Entry extends ObjectSelectionList.Entry<FontSelectionWidget.Entry> {
         final @Nullable FontFile fontFile;
-        final @Nullable String[] fontPreview;
+        final Component[] fontPreview;
         final Component name;
 
         public Entry(final @Nullable FontFile fontFile) {
@@ -213,8 +244,8 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
                     Component.translatableWithFallback("bigsignwriter.no_font", "None (Vanilla)");
         }
 
-        private static @Nullable String[] getFontPreview(@Nullable FontFile fontFile) {
-            if (fontFile == null) return null;
+        private static Component[] getFontPreview(@Nullable FontFile fontFile) {
+            if (fontFile == null) return new Component[0];
 
             int height = fontFile.height > 0 ? fontFile.height : 4;
             ArrayList<ArrayList<String>> lines = new ArrayList<>(height);
@@ -226,14 +257,14 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
                     lines.get(i).add(bigChar[i]);
             }
 
-            if (lines.isEmpty()) return null;
+            if (lines.isEmpty()) return new Component[0];
 
-            String[] preview = new String[height];
+            Component[] preview = new Component[height];
             String characterSeparator = fontFile.characterSeparator != null ?
                     fontFile.characterSeparator :
                     BigSignWriterConfig.MAIN_CONFIG.defaultCharacterSeparator;
             for (int i = 0; i < lines.size(); i++)
-                preview[i] = String.join(characterSeparator, lines.get(i));
+                preview[i] = Component.literal(String.join(characterSeparator, lines.get(i)));
 
             return preview;
         }
@@ -263,23 +294,28 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
                 guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
             }
 
-            if (this.fontPreview == null)
-                guiGraphics.drawString(FontSelectionWidget.this.minecraft.font, this.name, left + 5, top + 4, -1);
+            if (this.fontPreview.length == 0)
+                drawScrollingString(
+                        guiGraphics, this.name, left + 5, top, left + width - 5, top + height
+                );
             else {
                 float scale = 1.5F / (float) this.fontPreview.length;
+                int scaledWidth = (int) ((width - 10) / scale);
 
                 //? if <= 1.21.3 {
                 /*guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(left + 5, top + 2, 0);
+                guiGraphics.pose().translate(left + 5, top, 0);
                 guiGraphics.pose().scale(scale, scale, scale);
                 *///?} else {
                 guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(left + 5, top + 2);
+                guiGraphics.pose().translate(left + 5, top);
                 guiGraphics.pose().scale(scale);
                 //?}
 
                 for (int i = 0; i < this.fontPreview.length; i++)
-                    guiGraphics.drawString(FontSelectionWidget.this.minecraft.font, this.fontPreview[i], 0, i * 8, -1);
+                    drawScrollingString(
+                            guiGraphics, this.fontPreview[i], 0, i * 8, scaledWidth, height + i * 8
+                    );
 
                 //? if <= 1.21.3 {
                 /*guiGraphics.pose().popPose();
