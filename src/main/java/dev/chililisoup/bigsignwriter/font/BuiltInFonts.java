@@ -15,7 +15,7 @@ public class BuiltInFonts {
                 entry("monospace", new MonospaceFont()), // Makes heavy use of default font fallback
                 entry("thin", new ThinFont()),
                 entry("small", new SmallFont()),
-                //? if >= 1.21.6
+                //? if >= 1.21.4
                 entry("smooth_small", new SmoothSmallFont()),
                 entry("outlined", new OutlinedFont()),
                 entry("outlined_short", new OutlinedShortFont())

@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import net.minecraft.client.input.MouseButtonEvent;
-//?} else {
+//?} else if < 1.21.4 {
 /*import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.util.Mth;
@@ -73,6 +73,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
                 .orElse(null)
         );
         this.setHeight(Math.min(this.maxHeight, this.contentHeight()));
+        this.setScrollAmount(0.0);
     }
 
     private static void drawScrollingString(GuiGraphics guiGraphics, Component text, int left, int top, int right, int bottom) {
@@ -314,9 +315,9 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
                 float scale = 1.5F / (float) this.fontPreview.length;
                 int scaledWidth = (int) ((width - 10) / scale);
 
-                //? if <= 1.21.3 {
+                //? if < 1.21.6 {
                 /*guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(left + 5, top, 0);
+                guiGraphics.pose().translate(left + 5, top, 10);
                 guiGraphics.pose().scale(scale, scale, scale);
                 *///?} else {
                 guiGraphics.pose().pushMatrix();
@@ -329,7 +330,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
                             guiGraphics, this.fontPreview[i], 0, i * 8, scaledWidth, height + i * 8
                     );
 
-                //? if <= 1.21.3 {
+                //? if < 1.21.6 {
                 /*guiGraphics.pose().popPose();
                 *///?} else
                 guiGraphics.pose().popMatrix();
