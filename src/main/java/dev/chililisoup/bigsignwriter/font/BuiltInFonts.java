@@ -14,9 +14,11 @@ public class BuiltInFonts {
                 entry("retro", new RetroFont()),
                 entry("monospace", new MonospaceFont()), // Makes heavy use of default font fallback
                 entry("thin", new ThinFont()),
-                entry("small", new SmallFont())
+                entry("small", new SmallFont()),
                 //? if >= 1.21.6
-                , entry("smooth_small", new SmoothSmallFont())
+                entry("smooth_small", new SmoothSmallFont()),
+                entry("outlined", new OutlinedFont()),
+                entry("outlined_short", new OutlinedShortFont())
         );
     }
 }
