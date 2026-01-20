@@ -76,7 +76,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
     }
 
     private static void drawScrollingString(GuiGraphics guiGraphics, Component text, int left, int top, int right, int bottom) {
-        //? if < 1.21.11 {
+        //? if <= 1.21.3 {
         /*Font font = Minecraft.getInstance().font;
         int width = font.width(text);
         int middleY = (top + bottom - 9) / 2 + 1;
@@ -102,13 +102,25 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
             guiGraphics.disableScissor();
         }
         *///?} else {
+        //? if < 1.21.11 {
+        /*renderScrollingString(
+                guiGraphics,
+                Minecraft.getInstance().font,
+        *///?} else
         guiGraphics.textRenderer().acceptScrolling(
                 text,
                 left,
                 left,
+                //? if < 1.21.11 {
+                /*top,
+                right,
+                bottom,
+                -1
+                *///?} else {
                 right,
                 top,
                 bottom
+                //?}
         );
         //?}
     }
