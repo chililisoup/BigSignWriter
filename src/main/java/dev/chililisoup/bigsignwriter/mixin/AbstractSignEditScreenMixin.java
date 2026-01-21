@@ -129,7 +129,8 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
         fontSelector.setOnOpenChanged(instance -> {
             fontSelectorToggleButton.setMessage(bigSignWriter$getDropdownLabel(instance.isOpen()));
-            if (this.doneButton != null) this.doneButton.active = !instance.isOpen();
+            if (this.doneButton != null) this.doneButton.active =
+                    !MAIN_CONFIG.fontSelectorCoversDoneButton || !instance.isOpen();
         });
 
         this.addWidget(fontSelectorToggleButton);

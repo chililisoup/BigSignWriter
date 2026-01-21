@@ -104,6 +104,22 @@ public abstract class YaclIntegration {
                                 .build())
                         .option(Option.<Boolean>createBuilder()
                                 .name(Component.translatableWithFallback(
+                                        "bigsignwriter.config.fontSelectorCoversDoneButton",
+                                        "Font Selector Covers Done Button"))
+                                .description(OptionDescription.of(Component.translatableWithFallback(
+                                        "bigsignwriter.config.fontSelectorCoversDoneButton.desc",
+                                        "Disables the \"Done\" button when the font selector is open.")))
+                                .binding(
+                                        defaults.fontSelectorCoversDoneButton,
+                                        () -> MAIN_CONFIG.fontSelectorCoversDoneButton,
+                                        newVal -> {
+                                            MAIN_CONFIG.fontSelectorCoversDoneButton = newVal;
+                                            BigSignWriterConfig.saveConfig();
+                                        })
+                                .controller(TickBoxControllerBuilder::create)
+                                .build())
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Component.translatableWithFallback(
                                         "bigsignwriter.config.showReloadButton",
                                         "Show Reload Button"))
                                 .description(OptionDescription.of(Component.translatableWithFallback(

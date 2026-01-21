@@ -28,6 +28,7 @@ public class BigSignWriterConfig {
         public int buttonsY = 120;
         public double buttonsAlignmentX = 0.5;
         public double buttonsAlignmentY = 0.25;
+        public boolean fontSelectorCoversDoneButton = true;
         public boolean showReloadButton = false;
         public String defaultCharacterSeparator = " ";
 
