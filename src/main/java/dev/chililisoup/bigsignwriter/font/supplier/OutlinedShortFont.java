@@ -18,7 +18,7 @@ public class OutlinedShortFont implements FontSupplier {
                 entry('A', new String[]{
                         "╔═╗",
                         "╠═╣",
-                        "╙  ╜"
+                        "╚  ╝"
                 }),
                 entry('B', new String[]{
                         "╔═╕,",
@@ -43,7 +43,7 @@ public class OutlinedShortFont implements FontSupplier {
                 entry('F', new String[]{
                         "╔═╗",
                         "╠═  ",
-                        "╙    "
+                        "╚    "
                 }),
                 entry('G', new String[]{
                         "╔═╗",
@@ -51,9 +51,9 @@ public class OutlinedShortFont implements FontSupplier {
                         "╚═╣"
                 }),
                 entry('H', new String[]{
-                        "╓  ╖",
+                        "╔  ╗",
                         "╠═╣",
-                        "╙  ╜"
+                        "╚  ╝"
                 }),
                 entry('I', new String[]{
                         "╔╦╗",
@@ -61,29 +61,29 @@ public class OutlinedShortFont implements FontSupplier {
                         "╚╩╝"
                 }),
                 entry('J', new String[]{
-                        "    ╖",
+                        "    ╗",
                         "╓  ║",
                         "╚═╝"
                 }),
                 entry('K', new String[]{
-                        "╓  ╖",
+                        "╔  ╗",
                         "╠╦╛'",
-                        "╙  ╚"
+                        "╚  ╚"
                 }),
                 entry('L', new String[]{
-                        "╓    ",
+                        "╔    ",
                         "║    ",
                         "╚═╝"
                 }),
                 entry('M', new String[]{
                         "╔╦╗",
                         "║ܼ║ܼ║",
-                        "╙  ╜"
+                        "╚  ╝"
                 }),
                 entry('N', new String[]{
                         "╔═╕,",
                         "║  ║",
-                        "╙  ╜"
+                        "╚  ╝"
                 }),
                 entry('O', new String[]{
                         "╔═╗",
@@ -93,7 +93,7 @@ public class OutlinedShortFont implements FontSupplier {
                 entry('P', new String[]{
                         "╔═╕,",
                         "╠═╛'",
-                        "╙    "
+                        "╚    "
                 }),
                 entry('Q', new String[]{
                         "╔═╗",
@@ -103,7 +103,7 @@ public class OutlinedShortFont implements FontSupplier {
                 entry('R', new String[]{
                         "╔═╕,",
                         "╠╦╛'",
-                        "╙  ╚"
+                        "╚  ╚"
                 }),
                 entry('S', new String[]{
                         "╔═╗",
@@ -113,30 +113,30 @@ public class OutlinedShortFont implements FontSupplier {
                 entry('T', new String[]{
                         "╔╦╗",
                         "  ║  ",
-                        "  ╙  "
+                        "  ╚  "
                 }),
                 entry('U', new String[]{
-                        "╓  ╖",
+                        "╔  ╗",
                         "║  ║",
                         "╚═╝"
                 }),
                 entry('V', new String[]{
-                        "╓  ╖",
+                        "╔  ╗",
                         "║  ║",
                         " ╚\uD836\uDE9D╝ "
                 }),
                 entry('W', new String[]{
-                        "╓  ╖",
+                        "╔  ╗",
                         "║ܼ║ܼ║",
                         "╚╩╝"
                 }),
                 entry('X', new String[]{
-                        "╓  ╖",
+                        "╔  ╗",
                         " ╠\uD836\uDE9D╣ ",
-                        "╙  ╜"
+                        "╚  ╝"
                 }),
                 entry('Y', new String[]{
-                        "╓  ╖",
+                        "╔  ╗",
                         "╚═╣",
                         "╚═╝"
                 }),

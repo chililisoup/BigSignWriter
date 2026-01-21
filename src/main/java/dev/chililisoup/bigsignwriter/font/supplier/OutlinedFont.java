@@ -20,7 +20,7 @@ public class OutlinedFont implements FontSupplier {
                         "╔═╗",
                         "╠═╣",
                         "║  ║",
-                        "╙  ╜"
+                        "╚  ╝"
                 }),
                 entry('B', new String[]{
                         "╔═╕,",
@@ -50,7 +50,7 @@ public class OutlinedFont implements FontSupplier {
                         "╔═╗",
                         "╠═  ",
                         "║    ",
-                        "╙    "
+                        "╚    "
                 }),
                 entry('G', new String[]{
                         "╔═╗",
@@ -59,10 +59,10 @@ public class OutlinedFont implements FontSupplier {
                         "╚═╣"
                 }),
                 entry('H', new String[]{
-                        "╓  ╖",
+                        "╔  ╗",
                         "╠═╣",
                         "║  ║",
-                        "╙  ╜"
+                        "╚  ╝"
                 }),
                 entry('I', new String[]{
                         "╔╦╗",
@@ -71,19 +71,19 @@ public class OutlinedFont implements FontSupplier {
                         "╚╩╝"
                 }),
                 entry('J', new String[]{
-                        "    ╖",
+                        "    ╗",
                         "    ║",
                         "╓  ║",
                         "╚═╝"
                 }),
                 entry('K', new String[]{
-                        "╓  ╖",
+                        "╔  ╗",
                         "╠╦╛'",
                         "║  ╕,",
-                        "╙  ╜"
+                        "╙  ╚"
                 }),
                 entry('L', new String[]{
-                        "╓    ",
+                        "╔    ",
                         "║    ",
                         "║    ",
                         "╚═╝"
@@ -92,13 +92,13 @@ public class OutlinedFont implements FontSupplier {
                         "╔╦╗",
                         "║ܼ║ܼ║",
                         "║  ║",
-                        "╙  ╜"
+                        "╚  ╝"
                 }),
                 entry('N', new String[]{
                         "╔═╕,",
                         "║  ║",
                         "║  ║",
-                        "╙  ╜"
+                        "╚  ╝"
                 }),
                 entry('O', new String[]{
                         "╔═╗",
@@ -110,7 +110,7 @@ public class OutlinedFont implements FontSupplier {
                         "╔═╕,",
                         "╠═╛'",
                         "║    ",
-                        "╙    "
+                        "╚    "
                 }),
                 entry('Q', new String[]{
                         "╔═╗",
@@ -122,7 +122,7 @@ public class OutlinedFont implements FontSupplier {
                         "╔═╕,",
                         "╠╦╛'",
                         "║  ╕,",
-                        "╙  ╜"
+                        "╙  ╚"
                 }),
                 entry('S', new String[]{
                         "╔═╗",
@@ -134,34 +134,34 @@ public class OutlinedFont implements FontSupplier {
                         "╔╦╗",
                         "  ║  ",
                         "  ║  ",
-                        "  ╙  "
+                        "  ╚  "
                 }),
                 entry('U', new String[]{
-                        "╓  ╖",
+                        "╔  ╗",
                         "║  ║",
                         "║  ║",
                         "╚═╝"
                 }),
                 entry('V', new String[]{
-                        "╓  ╖",
+                        "╔  ╗",
                         "║  ║",
                         "║  ║",
                         " ╚\uD836\uDE9D╝ "
                 }),
                 entry('W', new String[]{
-                        "╓  ╖",
+                        "╔  ╗",
                         "║  ║",
                         "║ܼ║ܼ║",
                         "╚╩╝"
                 }),
                 entry('X', new String[]{
-                        "╓  ╖",
+                        "╔  ╗",
                         " ╠\uD836\uDE9D╣ ",
                         "║  ║",
-                        "╙  ╜"
+                        "╚  ╝"
                 }),
                 entry('Y', new String[]{
-                        "╓  ╖",
+                        "╔  ╗",
                         "╚═╣",
                         "╓  ║",
                         "╚═╝"
