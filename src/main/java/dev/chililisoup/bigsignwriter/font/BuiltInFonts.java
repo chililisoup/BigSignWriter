@@ -15,8 +15,12 @@ public class BuiltInFonts {
                 entry("monospace", new MonospaceFont()), // Makes heavy use of default font fallback
                 entry("thin", new ThinFont()),
                 entry("small", new SmallFont()),
-                //? if >= 1.21.4
+                //? if >= 1.21.4 {
                 entry("smooth_small", new SmoothSmallFont()),
+                entry("minecraft_striped", new MinecraftStripedFont()),
+                entry("minecraft_small", new MinecraftSmallFont()),
+                entry("happy_ghast", new HappyGhastFont()),
+                //?}
                 entry("outlined", new OutlinedFont()),
                 entry("outlined_short", new OutlinedShortFont())
         );
