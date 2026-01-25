@@ -4,6 +4,7 @@ package dev.chililisoup.bigsignwriter.font.supplier;
 import dev.chililisoup.bigsignwriter.font.FontFile;
 
 import java.util.Map;
+import java.util.Set;
 
 import static java.util.Map.entry;
 
@@ -168,11 +169,11 @@ public class MinecraftSmallFont implements FontSupplier {
                         "\uD833\uDD1D"
                 }),
                 entry('m', new String[]{
-                        "▂ܼܼܼ\uD833\uDEA0ܼܼ",
+                        "\uD833\uDD61\uD833\uDEA0\uD833\uDD80",
                         "\uD833\uDD0D᤺\uD833\uDEA8᤺\uD833\uDD0D"
                 }),
                 entry('n', new String[]{
-                        "▂\uD833\uDEA0\uD833\uDEA0ܼܼ",
+                        "\uD833\uDD61\uD833\uDD18\uD833\uDD80",
                         "\uD833\uDD0D\uD836\uDE9D \uD836\uDE9D\uD833\uDD0D"
                 }),
                 entry('o', new String[]{
@@ -392,6 +393,24 @@ public class MinecraftSmallFont implements FontSupplier {
                         "  "
                 })
         ));
+    }
+
+    @Override
+    public Map<Character, Set<PatchCharacter>> patches() {
+        return Map.ofEntries(
+                entry('m', Set.of(
+                        PatchCharacter.of(
+                                "▂ܼܼܼ\uD833\uDEA0ܼܼ",
+                                "\uD833\uDD0D᤺\uD833\uDEA8᤺\uD833\uDD0D"
+                        )
+                )),
+                entry('n', Set.of(
+                        PatchCharacter.of(
+                                "▂\uD833\uDEA0\uD833\uDEA0ܼܼ",
+                                "\uD833\uDD0D\uD836\uDE9D \uD836\uDE9D\uD833\uDD0D"
+                        )
+                ))
+        );
     }
 }
 //?}
