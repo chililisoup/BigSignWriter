@@ -17,10 +17,11 @@ public class BuiltInFonts {
                 entry("small", new SmallFont()),
                 //? if >= 1.21.4 {
                 entry("smooth_small", new SmoothSmallFont()),
+                entry("happy_ghast", new HappyGhastFont()),
                 entry("minecraft_striped", new MinecraftStripedFont()),
                 entry("minecraft_small", new MinecraftSmallFont()),
-                entry("happy_ghast", new HappyGhastFont()),
                 //?}
+                entry("minecraft", new MinecraftFont()),
                 entry("outlined", new OutlinedFont()),
                 entry("outlined_short", new OutlinedShortFont())
         );
