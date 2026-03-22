@@ -32,6 +32,10 @@ stonecutter {
     constants {
         match(loader, "fabric", "neoforge")
     }
+
+    replacements.string(minecraft >= "26.1") {
+        replace("GuiGraphics", "GuiGraphicsExtractor")
+    }
 }
 
 modstitch {
@@ -39,13 +43,9 @@ modstitch {
 
     // Alternatively use stonecutter.eval if you have a lot of versions to target.
     // https://stonecutter.kikugie.dev/stonecutter/guide/setup#checking-versions
-    javaVersion = when (minecraft) {
-        "1.21.1" -> 21
-        "1.21.3" -> 21
-        "1.21.4" -> 21
-        "1.21.6" -> 21
-        "1.21.9" -> 21
-        "1.21.11" -> 21
+    javaVersion = when {
+        minecraft >= "26.1" -> 25
+        minecraft >= "1.21.1" -> 21
         else -> throw IllegalArgumentException("Please store the java version for ${property("deps.minecraft")} in build.gradle.kts!")
     }
 
@@ -134,7 +134,7 @@ dependencies {
     if (modstitch.isLoom) {
         prop("deps.fapi") { modstitchModApi("net.fabricmc.fabric-api:fabric-api:${it}") }
         prop("deps.modmenu") {
-            if (stonecutter.eval(minecraft, "<1.21.9"))
+            if (minecraft < "1.21.9")
                 modstitchModApi("com.terraformersmc:modmenu:${it}")
             else
                 modstitchModCompileOnly("com.terraformersmc:modmenu:${it}")

@@ -11,7 +11,7 @@ public class ModMenuIntegration implements ModMenuApi {
         if (FabricLoader.getInstance().isModLoaded("yet_another_config_lib_v3"))
             return YaclIntegration::generateScreen;
 
-        return (screen) -> null;
+        return _ -> null;
     }
 }
 //?}

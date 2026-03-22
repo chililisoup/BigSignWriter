@@ -3,8 +3,9 @@ plugins {
 
     val modstitchVersion = "0.8.4"
     id("dev.isxander.modstitch.base") version modstitchVersion apply false
+    id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT" apply false
 }
-stonecutter active "1.21.11-fabric"
+stonecutter active "26.1-fabric"
 
 allprojects {
     repositories {

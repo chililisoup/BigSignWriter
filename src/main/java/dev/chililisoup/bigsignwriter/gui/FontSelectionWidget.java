@@ -4,7 +4,7 @@ import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.font.FontFile;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -76,7 +76,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
         this.setScrollAmount(0.0);
     }
 
-    private static void drawScrollingString(GuiGraphics guiGraphics, Component text, int left, int top, int right, int bottom) {
+    private static void drawScrollingString(GuiGraphicsExtractor guiGraphics, Component text, int left, int top, int right, int bottom) {
         //? if <= 1.21.3 {
         /*Font font = Minecraft.getInstance().font;
         int width = font.width(text);
@@ -153,9 +153,17 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
     }
 
     @Override
-    public void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    //? if >= 26.1 {
+    public void extractWidgetRenderState(
+    //?} else
+    //public void renderWidget(
+            @NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick
+    ) {
         if (!this.open) {
-            this.renderListBackground(guiGraphics);
+            //? if >= 26.1 {
+            this.extractListBackground(guiGraphics);
+            //?} else
+            //this.renderListBackground(guiGraphics);
 
             if (mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getRight() && mouseY < this.getBottom()) {
                 guiGraphics.fill(
@@ -186,7 +194,13 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
 
         //? if > 1.21.6
         if (this.isHovered()) guiGraphics.requestCursor(CursorType.DEFAULT);
-        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+
+        //? if >= 26.1 {
+        super.extractWidgetRenderState(
+        //?} else
+        //super.renderWidget(
+                guiGraphics, mouseX, mouseY, partialTick
+        );
     }
 
     @Override
@@ -289,9 +303,15 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
 
         @Override
         //? if <= 1.21.6 {
-        /*public void render(GuiGraphics guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovered, float partialTick) {
-        *///?} else
-        public void renderContent(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+        /*public void render(GuiGraphicsExtractor guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovered, float partialTick) {
+        *///?} else {
+        //? if >= 26.1 {
+        public void extractContent(
+        //?} else
+        //public void renderContent(
+                @NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick
+        ) {
+        //?}
             //? if <= 1.21.6 {
             /*width -= 4;
             *///?} else {

@@ -8,7 +8,7 @@ import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.gui.ClickableButtonWidget;
 import dev.chililisoup.bigsignwriter.gui.FontSelectionWidget;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -18,6 +18,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector2f;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -124,7 +125,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 14,
                 14,
                 bigSignWriter$getDropdownLabel(fontSelector.isOpen()),
-                button -> fontSelector.setOpen(!fontSelector.isOpen())
+                _ -> fontSelector.setOpen(!fontSelector.isOpen())
         );
 
         fontSelector.setOnOpenChanged(instance -> {
@@ -144,7 +145,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                     20,
                     20,
                     Component.literal("\uD83D\uDDD8"),
-                    button -> {
+                    _ -> {
                         reloadConfig();
                         BigSignWriter.reloadFonts();
                         fontSelector.updateEntries();
@@ -293,8 +294,10 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             this.signField.setCursorToEnd();
     }
 
+    //? if >= 26.1
+    @SuppressWarnings("LocalMayUseName")
     @Inject(
-            method = "renderSignText",
+            method = /*? if >= 26.1 {*/ "extractSignText" /*?} else {*/ /*"renderSignText" *//*?}*/,
             at = @At(
                     value = "FIELD",
                     target = "Lnet/minecraft/client/gui/screens/inventory/AbstractSignEditScreen;messages:[Ljava/lang/String;",
@@ -304,9 +307,11 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             cancellable = true
     )
     private void drawExtraLines(
-            GuiGraphics guiGraphics,
+            GuiGraphicsExtractor guiGraphics,
+            //? if >= 26.1
+            Vector2f cursorPosOutput,
             CallbackInfo ci,
-            @Local boolean blink,
+            @Local(ordinal = 0) boolean blink,
             @Local(ordinal = 0) int color
     ) {
         if (!BigSignWriter.enabled()) return;
@@ -328,17 +333,29 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     }
 
     @WrapWithCondition(
-            method = "renderSignText",
+            method = /*? if >= 26.1 {*/ "extractSignText" /*?} else {*/ /*"renderSignText" *//*?}*/,
             at = @At(
                     value = "INVOKE",
-                    ordinal = 1,
-                    //? if >= 1.21.6 {
-                    target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V"
-                    //?} else
-                    //target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I"
+                    //? if < 21.6
+                    //ordinal = 1,
+                    //? if >= 21.6 {
+                    target = "Lnet/minecraft/client/gui/components/TextCursorUtils;extractAppendCursor(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIIZ)V"
+                    //?} elif >= 1.21.6 {
+                    /*target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V"
+                    *///?} else
+                    //target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I"
             )
     )
-    private boolean hideUnderscore(GuiGraphics instance, Font font, String string, int i, int j, int k, boolean bl) {
+    private boolean hideUnderscore(
+            GuiGraphicsExtractor instance,
+            Font font,
+            //? if < 21.6
+            //String string,
+            int cursorX,
+            int cursorY,
+            int color,
+            boolean shadow
+    ) {
         return !BigSignWriter.enabled();
     }
 }
