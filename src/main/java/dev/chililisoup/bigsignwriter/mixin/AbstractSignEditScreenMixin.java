@@ -125,7 +125,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 14,
                 14,
                 bigSignWriter$getDropdownLabel(fontSelector.isOpen()),
-                _ -> fontSelector.setOpen(!fontSelector.isOpen())
+                button -> fontSelector.setOpen(!fontSelector.isOpen())
         );
 
         fontSelector.setOnOpenChanged(instance -> {
@@ -145,7 +145,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                     20,
                     20,
                     Component.literal("\uD83D\uDDD8"),
-                    _ -> {
+                    button -> {
                         reloadConfig();
                         BigSignWriter.reloadFonts();
                         fontSelector.updateEntries();
