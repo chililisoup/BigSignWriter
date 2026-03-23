@@ -60,7 +60,7 @@ modstitch {
     metadata {
         modId = mod.id
         modName = mod.name
-        modVersion = "${mod.version}+$minecraft-$loader"
+        modVersion = "${mod.version}+$name"
         modGroup = mod.group
         modAuthor = mod.authors
         modCredits = mod.contributors
