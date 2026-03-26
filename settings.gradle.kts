@@ -20,6 +20,7 @@ pluginManagement {
 
 plugins {
     id("dev.kikugie.stonecutter") version "0.8.3"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
 stonecutter {
@@ -35,7 +36,7 @@ stonecutter {
             loaders.forEach { version("$name-$it", mcVersion) }
 
         // Configure your targets here!
-        mc("26.1", loaders = listOf("fabric"))
+        mc("26.1", loaders = listOf("fabric", "neoforge"))
         mc("1.21.11", loaders = listOf("fabric", "neoforge"))
         mc("1.21.9", loaders = listOf("fabric", "neoforge"))
         mc("1.21.6", loaders = listOf("fabric", "neoforge"))
