@@ -23,7 +23,8 @@ public class BuiltInFonts {
                 //?}
                 entry("minecraft", new MinecraftFont()),
                 entry("outlined", new OutlinedFont()),
-                entry("outlined_short", new OutlinedShortFont())
+                entry("outlined_short", new OutlinedShortFont()),
+                entry("shulkerware", new ShulkerwareFont())
         );
     }
 }
