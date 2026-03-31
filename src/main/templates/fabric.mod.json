@@ -24,10 +24,10 @@
   },
   "depends": {
     "fabricloader": ">=0.15",
+    "fabric-api": "*",
     "minecraft": "${minecraft_range}"
   },
   "recommends": {
-    "fabric-api": "*",
     "yet_another_config_lib_v3": "*"
   }
 }

@@ -151,7 +151,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                         fontSelector.updateEntries();
                     }
             );
-            reloadButton.setTooltip(Tooltip.create(Component.translatableWithFallback("bigsignwriter.reload", "Reload Fonts")));
+            reloadButton.setTooltip(Tooltip.create(Component.translatable("bigsignwriter.reload")));
             this.addRenderableWidget(reloadButton);
         }
     }

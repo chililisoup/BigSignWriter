@@ -181,8 +181,8 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
             drawScrollingString(
                     guiGraphics,
                     CommonComponents.optionNameValue(
-                            Component.translatableWithFallback("bigsignwriter.font", "Font"),
-                            selected != null ? selected.name : Component.literal("Unknown")
+                            Component.translatable("bigsignwriter.font"),
+                            selected != null ? selected.name : Component.translatable("bigsignwriter.font.unknown")
                     ),
                     this.getX() + 19,
                     this.getY(),
@@ -268,7 +268,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
             this.fontPreview = getFontPreview(fontFile);
             this.name = fontFile != null ?
                     Component.literal(fontFile.name) :
-                    Component.translatableWithFallback("bigsignwriter.no_font", "None (Vanilla)");
+                    Component.translatable("bigsignwriter.font.none");
         }
 
         private static Component[] getFontPreview(@Nullable FontFile fontFile) {

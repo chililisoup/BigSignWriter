@@ -132,18 +132,11 @@ modstitch {
 // use the modstitch.createProxyConfigurations(sourceSets["client"]) function.
 dependencies {
     if (modstitch.isLoom) {
-        prop("deps.fapi") { modstitchModApi("net.fabricmc.fabric-api:fabric-api:${it}") }
-        prop("deps.modmenu") {
-            if (minecraft < "1.21.9")
-                modstitchModApi("com.terraformersmc:modmenu:${it}")
-            else
-                modstitchModCompileOnly("com.terraformersmc:modmenu:${it}")
-        }
+        prop("deps.fapi") { modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:${it}") }
+        prop("deps.modmenu") { modstitchModImplementation("com.terraformersmc:modmenu:${it}") }
     }
 
-    prop("deps.yacl") { modstitchModApi("dev.isxander:yet-another-config-lib:${it}-${loader}") }
-
-    // Anything else in the dependencies block will be used for all platforms.
+    prop("deps.yacl") { modstitchModImplementation("dev.isxander:yet-another-config-lib:${it}-${loader}") }
 }
 
 modstitch.onEnable {

@@ -1,10 +1,8 @@
 package dev.chililisoup.bigsignwriter.compat;
 
+import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
-import dev.isxander.yacl3.api.ConfigCategory;
-import dev.isxander.yacl3.api.Option;
-import dev.isxander.yacl3.api.OptionDescription;
-import dev.isxander.yacl3.api.YetAnotherConfigLib;
+import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.DoubleSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.StringControllerBuilder;
@@ -17,22 +15,15 @@ import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.MAIN_CONFIG;
 public abstract class YaclIntegration {
     public static Screen generateScreen(Screen parentScreen) {
         BigSignWriterConfig.MainConfig defaults = new BigSignWriterConfig.MainConfig();
-        Component name = Component.translatableWithFallback(
-                "bigsignwriter.config",
-                "Big Sign Writer Config"
-        );
+        Component name = Component.translatable("bigsignwriter.config");
 
         return YetAnotherConfigLib.createBuilder()
                 .title(name)
                 .category(ConfigCategory.createBuilder()
                         .name(name)
                         .option(Option.<Integer>createBuilder()
-                                .name(Component.translatableWithFallback(
-                                        "bigsignwriter.config.buttonsX",
-                                        "Buttons X"))
-                                .description(OptionDescription.of(Component.translatableWithFallback(
-                                        "bigsignwriter.config.buttonsX.desc",
-                                        "Horizontal offset for mod buttons, from center of screen.")))
+                                .name(Component.translatable("bigsignwriter.config.buttonsX"))
+                                .description(OptionDescription.of(Component.translatable("bigsignwriter.config.buttonsX.desc")))
                                 .binding(
                                         defaults.buttonsX,
                                         () -> MAIN_CONFIG.buttonsX,
@@ -46,12 +37,8 @@ public abstract class YaclIntegration {
                                         .formatValue(val -> Component.literal(val + "px")))
                                 .build())
                         .option(Option.<Integer>createBuilder()
-                                .name(Component.translatableWithFallback(
-                                        "bigsignwriter.config.buttonsY",
-                                        "Buttons Y"))
-                                .description(OptionDescription.of(Component.translatableWithFallback(
-                                        "bigsignwriter.config.buttonsY.desc",
-                                        "Vertical offset for mod buttons, from center of screen.")))
+                                .name(Component.translatable("bigsignwriter.config.buttonsY"))
+                                .description(OptionDescription.of(Component.translatable("bigsignwriter.config.buttonsY.desc")))
                                 .binding(
                                         defaults.buttonsY,
                                         () -> MAIN_CONFIG.buttonsY,
@@ -65,12 +52,8 @@ public abstract class YaclIntegration {
                                         .formatValue(val -> Component.literal(val + "px")))
                                 .build())
                         .option(Option.<Double>createBuilder()
-                                .name(Component.translatableWithFallback(
-                                        "bigsignwriter.config.buttonsAlignmentX",
-                                        "Buttons Alignment X"))
-                                .description(OptionDescription.of(Component.translatableWithFallback(
-                                        "bigsignwriter.config.buttonsAlignmentX.desc",
-                                        "Horizontal screen alignment for mod buttons (0%: left, 100%: right)")))
+                                .name(Component.translatable("bigsignwriter.config.buttonsAlignmentX"))
+                                .description(OptionDescription.of(Component.translatable("bigsignwriter.config.buttonsAlignmentX.desc")))
                                 .binding(
                                         defaults.buttonsAlignmentX,
                                         () -> MAIN_CONFIG.buttonsAlignmentX,
@@ -84,12 +67,8 @@ public abstract class YaclIntegration {
                                         .formatValue(val -> Component.literal((int) (val * 100) + "%")))
                                 .build())
                         .option(Option.<Double>createBuilder()
-                                .name(Component.translatableWithFallback(
-                                        "bigsignwriter.config.buttonsAlignmentY",
-                                        "Buttons Alignment Y"))
-                                .description(OptionDescription.of(Component.translatableWithFallback(
-                                        "bigsignwriter.config.buttonsAlignmentY.desc",
-                                        "Vertical screen alignment for mod buttons (0%: top, 100%: bottom)")))
+                                .name(Component.translatable("bigsignwriter.config.buttonsAlignmentY"))
+                                .description(OptionDescription.of(Component.translatable("bigsignwriter.config.buttonsAlignmentY.desc")))
                                 .binding(
                                         defaults.buttonsAlignmentY,
                                         () -> MAIN_CONFIG.buttonsAlignmentY,
@@ -103,12 +82,8 @@ public abstract class YaclIntegration {
                                         .formatValue(val -> Component.literal((int) (val * 100) + "%")))
                                 .build())
                         .option(Option.<Boolean>createBuilder()
-                                .name(Component.translatableWithFallback(
-                                        "bigsignwriter.config.fontSelectorCoversDoneButton",
-                                        "Font Selector Covers Done Button"))
-                                .description(OptionDescription.of(Component.translatableWithFallback(
-                                        "bigsignwriter.config.fontSelectorCoversDoneButton.desc",
-                                        "Disables the \"Done\" button when the font selector is open.")))
+                                .name(Component.translatable("bigsignwriter.config.fontSelectorCoversDoneButton"))
+                                .description(OptionDescription.of(Component.translatable("bigsignwriter.config.fontSelectorCoversDoneButton.desc")))
                                 .binding(
                                         defaults.fontSelectorCoversDoneButton,
                                         () -> MAIN_CONFIG.fontSelectorCoversDoneButton,
@@ -119,12 +94,8 @@ public abstract class YaclIntegration {
                                 .controller(TickBoxControllerBuilder::create)
                                 .build())
                         .option(Option.<Boolean>createBuilder()
-                                .name(Component.translatableWithFallback(
-                                        "bigsignwriter.config.showReloadButton",
-                                        "Show Reload Button"))
-                                .description(OptionDescription.of(Component.translatableWithFallback(
-                                        "bigsignwriter.config.showReloadButton.desc",
-                                        "Whether to show the Reload Fonts button")))
+                                .name(Component.translatable("bigsignwriter.config.showReloadButton"))
+                                .description(OptionDescription.of(Component.translatable("bigsignwriter.config.showReloadButton.desc")))
                                 .binding(
                                         defaults.showReloadButton,
                                         () -> MAIN_CONFIG.showReloadButton,
@@ -135,12 +106,8 @@ public abstract class YaclIntegration {
                                 .controller(TickBoxControllerBuilder::create)
                                 .build())
                         .option(Option.<String>createBuilder()
-                                .name(Component.translatableWithFallback(
-                                        "bigsignwriter.config.defaultCharacterSeparator",
-                                        "Default Character Separator"))
-                                .description(OptionDescription.of(Component.translatableWithFallback(
-                                        "bigsignwriter.config.defaultCharacterSeparator.desc",
-                                        "Default separator string to place between characters. May be overridden by fonts.")))
+                                .name(Component.translatable("bigsignwriter.config.defaultCharacterSeparator"))
+                                .description(OptionDescription.of(Component.translatable("bigsignwriter.config.defaultCharacterSeparator.desc")))
                                 .binding(
                                         defaults.defaultCharacterSeparator,
                                         () -> MAIN_CONFIG.defaultCharacterSeparator,
@@ -149,6 +116,15 @@ public abstract class YaclIntegration {
                                             BigSignWriterConfig.saveConfig();
                                         })
                                 .controller(StringControllerBuilder::create)
+                                .build())
+                        .build())
+
+                .category(ConfigCategory.createBuilder()
+                        .name(Component.translatable("bigsignwriter.debug"))
+                        .option(ButtonOption.createBuilder()
+                                .name(Component.translatable("bigsignwriter.debug.validateFonts"))
+                                .description(OptionDescription.of(Component.translatable("bigsignwriter.debug.validateFonts.desc")))
+                                .action(((yaclScreen, buttonOption) -> BigSignWriter.analyzeFonts()))
                                 .build())
                         .build())
                 .build()

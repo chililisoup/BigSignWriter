@@ -6,6 +6,8 @@ import com.google.gson.reflect.TypeToken;
 import dev.chililisoup.bigsignwriter.font.BuiltInFonts;
 import dev.chililisoup.bigsignwriter.font.FontFile;
 import dev.chililisoup.bigsignwriter.font.supplier.FontSupplier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -16,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 public class BigSignWriter {
@@ -184,5 +187,55 @@ public class BigSignWriter {
         } catch (Exception e) {
             LOGGER.error("Error copying built-in fonts", e);
         }
+    }
+
+    public static void analyzeFonts() {
+        Font font = Minecraft.getInstance().font;
+        AVAILABLE_FONTS.forEach(fontFile -> {
+            if (fontFile.height <= 0) {
+                LOGGER.error(
+                        "Font '{}' has an invalid height ({})!",
+                        fontFile.name,
+                        fontFile.height
+                );
+                return;
+            }
+
+            AtomicBoolean valid = new AtomicBoolean(true);
+            fontFile.characters.forEach((baseChar, bigChar) -> {
+                if (bigChar.length != fontFile.height) {
+                    LOGGER.error(
+                            "Character '{}' in font '{}' has an incorrect number of lines!",
+                            baseChar,
+                            fontFile.name
+                    );
+                    valid.set(false);
+                    return;
+                }
+
+                int[] widths = new int[bigChar.length];
+                widths[0] = font.width(bigChar[0]);
+                boolean unfixed = false;
+                for (int i = 1; i < bigChar.length; i++) {
+                    widths[i] = font.width(bigChar[i]);
+                    if (widths[i] != widths[0]) unfixed = true;
+                }
+                if (unfixed) {
+                    LOGGER.error(
+                            "Character '{}' in font '{}' does not have a fixed width! {}",
+                            baseChar,
+                            fontFile.name,
+                            Arrays.toString(widths)
+                    );
+                    valid.set(false);
+                }
+            });
+
+            if (valid.get()) LOGGER.info(
+                    "Validated {} characters in font '{}'",
+                    fontFile.characters.size(),
+                    fontFile.name
+            );
+        });
     }
 }
