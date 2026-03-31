@@ -361,8 +361,8 @@ public class DefaultFont implements FontSupplier {
                         "    █"
                 }),
                 entry('5', new String[]{
-                        "█▋▋█",
-                        "▉▉▄🬏 ",
+                        "█▉▋█",
+                        "▉▉▄🬏 ",
                         "'▘▘▀▌🬓",
                         "▝🮅█🮅▘"
                 }),
@@ -602,6 +602,14 @@ public class DefaultFont implements FontSupplier {
                                 "🬉▌ ▎ 🬏▔",
                                 "▁🬁 ▎ ▌🬓",
                                 "▝🮅 ▎ 🮅▘"
+                        )
+                )),
+                entry('5', Set.of(
+                        PatchCharacter.of(
+                                "█▋▋█",
+                                "▉▉▄🬏 ",
+                                "'▘▘▀▌🬓",
+                                "▝🮅█🮅▘"
                         )
                 ))
         ));
