@@ -133,7 +133,10 @@ modstitch {
 dependencies {
     if (modstitch.isLoom) {
         prop("deps.fapi") { modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:${it}") }
-        prop("deps.modmenu") { modstitchModImplementation("com.terraformersmc:modmenu:${it}") }
+        prop("deps.modmenu") {
+            if (minecraft == "1.21.9") modstitchModCompileOnly("com.terraformersmc:modmenu:${it}")
+            else modstitchModImplementation("com.terraformersmc:modmenu:${it}")
+        }
     }
 
     prop("deps.yacl") { modstitchModImplementation("dev.isxander:yet-another-config-lib:${it}-${loader}") }

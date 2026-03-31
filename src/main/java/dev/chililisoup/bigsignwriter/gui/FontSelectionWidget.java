@@ -4,10 +4,12 @@ import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.font.FontFile;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,10 +21,15 @@ import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import net.minecraft.client.input.MouseButtonEvent;
 //?} else if < 1.21.4 {
+/*import org.joml.Vector3f;
+*///?}
+
+//? if >= 1.21.11 {
+import net.minecraft.client.gui.ActiveTextCollector;
+import net.minecraft.client.gui.TextAlignment;
+import net.minecraft.util.Util;
+//?} else {
 /*import net.minecraft.Util;
-import net.minecraft.client.gui.Font;
-import net.minecraft.util.Mth;
-import org.joml.Vector3f;
 *///?}
 
 public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget.Entry> {
@@ -83,7 +90,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
         int middleY = (top + bottom - 9) / 2 + 1;
         int maxWidth = right - left;
         if (width <= maxWidth) guiGraphics.drawString(font, text, left, middleY, -1);
-        else  {
+        else {
             int hiddenWidth = width - maxWidth;
             double time = Util.getMillis() / 1000.0;
             double speed = Math.max(hiddenWidth * 0.5, 3.0);
@@ -124,6 +131,71 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
                 //?}
         );
         //?}
+    }
+
+    private static void drawScrollingFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, int x, int y, int width, int height) {
+        float scale = 1.5F / (float) fontPreview.length;
+        int scaledWidth = (int) (width / scale);
+
+        //? if < 1.21.6 {
+        /*guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(x, y, 10);
+        guiGraphics.pose().scale(scale, scale, scale);
+        *///?} else {
+        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().translate(x, y);
+        guiGraphics.pose().scale(scale);
+        //?}
+
+        Font font = Minecraft.getInstance().font;
+        int middleY = (height - 9) / 2 + 1;
+        int previewWidth = font.width(fontPreview[0]);
+        if (previewWidth <= scaledWidth) {
+            for (int i = 0; i < fontPreview.length; i++)
+                //? if >= 1.21.11 {
+                guiGraphics.textRenderer().accept(TextAlignment.LEFT, 0, middleY + i * 8, fontPreview[i]);
+                //?} else
+                //guiGraphics.drawString(font, fontPreview[i], 0, middleY + i * 8, -1);
+        } else {
+            int scaledHeight = (int) (height / scale);
+            int hiddenWidth = previewWidth - scaledWidth;
+            double time = (double) Util.getMillis() / (500.0 * (double) scale);
+            double speed = Math.max(hiddenWidth * 0.5, 3.0);
+            double scrollEnd = Math.sin((Math.PI / 2.0) * Math.cos((Math.PI * 2.0) * time / speed)) / 2.0 + 0.5;
+            double scrollPos = Mth.lerp(scrollEnd, 0.0, hiddenWidth);
+            //? if >= 1.21.11 {
+            ActiveTextCollector.Parameters parameters = guiGraphics
+                    .textRenderer()
+                    .defaultParameters()
+                    .withScissor(0, scaledWidth, 0, scaledHeight);
+            //?} else if >= 1.21.4 {
+            /*guiGraphics.enableScissor(0, 0, scaledWidth, scaledHeight);
+            *///?} else {
+            /*Vector3f poseScale = guiGraphics.pose().last().pose().getScale(new Vector3f());
+            Vector3f poseTranslation = guiGraphics.pose().last().pose().getTranslation(new Vector3f());
+
+            guiGraphics.enableScissor(
+                    (int) (0 * poseScale.x + poseTranslation.x),
+                    (int) (0 * poseScale.y + poseTranslation.y),
+                    (int) (scaledWidth * poseScale.x + poseTranslation.x),
+                    (int) (scaledHeight * poseScale.y + poseTranslation.y)
+            );
+            *///?}
+
+            for (int i = 0; i < fontPreview.length; i++)
+                //? if >= 1.21.11 {
+                guiGraphics.textRenderer().accept(TextAlignment.LEFT, -(int) scrollPos, middleY + i * 8, parameters, fontPreview[i]);
+                //?} else
+                //guiGraphics.drawString(font, fontPreview[i], -(int) scrollPos, middleY + i * 8, -1);
+
+            //? if < 1.21.11
+            //guiGraphics.disableScissor();
+        }
+
+        //? if < 1.21.6 {
+        /*guiGraphics.pose().popPose();
+        *///?} else
+        guiGraphics.pose().popMatrix();
     }
 
     //? if <= 1.21.3 {
@@ -331,30 +403,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
                 drawScrollingString(
                         guiGraphics, this.name, left + 5, top, left + width - 5, top + height
                 );
-            else {
-                float scale = 1.5F / (float) this.fontPreview.length;
-                int scaledWidth = (int) ((width - 10) / scale);
-
-                //? if < 1.21.6 {
-                /*guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(left + 5, top, 10);
-                guiGraphics.pose().scale(scale, scale, scale);
-                *///?} else {
-                guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(left + 5, top);
-                guiGraphics.pose().scale(scale);
-                //?}
-
-                for (int i = 0; i < this.fontPreview.length; i++)
-                    drawScrollingString(
-                            guiGraphics, this.fontPreview[i], 0, i * 8, scaledWidth, height + i * 8
-                    );
-
-                //? if < 1.21.6 {
-                /*guiGraphics.pose().popPose();
-                *///?} else
-                guiGraphics.pose().popMatrix();
-            }
+            else drawScrollingFontPreview(guiGraphics, fontPreview, left + 5, top, width - 10, height);
         }
     }
 }
