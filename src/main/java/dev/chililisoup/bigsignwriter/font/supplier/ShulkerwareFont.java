@@ -1,5 +1,5 @@
 /*
- * SHULKERWARE (c) 2026 by adhillA97
+ * SHULKERWARE (c) 2026 by adhill
  * https://www.reddit.com/r/Minecraft/comments/1n2zjxl/shulkerware_a_new_typeface_for_large_signs/
  * Licensed under CC BY-NC 4.0.
  * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
