@@ -281,7 +281,10 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
     /*public boolean mouseClicked(double mouseX, double mouseY, int button) {
     *///?} else
     public boolean mouseClicked(@NotNull MouseButtonEvent mouseButtonEvent, boolean bl) {
+        //? if > 1.21.3 {
         if (!this.open) {
+        //?} else
+        //if (!this.open && this.isMouseOver(mouseX, mouseY)) {
             //? if > 1.21.6
             int button = mouseButtonEvent.button();
             if (button == 0) {

@@ -18,7 +18,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector2f;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,6 +31,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 //? if >= 1.21.9 {
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
+//?}
+
+//? if >= 26.1 {
+import org.joml.Vector2f;
 //?}
 
 import java.util.*;
