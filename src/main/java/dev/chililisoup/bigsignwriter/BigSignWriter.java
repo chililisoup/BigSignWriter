@@ -8,6 +8,7 @@ import dev.chililisoup.bigsignwriter.font.FontFile;
 import dev.chililisoup.bigsignwriter.font.supplier.FontSupplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -21,18 +22,39 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
+//? if fabric {
+import net.fabricmc.loader.api.FabricLoader;
+//?} else {
+/*import net.neoforged.fml.ModList;
+*///?}
+
 public class BigSignWriter {
     public static final String MOD_ID = "bigsignwriter";
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
+    public static final Identifier ICON = id("icon.png");
+    public static final String VERSION;
 
     public static final ArrayList<FontFile> AVAILABLE_FONTS = new ArrayList<>();
     public static @Nullable FontFile SELECTED_FONT = null;
     public static String CHARACTER_SEPARATOR;
     public static FontFile DEFAULT_FONT;
 
+    public static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
+    }
+
     public static void initialize() {
         BigSignWriterConfig.init();
         reloadFonts();
+    }
+
+    static {
+        VERSION =
+                //? if fabric {
+                FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow().getMetadata().getVersion().getFriendlyString();
+                //?} else {
+                /*ModList.get().getModFileById(MOD_ID).versionString();
+                *///?}
     }
 
     public static boolean enabled() {
@@ -73,9 +95,9 @@ public class BigSignWriter {
         SELECTED_FONT = (fontFile != null && AVAILABLE_FONTS.contains(fontFile)) ?
                 fontFile : null;
 
-        CHARACTER_SEPARATOR = (SELECTED_FONT == null || SELECTED_FONT.characterSeparator == null) ?
-                BigSignWriterConfig.MAIN_CONFIG.defaultCharacterSeparator :
-                SELECTED_FONT.characterSeparator;
+        CHARACTER_SEPARATOR = BigSignWriterConfig.MAIN_CONFIG.characterSeparatorOverrideEnabled ?
+                BigSignWriterConfig.MAIN_CONFIG.characterSeparatorOverride :
+                (SELECTED_FONT != null && SELECTED_FONT.characterSeparator != null ? SELECTED_FONT.characterSeparator : " ");
     }
 
     static void reselectFont(int index) {
@@ -189,7 +211,7 @@ public class BigSignWriter {
         }
     }
 
-    public static void analyzeFonts() {
+    public static void validateFonts() {
         Font font = Minecraft.getInstance().font;
         AVAILABLE_FONTS.forEach(fontFile -> {
             if (fontFile.height <= 0) {

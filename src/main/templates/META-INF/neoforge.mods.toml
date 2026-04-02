@@ -9,7 +9,7 @@ version = "${mod_version}"
 displayName = "${mod_name}"
 displayURL = "${mod_homepage}"
 description = '''${mod_description}'''
-logoFile = "icon.png"
+logoFile = "assets/${mod_id}/icon.png"
 authors = "${mod_author}"
 credits = "${mod_credits}"
 

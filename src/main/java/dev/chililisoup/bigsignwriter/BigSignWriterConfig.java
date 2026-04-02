@@ -10,12 +10,13 @@ import net.fabricmc.loader.api.FabricLoader;
 //import net.neoforged.fml.loading.FMLPaths;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class BigSignWriterConfig {
-    public static MainConfig MAIN_CONFIG;
+    public static final MainConfig MAIN_CONFIG = new MainConfig();
 
     public static void init() {}
 
@@ -23,16 +24,70 @@ public class BigSignWriterConfig {
         reloadConfig();
     }
 
-    public static class MainConfig {
+    public static class PersistentConfig {
         public int buttonsX = 0;
         public int buttonsY = 120;
         public double buttonsAlignmentX = 0.5;
         public double buttonsAlignmentY = 0.25;
         public boolean fontSelectorCoversDoneButton = true;
         public boolean showReloadButton = false;
-        public String defaultCharacterSeparator = " ";
 
-        public MainConfig() {}
+        public PersistentConfig copyFrom(PersistentConfig other) {
+            for (Field field : PersistentConfig.class.getDeclaredFields()) {
+                try {
+                    field.set(this, field.get(other));
+                } catch (IllegalAccessException ignored) {}
+            }
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (other == this) return true;
+            if (!(other instanceof PersistentConfig)) return false;
+            for (Field field : PersistentConfig.class.getDeclaredFields()) {
+                try {
+                    if (!field.get(this).equals(field.get(other)))
+                        return false;
+                } catch (IllegalAccessException ignored) {}
+            }
+            return true;
+        }
+    }
+
+    public static class MainConfig extends PersistentConfig {
+        public boolean characterSeparatorOverrideEnabled = false;
+        public String characterSeparatorOverride = "";
+
+        public static MainConfig of(MainConfig other) {
+            return new MainConfig().copyFrom(other);
+        }
+
+        public MainConfig createCopy() {
+            return of(this);
+        }
+
+        public MainConfig copyFrom(MainConfig other) {
+            super.copyFrom(other);
+            for (Field field : MainConfig.class.getDeclaredFields()) {
+                try {
+                    field.set(this, field.get(other));
+                } catch (IllegalAccessException ignored) {}
+            }
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (!super.equals(other)) return false;
+            for (Field field : MainConfig.class.getDeclaredFields()) {
+                try {
+                    if (!field.get(this).equals(field.get(other)))
+                        return false;
+                } catch (IllegalAccessException ignored) {}
+            }
+            return true;
+        }
     }
 
     static Path getConfigDir() {
@@ -49,31 +104,31 @@ public class BigSignWriterConfig {
         return configDir;
     }
 
-    private static ConfigInterface<MainConfig> getConfig() {
+    private static ConfigInterface<PersistentConfig> getConfig() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Path configDir = getConfigDir();
         return new ConfigInterface<>(
                 gson,
-                TypeToken.get(MainConfig.class),
+                TypeToken.get(PersistentConfig.class),
                 configDir.resolve("config.json"),
-                new MainConfig()
+                new PersistentConfig()
         );
     }
 
     public static void saveConfig() {
-        ConfigInterface<MainConfig> mainConfig = getConfig();
+        ConfigInterface<PersistentConfig> persistentConfig = getConfig();
 
-        mainConfig.save(MAIN_CONFIG);
+        persistentConfig.save(new PersistentConfig().copyFrom(MAIN_CONFIG));
         BigSignWriter.reselectFont();
 
         BigSignWriter.LOGGER.info("Config saved!");
     }
 
     public static void reloadConfig() {
-        ConfigInterface<MainConfig> mainConfig = getConfig();
+        ConfigInterface<PersistentConfig> persistentConfig = getConfig();
 
-        MAIN_CONFIG = mainConfig.load();
-        mainConfig.save(MAIN_CONFIG);
+        MAIN_CONFIG.copyFrom(persistentConfig.load());
+        persistentConfig.save(new PersistentConfig().copyFrom(MAIN_CONFIG));
 
         BigSignWriter.LOGGER.debug("Config loaded!");
     }

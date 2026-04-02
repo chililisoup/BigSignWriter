@@ -2,9 +2,8 @@
 /*package dev.chililisoup.bigsignwriter.loaders.neoforge;
 
 import dev.chililisoup.bigsignwriter.BigSignWriter;
-import dev.chililisoup.bigsignwriter.compat.YaclIntegration;
+import dev.chililisoup.bigsignwriter.gui.BigSignWriterConfigScreen;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
@@ -13,12 +12,10 @@ public class NeoforgeEntrypoint {
     public NeoforgeEntrypoint(ModContainer container) {
         BigSignWriter.initialize();
 
-        if (ModList.get().isLoaded("yet_another_config_lib_v3")) {
-            container.registerExtensionPoint(
-                    IConfigScreenFactory.class,
-                    (modContainer, parentScreen) -> YaclIntegration.generateScreen(parentScreen)
-            );
-        }
+        container.registerExtensionPoint(
+                IConfigScreenFactory.class,
+                (modContainer, parentScreen) -> new BigSignWriterConfigScreen(parentScreen)
+        );
     }
 }
 *///?}

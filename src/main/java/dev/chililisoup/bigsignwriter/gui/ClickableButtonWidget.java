@@ -16,24 +16,28 @@ public class ClickableButtonWidget extends Button/*? if >= 1.21.11 {*/.Plain/*?}
     }
 
     @Override
-    //? if < 1.21.9 {
-    /*public void onClick(double mouseX, double mouseY) {
-    *///?} else
-    public void onClick(@NotNull MouseButtonEvent mouseButtonEvent, boolean bl) {
+    public void onClick(
+            //? if >= 1.21.9 {
+            @NotNull MouseButtonEvent mouseButtonEvent, boolean bl
+            //?} else
+            //double mouseX, double mouseY
+    ) {
         this.onPress.onPress(this);
     }
 
     @Override
-    //? if < 1.21.9 {
-    /*public void onPress() {}
-    *///?} else
-    public void onPress(@NotNull InputWithModifiers inputWithModifiers) {}
+    public void onPress(
+            //? if >= 1.21.9
+            @NotNull InputWithModifiers input
+    ) {}
 
     @Override
-    //? if < 1.21.9 {
-    /*public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-    *///?} else
-    public boolean keyPressed(@NotNull KeyEvent keyEvent) {
+    public boolean keyPressed(
+            //? if >= 1.21.9 {
+            @NotNull KeyEvent keyEvent
+            //?} else
+            //int keyCode, int scanCode, int modifiers
+    ) {
         return false;
     }
 }

@@ -32,10 +32,6 @@ stonecutter {
     constants {
         match(loader, "fabric", "neoforge")
     }
-
-    replacements.string(minecraft >= "26.1") {
-        replace("GuiGraphics", "GuiGraphicsExtractor")
-    }
 }
 
 modstitch {
@@ -138,8 +134,6 @@ dependencies {
             else modstitchModImplementation("com.terraformersmc:modmenu:${it}")
         }
     }
-
-    prop("deps.yacl") { modstitchModImplementation("dev.isxander:yet-another-config-lib:${it}-${loader}") }
 }
 
 modstitch.onEnable {
