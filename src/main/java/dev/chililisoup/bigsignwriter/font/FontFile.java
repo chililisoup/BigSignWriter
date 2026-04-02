@@ -1,6 +1,7 @@
 package dev.chililisoup.bigsignwriter.font;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 public class FontFile {
     public String name;
@@ -12,7 +13,7 @@ public class FontFile {
 
     public FontFile(String name, Map<Character, String[]> characters) {
         this.name = name;
-        this.characters = characters;
+        this.characters = new TreeMap<>(characters);
     }
 
     public FontFile(String name, int height, Map<Character, String[]> characters) {
