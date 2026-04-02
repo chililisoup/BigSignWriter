@@ -69,7 +69,14 @@ public class TickBox extends AbstractButton {
 
         int labelX = this.getX() + boxSize + 2;
         Screen.extractMenuBackgroundTexture(
-                guiGraphics, Screen.MENU_BACKGROUND, labelX, this.getY(), 0.0F, 0.0F, this.getRight() - labelX, this.getHeight()
+                guiGraphics,
+                Screen.MENU_BACKGROUND,
+                labelX,
+                this.getY(),
+                0.0F,
+                0.0F,
+                this.getRight() - labelX,
+                this.getHeight()
         );
         if (this.isHovered()) guiGraphics.fill(
                 labelX,

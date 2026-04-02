@@ -50,8 +50,8 @@ public abstract class AbstractScrollArea extends AbstractContainerWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return super.mouseClicked(mouseX, mouseY, button)
-                || this.updateScrolling(mouseX, mouseY, button);
+        boolean scrolling = this.updateScrolling(mouseX, mouseY, button);
+        return super.mouseClicked(mouseX, mouseY, button) || scrolling;
     }
 
     @Override

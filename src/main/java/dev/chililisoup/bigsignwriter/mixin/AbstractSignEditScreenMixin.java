@@ -52,8 +52,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
     @Unique
     private static int bigSignWriter$getHeight() {
-        return (BigSignWriter.SELECTED_FONT != null && BigSignWriter.SELECTED_FONT.height > 0) ?
-                BigSignWriter.SELECTED_FONT.height : 4;
+        return BigSignWriter.SELECTED_FONT != null ? BigSignWriter.SELECTED_FONT.height() : 4;
     }
 
     @Unique
@@ -85,7 +84,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
     @Shadow /*? if >= 1.21.2 {*/ protected /*?} else {*/ /*private *//*?}*/ @Final SignBlockEntity sign;
     @Shadow private @Final String[] messages;
-    @Shadow private void setMessage(String string) {}
+    @Shadow private void setMessage(String message) {}
     @Shadow private int line;
     @Shadow private @Nullable TextFieldHelper signField;
 

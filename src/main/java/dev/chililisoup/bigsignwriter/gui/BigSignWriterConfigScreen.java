@@ -1,9 +1,10 @@
 package dev.chililisoup.bigsignwriter.gui;
 
 import dev.chililisoup.bigsignwriter.BigSignWriter;
-import dev.chililisoup.bigsignwriter.font.FontFile;
+import dev.chililisoup.bigsignwriter.font.FontInfo;
 import dev.chililisoup.bigsignwriter.util.VersionHelper;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -11,6 +12,8 @@ import net.minecraft.client.gui.components.tabs.Tab;
 import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.client.gui.components.tabs.TabNavigationBar;
 import net.minecraft.client.gui.layouts.*;
+import net.minecraft.client.gui.narration.NarratedElementType;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -19,6 +22,7 @@ import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -32,13 +36,17 @@ import net.minecraft.client.renderer.RenderPipelines;
 /*import com.mojang.blaze3d.systems.RenderSystem;
 *///?}
 
+//? if >= 1.21.9 {
+import net.minecraft.client.input.InputWithModifiers;
+//?}
+
 public class BigSignWriterConfigScreen extends Screen {
     private static final Component TITLE = Component.translatable("bigsignwriter.config");
     private static final int MARGIN = 16;
 
     private final MainConfig workingConfig = MAIN_CONFIG.createCopy();
     private final MainConfig defaults = new MainConfig();
-    private final FontFile titleFont = BigSignWriter.AVAILABLE_FONTS.get(Mth.floor(Math.random() * BigSignWriter.AVAILABLE_FONTS.size()));
+    private final FontInfo titleFont = BigSignWriter.AVAILABLE_FONTS.get(Mth.floor(Math.random() * BigSignWriter.AVAILABLE_FONTS.size()));
 
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private final TabManager tabManager = new TabManager(this::addRenderableWidget, this::removeWidget);
@@ -341,6 +349,7 @@ public class BigSignWriterConfigScreen extends Screen {
             this.layout.container.setWidth(screenRectangle.width() + 2 * scrollbarReserve);
             FrameLayout.alignInRectangle(this.layout, screenRectangle, 0.5F, 0F);
             FrameLayout.alignInRectangle(this.layout.content, screenRectangle, 0.5F, 0F);
+            this.layout.container.refreshScrollAmount();
         }
 
         public abstract void extractExtraRenderState(GuiGraphicsExtractor guiGraphics, int width, int height, int mouseX, int mouseY);
@@ -646,18 +655,19 @@ public class BigSignWriterConfigScreen extends Screen {
     }
 
     private class FontsTab extends ConfigTab {
+        private @Nullable FontElement selected = null;
+
         public FontsTab() {
             super(Component.translatable("bigsignwriter.config.fonts"));
         }
 
         @Override
         protected Layout buildContent() {
-            GridLayout content = new GridLayout().spacing(8);
+            GridLayout content = new GridLayout().spacing(4);
             GridLayout.RowHelper rowHelper = content.createRowHelper(1);
-            rowHelper.addChild(Button.builder(
-                    Component.translatable("bigsignwriter.debug.validateFonts"),
-                    button -> BigSignWriter.validateFonts()
-            ).build());
+            BigSignWriter.AVAILABLE_FONTS.forEach(
+                    fontFile -> rowHelper.addChild(new FontElement(fontFile))
+            );
             return content;
         }
 
@@ -669,14 +679,126 @@ public class BigSignWriterConfigScreen extends Screen {
 
         @Override
         public void extractExtraRenderState(GuiGraphicsExtractor guiGraphics, int width, int height, int mouseX, int mouseY) {
-            guiGraphics.textWithWordWrap(
+            if (this.selected == null) return;
+
+            VersionHelper.drawScrollingString(
+                    guiGraphics,
+                    this.selected.getMessage().copy().withStyle(ChatFormatting.BOLD),
+                    0,
+                    width,
+                    -5,
+                    5
+            );
+
+            guiGraphics.fill(0, 10, width, 11, 0xFFFFFFFF);
+
+            Component error = this.selected.fontInfo.error();
+            if (error != null) guiGraphics.textWithWordWrap(
                     BigSignWriterConfigScreen.this.minecraft.font,
-                    Component.translatable("bigsignwriter.debug.validateFonts.desc"),
+                    error.copy().withStyle(ChatFormatting.RED),
                     0,
                     20,
                     width,
                     -1
             );
+        }
+
+        private class FontElement extends AbstractButton {
+            private final FontInfo fontInfo;
+            private final Component[] fontPreview;
+
+            public FontElement(FontInfo fontInfo) {
+                super(0, 0, 0, 24, Component.literal(fontInfo.name()));
+                this.fontInfo = fontInfo;
+                this.fontPreview = fontInfo.getPreview();
+            }
+
+            private boolean selected() {
+                return FontsTab.this.selected == this;
+            }
+
+            @Override
+            public void onPress(
+                    //? if >= 1.21.9
+                    @NotNull InputWithModifiers input
+            ) {
+                FontsTab.this.selected = this;
+            }
+
+            @Override
+            //? if >= 1.21.11 {
+            protected void extractContents(
+            //?} else
+            //protected void extractWidgetRenderState(
+                    @NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick
+            ) {
+                int left = this.getX();
+                int right = this.getRight();
+                int top = this.getY();
+                int bottom = this.getBottom();
+                int width = this.getWidth();
+                int height = this.getHeight();
+
+                if (this.selected()) {
+                    guiGraphics.fill(left, top, right, bottom, this.isFocused() ? -1 : 0xFF808080);
+                    guiGraphics.fill(left + 1, top + 1, right - 1, bottom - 1, 0xFF000000);
+                } else {
+                    Screen.extractMenuBackgroundTexture(
+                            guiGraphics,
+                            Screen.MENU_BACKGROUND,
+                            left + 2,
+                            top + 2,
+                            0.0F,
+                            0.0F,
+                            width - 4,
+                            height - 4
+                    );
+                }
+
+                if (this.isHovered()) guiGraphics.fill(
+                        left + 2,
+                        top + 2,
+                        right - 2,
+                        bottom - 2,
+                        0x40FFFFFF
+                );
+
+                if (this.fontInfo.error() != null) {
+                    Font font = BigSignWriterConfigScreen.this.minecraft.font;
+                    Component errorMarker = Component.literal("⚠").withStyle(ChatFormatting.RED);
+                    int errorMarkerWidth = font.width(errorMarker);
+                    guiGraphics.text(
+                            font,
+                            errorMarker,
+                            right - errorMarkerWidth - 4,
+                            top + height / 2 - 4,
+                            0xFFFF0000
+                    );
+
+                    VersionHelper.drawScrollingFontPreview(
+                            guiGraphics,
+                            Arrays.stream(this.fontPreview).map(
+                                    component -> component.copy().withStyle(ChatFormatting.RED)
+                            ).toArray(Component[]::new),
+                            left + 4,
+                            top + 4,
+                            width - errorMarkerWidth - 10,
+                            height - 8
+                    );
+                } else VersionHelper.drawScrollingFontPreview(
+                        guiGraphics,
+                        this.fontPreview,
+                        left + 4,
+                        top + 4,
+                        width - 8,
+                        height - 8
+                );
+            }
+
+            @Override
+            protected void updateWidgetNarration(NarrationElementOutput output) {
+                output.add(NarratedElementType.TITLE, this.getMessage());
+            }
         }
     }
 }

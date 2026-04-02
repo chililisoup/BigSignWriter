@@ -88,12 +88,12 @@ public final class VersionHelper {
     }
 
     public static void drawScrollingFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, int x, int y, int width, int height) {
-        float scale = 1.5F / (float) fontPreview.length;
+        float scale = (height / 9F) / (float) fontPreview.length;
         int scaledWidth = (int) (width / scale);
 
         //? if < 1.21.6 {
         /*guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(x, y, 10);
+        guiGraphics.pose().translate(x, y, 0);
         guiGraphics.pose().scale(scale, scale, scale);
         *///?} else {
         guiGraphics.pose().pushMatrix();
@@ -102,14 +102,13 @@ public final class VersionHelper {
         //?}
 
         Font font = Minecraft.getInstance().font;
-        int middleY = (height - 9) / 2 + 1;
         int previewWidth = font.width(fontPreview[0]);
         if (previewWidth <= scaledWidth) {
             for (int i = 0; i < fontPreview.length; i++)
                 //? if >= 1.21.11 {
-                guiGraphics.textRenderer().accept(TextAlignment.LEFT, 0, middleY + i * 8, fontPreview[i]);
+                guiGraphics.textRenderer().accept(TextAlignment.LEFT, 0, i * 9, fontPreview[i]);
                 //?} else
-                //guiGraphics.text(font, fontPreview[i], 0, middleY + i * 8, -1);
+                //guiGraphics.text(font, fontPreview[i], 0, i * 9, -1);
         } else {
             int scaledHeight = (int) (height / scale);
             int hiddenWidth = previewWidth - scaledWidth;
@@ -138,9 +137,9 @@ public final class VersionHelper {
 
             for (int i = 0; i < fontPreview.length; i++)
                 //? if >= 1.21.11 {
-                guiGraphics.textRenderer().accept(TextAlignment.LEFT, -(int) scrollPos, middleY + i * 8, parameters, fontPreview[i]);
+                guiGraphics.textRenderer().accept(TextAlignment.LEFT, -(int) scrollPos, i * 9, parameters, fontPreview[i]);
                 //?} else
-                //guiGraphics.text(font, fontPreview[i], -(int) scrollPos, middleY + i * 8, -1);
+                //guiGraphics.text(font, fontPreview[i], -(int) scrollPos, i * 9, -1);
 
             //? if < 1.21.11
             //guiGraphics.disableScissor();
@@ -157,7 +156,7 @@ public final class VersionHelper {
 
         //? if < 1.21.6 {
         /*guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(x, y, 10);
+        guiGraphics.pose().translate(x, y, 0);
         guiGraphics.pose().scale(scale, scale, scale);
         *///?} else {
         guiGraphics.pose().pushMatrix();

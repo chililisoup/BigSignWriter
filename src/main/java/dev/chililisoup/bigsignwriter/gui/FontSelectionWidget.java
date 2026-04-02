@@ -1,7 +1,7 @@
 package dev.chililisoup.bigsignwriter.gui;
 
 import dev.chililisoup.bigsignwriter.BigSignWriter;
-import dev.chililisoup.bigsignwriter.font.FontFile;
+import dev.chililisoup.bigsignwriter.font.FontInfo;
 import dev.chililisoup.bigsignwriter.util.VersionHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -63,7 +63,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
         super.setSelected(this
                 .children()
                 .stream()
-                .filter(entry -> entry.fontFile == BigSignWriter.SELECTED_FONT)
+                .filter(entry -> entry.fontInfo == BigSignWriter.SELECTED_FONT)
                 .findFirst()
                 .orElse(null)
         );
@@ -93,7 +93,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
         this.playDownSound(this.minecraft.getSoundManager());
         if (this.getSelected() == entry) return;
         super.setSelected(entry);
-        if (entry != null) BigSignWriter.selectFont(entry.fontFile);
+        if (entry != null) BigSignWriter.selectFont(entry.fontInfo);
         this.onSelect.run();
     }
 
@@ -208,15 +208,15 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
     *///?}
 
     public static class Entry extends ObjectSelectionList.Entry<FontSelectionWidget.Entry> {
-        final @Nullable FontFile fontFile;
+        final @Nullable FontInfo fontInfo;
         final Component[] fontPreview;
         final Component name;
 
-        public Entry(final @Nullable FontFile fontFile) {
-            this.fontFile = fontFile;
-            this.fontPreview = fontFile == null ? new Component[0] : fontFile.getPreview();
-            this.name = fontFile != null ?
-                    Component.literal(fontFile.name) :
+        public Entry(final @Nullable FontInfo fontInfo) {
+            this.fontInfo = fontInfo;
+            this.fontPreview = fontInfo == null ? new Component[0] : fontInfo.getPreview();
+            this.name = fontInfo != null ?
+                    Component.literal(fontInfo.name()) :
                     Component.translatable("bigsignwriter.font.none");
         }
 
@@ -253,9 +253,22 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
 
             if (this.fontPreview.length == 0)
                 VersionHelper.drawScrollingString(
-                        guiGraphics, this.name, left + 5, left + 5, left + width - 5, top, top + height
+                        guiGraphics,
+                        this.name,
+                        left + 5,
+                        left + 5,
+                        left + width - 5,
+                        top,
+                        top + height
                 );
-            else VersionHelper.drawScrollingFontPreview(guiGraphics, fontPreview, left + 5, top, width - 10, height);
+            else VersionHelper.drawScrollingFontPreview(
+                    guiGraphics,
+                    fontPreview,
+                    left + 5,
+                    top + 2,
+                    width - 10,
+                    height - 4
+            );
         }
     }
 }

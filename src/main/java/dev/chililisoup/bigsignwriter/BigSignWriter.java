@@ -5,9 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import dev.chililisoup.bigsignwriter.font.BuiltInFonts;
 import dev.chililisoup.bigsignwriter.font.FontFile;
+import dev.chililisoup.bigsignwriter.font.FontInfo;
 import dev.chililisoup.bigsignwriter.font.supplier.FontSupplier;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +18,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 //? if fabric {
@@ -34,10 +32,10 @@ public class BigSignWriter {
     public static final Identifier ICON = id("icon.png");
     public static final String VERSION;
 
-    public static final ArrayList<FontFile> AVAILABLE_FONTS = new ArrayList<>();
-    public static @Nullable FontFile SELECTED_FONT = null;
+    public static final ArrayList<FontInfo> AVAILABLE_FONTS = new ArrayList<>();
+    public static @Nullable FontInfo SELECTED_FONT = null;
     public static String CHARACTER_SEPARATOR;
-    public static FontFile DEFAULT_FONT;
+    public static FontInfo DEFAULT_FONT;
 
     public static Identifier id(String path) {
         return Identifier.fromNamespaceAndPath(MOD_ID, path);
@@ -61,28 +59,28 @@ public class BigSignWriter {
         return SELECTED_FONT != null;
     }
 
-    public static Optional<String[]> getBigChar(char chr, @Nullable FontFile fontFile) {
-        if (fontFile == null)
+    public static Optional<String[]> getBigChar(char chr, @Nullable FontInfo fontInfo) {
+        if (fontInfo == null)
             return Optional.empty();
 
-        if (fontFile.characters == null)
+        if (fontInfo.characters() == null)
             return Optional.empty();
 
-        if (fontFile.characters.containsKey(chr))
-            return Optional.of(fontFile.characters.get(chr));
+        if (fontInfo.characters().containsKey(chr))
+            return Optional.of(fontInfo.characters().get(chr));
 
         char upper = Character.toUpperCase(chr);
-        if (fontFile.characters.containsKey(upper))
-            return Optional.of(fontFile.characters.get(upper));
+        if (fontInfo.characters().containsKey(upper))
+            return Optional.of(fontInfo.characters().get(upper));
 
-        if (DEFAULT_FONT == null || fontFile.name.equals("Default") || (fontFile.height > 0 && fontFile.height != 4))
+        if (DEFAULT_FONT == null || fontInfo.name().equals("Default") || fontInfo.height() != 4)
             return Optional.empty();
 
-        if (DEFAULT_FONT.characters.containsKey(chr))
-            return Optional.of(DEFAULT_FONT.characters.get(chr));
+        if (DEFAULT_FONT.characters().containsKey(chr))
+            return Optional.of(DEFAULT_FONT.characters().get(chr));
 
-        if (DEFAULT_FONT.characters.containsKey(upper))
-            return Optional.of(DEFAULT_FONT.characters.get(upper));
+        if (DEFAULT_FONT.characters().containsKey(upper))
+            return Optional.of(DEFAULT_FONT.characters().get(upper));
 
         return Optional.empty();
     }
@@ -91,13 +89,13 @@ public class BigSignWriter {
         return getBigChar(chr, SELECTED_FONT);
     }
 
-    public static void selectFont(@Nullable FontFile fontFile) {
-        SELECTED_FONT = (fontFile != null && AVAILABLE_FONTS.contains(fontFile)) ?
-                fontFile : null;
+    public static void selectFont(@Nullable FontInfo fontInfo) {
+        SELECTED_FONT = (fontInfo != null && AVAILABLE_FONTS.contains(fontInfo)) ?
+                fontInfo : null;
 
         CHARACTER_SEPARATOR = BigSignWriterConfig.MAIN_CONFIG.characterSeparatorOverrideEnabled ?
                 BigSignWriterConfig.MAIN_CONFIG.characterSeparatorOverride :
-                (SELECTED_FONT != null && SELECTED_FONT.characterSeparator != null ? SELECTED_FONT.characterSeparator : " ");
+                (SELECTED_FONT != null && SELECTED_FONT.characterSeparator() != null ? SELECTED_FONT.characterSeparator() : " ");
     }
 
     static void reselectFont(int index) {
@@ -135,7 +133,11 @@ public class BigSignWriter {
         Arrays.sort(jsonFiles, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
 
         AVAILABLE_FONTS.clear();
-        AVAILABLE_FONTS.addAll(Arrays.stream(jsonFiles).map(file -> getFont(gson, file.toPath()).load()).toList());
+        AVAILABLE_FONTS.addAll(Arrays.stream(jsonFiles).map(file -> {
+            FontInfo fontInfo = getFont(gson, file.toPath()).load().createInfo();
+            if (file.getName().equals("default.json")) DEFAULT_FONT = fontInfo;
+            return fontInfo;
+        }).toList());
         reselectFont(selectedFontIndex);
         LOGGER.info("Fonts loaded!");
     }
@@ -158,15 +160,13 @@ public class BigSignWriter {
             Files.createDirectories(configFonts);
 
             BuiltInFonts.get().forEach((path, font) -> {
-                FontFile fontDefaults = font.get();
+                FontFile fontFile = font.get();
                 Path target = configFonts.resolve(path + ".json");
                 BigSignWriterConfig.ConfigInterface<FontFile> file = getFont(gson, target);
 
                 if (Files.notExists(target)) {
-                    file.save(fontDefaults);
-                    LOGGER.info("Copied built-in font: {}", fontDefaults.name);
-                    if (fontDefaults.name.equals("Default"))
-                        DEFAULT_FONT = fontDefaults;
+                    file.save(fontFile);
+                    LOGGER.info("Copied built-in font: {}", fontFile.name);
                     return;
                 }
 
@@ -174,14 +174,14 @@ public class BigSignWriter {
                 Map<Character, Set<FontSupplier.PatchCharacter>> patches = font.patches();
                 ArrayList<Character> changed = new ArrayList<>();
                 ArrayList<Character> patched = new ArrayList<>();
-                for (char character : fontDefaults.characters.keySet()) {
+                for (char character : fontFile.characters.keySet()) {
                     if (existingFont.characters.containsKey(character)) {
                         if (!patches.containsKey(character)) continue;
 
                         String existing = Pattern.quote(String.join("\n", existingFont.characters.get(character)));
                         for (FontSupplier.PatchCharacter patch : patches.get(character)) {
                             if (String.join("\n", patch.lines()).matches(existing)) {
-                                existingFont.characters.put(character, fontDefaults.characters.get(character));
+                                existingFont.characters.put(character, fontFile.characters.get(character));
                                 patched.add(character);
                                 break;
                             }
@@ -190,7 +190,7 @@ public class BigSignWriter {
                         continue;
                     }
 
-                    existingFont.characters.put(character, fontDefaults.characters.get(character));
+                    existingFont.characters.put(character, fontFile.characters.get(character));
                     changed.add(character);
                 }
 
@@ -198,66 +198,13 @@ public class BigSignWriter {
                     file.save(existingFont);
 
                     if (!changed.isEmpty())
-                        LOGGER.info("Merged new characters from built-in font '{}': {}", fontDefaults.name, changed);
+                        LOGGER.info("Merged new characters from built-in font '{}': {}", fontFile.name, changed);
                     if (!patched.isEmpty())
-                        LOGGER.info("Patched outdated characters from built-in font '{}': {}", fontDefaults.name, patched);
+                        LOGGER.info("Patched outdated characters from built-in font '{}': {}", fontFile.name, patched);
                 }
-
-                if (existingFont.name.equals("Default"))
-                    DEFAULT_FONT = existingFont;
             });
         } catch (Exception e) {
             LOGGER.error("Error copying built-in fonts", e);
         }
-    }
-
-    public static void validateFonts() {
-        Font font = Minecraft.getInstance().font;
-        AVAILABLE_FONTS.forEach(fontFile -> {
-            if (fontFile.height <= 0) {
-                LOGGER.error(
-                        "Font '{}' has an invalid height ({})!",
-                        fontFile.name,
-                        fontFile.height
-                );
-                return;
-            }
-
-            AtomicBoolean valid = new AtomicBoolean(true);
-            fontFile.characters.forEach((baseChar, bigChar) -> {
-                if (bigChar.length != fontFile.height) {
-                    LOGGER.error(
-                            "Character '{}' in font '{}' has an incorrect number of lines!",
-                            baseChar,
-                            fontFile.name
-                    );
-                    valid.set(false);
-                    return;
-                }
-
-                int[] widths = new int[bigChar.length];
-                widths[0] = font.width(bigChar[0]);
-                boolean unfixed = false;
-                for (int i = 1; i < bigChar.length; i++) {
-                    widths[i] = font.width(bigChar[i]);
-                    if (widths[i] != widths[0]) unfixed = true;
-                }
-                if (unfixed) {
-                    LOGGER.error(
-                            "Character '{}' in font '{}' does not have a fixed width! {}",
-                            baseChar,
-                            fontFile.name,
-                            Arrays.toString(widths)
-                    );
-                    valid.set(false);
-                }
-            });
-
-            if (valid.get()) LOGGER.info(
-                    "Validated {} characters in font '{}'",
-                    fontFile.characters.size(),
-                    fontFile.name
-            );
-        });
     }
 }
