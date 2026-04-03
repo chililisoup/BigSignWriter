@@ -134,8 +134,9 @@ public class BigSignWriter {
 
         AVAILABLE_FONTS.clear();
         AVAILABLE_FONTS.addAll(Arrays.stream(jsonFiles).map(file -> {
-            FontInfo fontInfo = getFont(gson, file.toPath()).load().createInfo();
-            if (file.getName().equals("default.json")) DEFAULT_FONT = fontInfo;
+            String fileName = file.getName();
+            FontInfo fontInfo = getFont(gson, file.toPath()).load().createInfo(fileName);
+            if (fileName.equals("default.json")) DEFAULT_FONT = fontInfo;
             return fontInfo;
         }).toList());
         reselectFont(selectedFontIndex);
@@ -194,7 +195,13 @@ public class BigSignWriter {
                     changed.add(character);
                 }
 
-                if (!changed.isEmpty() || !patched.isEmpty()) {
+                boolean needsSaved;
+                if (fontFile.credits != null && !fontFile.credits.equals(existingFont.credits)) {
+                    existingFont.credits = fontFile.credits;
+                    needsSaved = true;
+                } else needsSaved = !changed.isEmpty() || !patched.isEmpty();
+
+                if (needsSaved) {
                     file.save(existingFont);
 
                     if (!changed.isEmpty())

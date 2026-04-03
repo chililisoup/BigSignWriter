@@ -10,7 +10,7 @@ import static java.util.Map.entry;
 public class HappyGhastFont implements FontSupplier {
     @Override
     public FontFile get() {
-        return new FontFile("Happy Ghast", 2, "", Map.<Character, String[]>ofEntries(
+        return new FontFile("Happy Ghast", "chililisoup", 2, "", Map.<Character, String[]>ofEntries(
                 entry(' ', new String[]{
                         "   ",
                         "   ",

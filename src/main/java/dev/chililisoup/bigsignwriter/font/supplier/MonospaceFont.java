@@ -9,7 +9,7 @@ import static java.util.Map.entry;
 public class MonospaceFont implements FontSupplier {
     @Override
     public FontFile get() {
-        return new FontFile("Monospace", Map.<Character, String[]>ofEntries(
+        return new FontFile("Monospace", "chililisoup", Map.<Character, String[]>ofEntries(
                 entry('I', new String[]{
                         "███",
                         "  █  ",

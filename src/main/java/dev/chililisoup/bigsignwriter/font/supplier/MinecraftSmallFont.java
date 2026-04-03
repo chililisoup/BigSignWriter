@@ -11,7 +11,7 @@ import static java.util.Map.entry;
 public class MinecraftSmallFont implements FontSupplier {
     @Override
     public FontFile get() {
-        return new FontFile("Minecraft Small", 2, "", Map.<Character, String[]>ofEntries(
+        return new FontFile("Minecraft Small", "Mojang, chililisoup", 2, "", Map.<Character, String[]>ofEntries(
                 entry(' ', new String[]{
                         "  ",
                         "  "

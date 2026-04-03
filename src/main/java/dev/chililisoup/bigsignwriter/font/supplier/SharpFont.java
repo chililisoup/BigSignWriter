@@ -11,7 +11,7 @@ import static java.util.Map.entry;
 public class SharpFont implements FontSupplier {
     @Override
     public FontFile get() {
-        return new FontFile("Sharp", Map.<Character, String[]>ofEntries(
+        return new FontFile("Sharp", "Hugleton, DebornMC", Map.<Character, String[]>ofEntries(
                 entry(' ', new String[]{
                         "      ",
                         "      ",

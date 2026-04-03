@@ -11,7 +11,7 @@ import static java.util.Map.entry;
 public class DefaultFont implements FontSupplier {
     @Override
     public FontFile get() {
-        return new FontFile("Default", Map.<Character, String[]>ofEntries(
+        return new FontFile("Default", "chililisoup", Map.<Character, String[]>ofEntries(
                 entry(' ', new String[]{
                         "      ",
                         "      ",

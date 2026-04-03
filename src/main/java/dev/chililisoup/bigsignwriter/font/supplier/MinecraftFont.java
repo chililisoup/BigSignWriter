@@ -9,7 +9,7 @@ import static java.util.Map.entry;
 public class MinecraftFont implements FontSupplier {
     @Override
     public FontFile get() {
-        return new FontFile("Minecraft", " ", Map.<Character, String[]>ofEntries(
+        return new FontFile("Minecraft", "Mojang, chililisoup", " ", Map.<Character, String[]>ofEntries(
                 entry(' ', new String[]{
                         "    ",
                         "    ",

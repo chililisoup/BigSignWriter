@@ -9,7 +9,7 @@ import static java.util.Map.entry;
 public class OutlinedShortFont implements FontSupplier {
     @Override
     public FontFile get() {
-        return new FontFile("Outlined Short", 3, " ", Map.<Character, String[]>ofEntries(
+        return new FontFile("Outlined Short", "chililisoup", 3, " ", Map.<Character, String[]>ofEntries(
                 entry(' ', new String[]{
                         "      ",
                         "      ",

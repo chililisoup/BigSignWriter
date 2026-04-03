@@ -16,7 +16,7 @@ import static java.util.Map.entry;
 public class ShulkerwareFont implements FontSupplier {
     @Override
     public FontFile get() {
-        return new FontFile("SHULKERWARE", "   ", Map.<Character, String[]>ofEntries(
+        return new FontFile("SHULKERWARE", "adhill", "   ", Map.<Character, String[]>ofEntries(
                 entry('A', new String[] {
                         "▄▀▀▄",
                         "█    █",

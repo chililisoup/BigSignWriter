@@ -10,25 +10,32 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 
 public class FontInfo {
     private final FontFile fontFile;
+    public final String fileName;
     private boolean checked = false;
     private @Nullable Component error = null;
 
-    FontInfo(FontFile fontFile) {
+    FontInfo(FontFile fontFile, String fileName) {
         this.fontFile = fontFile;
+        this.fileName = fileName;
     }
 
     public String name() {
         return this.fontFile.name;
     }
 
+    public @Nullable String credits() {
+        return this.fontFile.credits;
+    }
+
     public int height() {
         return this.fontFile.height > 0 ? this.fontFile.height : 4;
     }
 
-    public String characterSeparator() {
+    public @Nullable String characterSeparator() {
         return this.fontFile.characterSeparator;
     }
 
@@ -68,7 +75,7 @@ public class FontInfo {
         Component[] preview = new Component[height];
         String characterSeparator = BigSignWriterConfig.MAIN_CONFIG.characterSeparatorOverrideEnabled ?
                 BigSignWriterConfig.MAIN_CONFIG.characterSeparatorOverride :
-                (fontInfo.characterSeparator() != null ? fontInfo.characterSeparator() : " ");
+                Optional.ofNullable(fontInfo.characterSeparator()).orElse(" ");
         for (int i = 0; i < lines.size(); i++)
             preview[i] = Component.literal(String.join(characterSeparator, lines.get(i)));
 

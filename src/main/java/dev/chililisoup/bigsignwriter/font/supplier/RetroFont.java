@@ -9,7 +9,7 @@ import static java.util.Map.entry;
 public class RetroFont implements FontSupplier {
     @Override
     public FontFile get() {
-        return new FontFile("Retro", "   ", Map.<Character, String[]>ofEntries(
+        return new FontFile("Retro", "DebornMC", "   ", Map.<Character, String[]>ofEntries(
                 entry(' ', new String[]{
                         "        ",
                         "        ",

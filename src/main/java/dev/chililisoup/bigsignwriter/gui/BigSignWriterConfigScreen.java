@@ -22,8 +22,10 @@ import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -677,9 +679,20 @@ public class BigSignWriterConfigScreen extends Screen {
             this.getContent().visitWidgets(widget -> widget.setWidth(width));
         }
 
+        private static Component infoLine(String key, Object object) {
+            return Component.translatable(
+                    key,
+                    (object instanceof Component component ?
+                            component.copy() :
+                            Component.literal(String.valueOf(object))
+                    ).withStyle(ChatFormatting.AQUA)
+            );
+        }
+
         @Override
         public void extractExtraRenderState(GuiGraphicsExtractor guiGraphics, int width, int height, int mouseX, int mouseY) {
             if (this.selected == null) return;
+            FontInfo fontInfo = this.selected.fontInfo;
 
             VersionHelper.drawScrollingString(
                     guiGraphics,
@@ -692,15 +705,41 @@ public class BigSignWriterConfigScreen extends Screen {
 
             guiGraphics.fill(0, 10, width, 11, 0xFFFFFFFF);
 
-            Component error = this.selected.fontInfo.error();
-            if (error != null) guiGraphics.textWithWordWrap(
-                    BigSignWriterConfigScreen.this.minecraft.font,
-                    error.copy().withStyle(ChatFormatting.RED),
-                    0,
-                    20,
-                    width,
-                    -1
+            ArrayList<Component> infoLines = new ArrayList<>();
+            Optional.ofNullable(fontInfo.credits()).ifPresent(
+                    credits -> infoLines.add(infoLine("bigsignwriter.font.info.credits", credits))
             );
+            infoLines.add(infoLine("bigsignwriter.font.info.file", fontInfo.fileName));
+            infoLines.add(infoLine("bigsignwriter.font.info.characterCount", fontInfo.characters().size()));
+
+            for (int i = 0; i < infoLines.size(); i++) VersionHelper.drawScrollingString(
+                    guiGraphics,
+                    infoLines.get(i),
+                    0,
+                    0,
+                    width,
+                    20 + i * 12,
+                    29 + i * 12
+            );
+
+            int afterInfoLines = 22 + infoLines.size() * 12;
+            guiGraphics.fill(0, afterInfoLines, width, afterInfoLines + 1, 0xFFFFFFFF);
+
+            Component error = fontInfo.error();
+            if (error != null) {
+                guiGraphics.textWithWordWrap(
+                        BigSignWriterConfigScreen.this.minecraft.font,
+                        error.copy().withStyle(ChatFormatting.RED),
+                        0,
+                        afterInfoLines + 10,
+                        width,
+                        -1
+                );
+
+                return;
+            }
+
+
         }
 
         private class FontElement extends AbstractButton {

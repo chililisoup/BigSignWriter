@@ -12,7 +12,7 @@ import static java.util.Map.entry;
 public class SmoothSmallFont implements FontSupplier {
     @Override
     public FontFile get() {
-        return new FontFile("Smooth Small", 2, Map.<Character, String[]>ofEntries(
+        return new FontFile("Smooth Small", "chililisoup, Opticality", 2, Map.<Character, String[]>ofEntries(
                 entry(' ', new String[]{
                         "  ",
                         "  "

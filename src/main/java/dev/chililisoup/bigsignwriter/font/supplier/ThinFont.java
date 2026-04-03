@@ -9,7 +9,7 @@ import static java.util.Map.entry;
 public class ThinFont implements FontSupplier {
     @Override
     public FontFile get() {
-        return new FontFile("Thin", 3, " ", Map.<Character, String[]>ofEntries(
+        return new FontFile("Thin", "chililisoup", 3, " ", Map.<Character, String[]>ofEntries(
                 entry(' ', new String[]{
                         "    ",
                         "    ",

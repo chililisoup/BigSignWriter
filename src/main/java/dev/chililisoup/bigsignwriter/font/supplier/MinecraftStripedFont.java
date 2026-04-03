@@ -10,7 +10,7 @@ import static java.util.Map.entry;
 public class MinecraftStripedFont implements FontSupplier {
     @Override
     public FontFile get() {
-        return new FontFile("Minecraft Striped", Map.<Character, String[]>ofEntries(
+        return new FontFile("Minecraft Striped", "Mojang, chililisoup", Map.<Character, String[]>ofEntries(
                 entry(' ', new String[]{
                         "    ",
                         "    ",
