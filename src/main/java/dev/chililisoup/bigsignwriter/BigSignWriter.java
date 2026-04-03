@@ -93,9 +93,9 @@ public class BigSignWriter {
         SELECTED_FONT = (fontInfo != null && AVAILABLE_FONTS.contains(fontInfo)) ?
                 fontInfo : null;
 
-        CHARACTER_SEPARATOR = BigSignWriterConfig.MAIN_CONFIG.characterSeparatorOverrideEnabled ?
-                BigSignWriterConfig.MAIN_CONFIG.characterSeparatorOverride :
-                (SELECTED_FONT != null && SELECTED_FONT.characterSeparator() != null ? SELECTED_FONT.characterSeparator() : " ");
+        CHARACTER_SEPARATOR = SELECTED_FONT != null ?
+                SELECTED_FONT.characterSeparator() :
+                BigSignWriterConfig.MAIN_CONFIG.characterSeparatorOverride;
     }
 
     static void reselectFont(int index) {

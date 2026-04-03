@@ -10,17 +10,16 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Optional;
 
 public class FontInfo {
     private final FontFile fontFile;
-    public final String fileName;
+    public final String source;
     private boolean checked = false;
     private @Nullable Component error = null;
 
-    FontInfo(FontFile fontFile, String fileName) {
+    FontInfo(FontFile fontFile, String source) {
         this.fontFile = fontFile;
-        this.fileName = fileName;
+        this.source = source;
     }
 
     public String name() {
@@ -35,12 +34,22 @@ public class FontInfo {
         return this.fontFile.height > 0 ? this.fontFile.height : 4;
     }
 
-    public @Nullable String characterSeparator() {
-        return this.fontFile.characterSeparator;
+    public String characterSeparator() {
+        return BigSignWriterConfig.MAIN_CONFIG.characterSeparatorOverrideEnabled ?
+                BigSignWriterConfig.MAIN_CONFIG.characterSeparatorOverride :
+                (this.fontFile.characterSeparator != null ? this.fontFile.characterSeparator : " ");
     }
 
     public Map<Character, String[]> characters() {
         return this.fontFile.characters;
+    }
+
+    public boolean isBroken() {
+        return this.error() != null;
+    }
+
+    public boolean isWorking() {
+        return !this.isBroken();
     }
 
     public @Nullable Component error() {
@@ -48,38 +57,6 @@ public class FontInfo {
         this.error = getError(fontFile);
         this.checked = true;
         return this.error;
-    }
-
-    public final Component[] getPreview(String text) {
-        return getFontPreview(this, text);
-    }
-
-    public final Component[] getPreview() {
-        return this.getPreview(this.name());
-    }
-
-    static Component[] getFontPreview(FontInfo fontInfo, String text) {
-        int height = fontInfo.height();
-        ArrayList<ArrayList<String>> lines = new ArrayList<>(height);
-        for (int i = 0; i < height; i++) lines.add(new ArrayList<>());
-
-        for (char chr : text.toCharArray()) {
-            String[] bigChar = BigSignWriter.getBigChar(chr, fontInfo).orElse(new String[]{""});
-            int length = Math.min(height, bigChar.length);
-            for (int i = 0; i < length; i++)
-                lines.get(i).add(bigChar[i]);
-        }
-
-        if (lines.isEmpty()) return new Component[0];
-
-        Component[] preview = new Component[height];
-        String characterSeparator = BigSignWriterConfig.MAIN_CONFIG.characterSeparatorOverrideEnabled ?
-                BigSignWriterConfig.MAIN_CONFIG.characterSeparatorOverride :
-                Optional.ofNullable(fontInfo.characterSeparator()).orElse(" ");
-        for (int i = 0; i < lines.size(); i++)
-            preview[i] = Component.literal(String.join(characterSeparator, lines.get(i)));
-
-        return preview;
     }
 
     private static @Nullable Component getError(FontFile fontFile) {
@@ -115,5 +92,35 @@ public class FontInfo {
         }
 
         return null;
+    }
+
+    public final Component[] getPreview(String text) {
+        return getFontPreview(this, text);
+    }
+
+    public final Component[] getPreview() {
+        return this.getPreview(this.name());
+    }
+
+    private static Component[] getFontPreview(FontInfo fontInfo, String text) {
+        int height = fontInfo.height();
+        ArrayList<ArrayList<String>> lines = new ArrayList<>(height);
+        for (int i = 0; i < height; i++) lines.add(new ArrayList<>());
+
+        for (char chr : text.toCharArray()) {
+            String[] bigChar = BigSignWriter.getBigChar(chr, fontInfo).orElse(new String[]{""});
+            int length = Math.min(height, bigChar.length);
+            for (int i = 0; i < length; i++)
+                lines.get(i).add(bigChar[i]);
+        }
+
+        if (lines.isEmpty()) return new Component[0];
+
+        Component[] preview = new Component[height];
+        String characterSeparator = fontInfo.characterSeparator();
+        for (int i = 0; i < lines.size(); i++)
+            preview[i] = Component.literal(String.join(characterSeparator, lines.get(i)));
+
+        return preview;
     }
 }

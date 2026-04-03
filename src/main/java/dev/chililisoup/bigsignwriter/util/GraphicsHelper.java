@@ -1,9 +1,14 @@
 package dev.chililisoup.bigsignwriter.util;
 
+import dev.chililisoup.bigsignwriter.BigSignWriter;
+import dev.chililisoup.bigsignwriter.font.FontInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 //? if < 1.21.4 {
 /*import org.joml.Vector3f;
@@ -21,7 +26,7 @@ import net.minecraft.Util;
 import net.minecraft.client.gui.components.AbstractWidget;
 *///?}
 
-public final class VersionHelper {
+public final class GraphicsHelper {
     public static void drawScrollingString(GuiGraphicsExtractor guiGraphics, Component text, int centerX, int left, int right, int top, int bottom) {
         // <= 1.21.3 doesn't use AbstractWidget.renderScrollingString
         // cause its scissor doesn't care for the pose transform
@@ -177,5 +182,49 @@ public final class VersionHelper {
         /*guiGraphics.pose().popMatrix();
         *///?} else
         guiGraphics.pose().popMatrix();
+    }
+
+    public static Component[] getWrappedFontPreview(FontInfo fontInfo, String text, int width, int lineHeight) {
+        if (fontInfo.isBroken()) return new Component[0];
+
+        Font font = Minecraft.getInstance().font;
+        float scale = (lineHeight / 9F) / (float) fontInfo.height();
+        float separatorWidth = font.width(fontInfo.characterSeparator()) * scale;
+
+        ArrayList<Component> previewLines = new ArrayList<>();
+        StringBuilder runningString = new StringBuilder();
+        float runningWidth = 0F;
+        for (char chr : text.toCharArray()) {
+            String top = BigSignWriter.getBigChar(chr, fontInfo).orElse(new String[]{""})[0];
+
+            float chrWidth = font.width(top) * scale;
+            if (runningWidth > 0 && runningWidth + chrWidth > width) {
+                if (!runningString.isEmpty()) {
+                    if (!previewLines.isEmpty()) previewLines.add(Component.empty());
+                    previewLines.addAll(List.of(fontInfo.getPreview(runningString.toString())));
+                }
+                runningWidth = chrWidth + separatorWidth;
+                runningString = new StringBuilder(String.valueOf(chr));
+            } else {
+                runningWidth += chrWidth + separatorWidth;
+                runningString.append(chr);
+            }
+        }
+
+        if (!runningString.isEmpty()) {
+            if (!previewLines.isEmpty()) previewLines.add(Component.empty());
+            previewLines.addAll(List.of(fontInfo.getPreview(runningString.toString())));
+        }
+
+        return previewLines.toArray(Component[]::new);
+
+//        drawFontPreview(
+//                guiGraphics,
+//                previewLines.toArray(Component[]::new),
+//                0F,
+//                x,
+//                y,
+//                (int) (lineHeight * ((float) previewLines.size() / fontInfo.height()))
+//        );
     }
 }

@@ -1,6 +1,6 @@
 package dev.chililisoup.bigsignwriter.gui;
 
-import dev.chililisoup.bigsignwriter.util.VersionHelper;
+import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarratedElementType;
@@ -86,7 +86,7 @@ public class TickBox extends AbstractButton {
                 0x40FFFFFF
         );
 
-        VersionHelper.drawScrollingString(
+        GraphicsHelper.drawScrollingString(
                 guiGraphics,
                 this.getMessage(),
                 labelX + 2,

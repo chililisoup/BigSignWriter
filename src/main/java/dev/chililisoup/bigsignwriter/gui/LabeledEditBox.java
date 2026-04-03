@@ -1,6 +1,6 @@
 package dev.chililisoup.bigsignwriter.gui;
 
-import dev.chililisoup.bigsignwriter.util.VersionHelper;
+import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
@@ -59,7 +59,7 @@ public class LabeledEditBox extends EditBox {
                 0x40FFFFFF
         );
 
-        VersionHelper.drawScrollingString(
+        GraphicsHelper.drawScrollingString(
                 guiGraphics,
                 this.getMessage(),
                 labelX + 2,
