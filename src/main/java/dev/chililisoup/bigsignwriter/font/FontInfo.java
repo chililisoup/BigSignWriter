@@ -52,6 +52,29 @@ public class FontInfo {
         return !this.isBroken();
     }
 
+    public boolean isBuiltIn() {
+        return this.getBuiltInName() != null;
+    }
+
+    public boolean isVisible(BigSignWriterConfig.PersistentConfig config) {
+        return !config.hiddenFonts.contains(this.source);
+    }
+
+    public boolean isVisible() {
+        return this.isVisible(BigSignWriterConfig.MAIN_CONFIG);
+    }
+
+    public void setVisible(BigSignWriterConfig.PersistentConfig config, boolean visible) {
+        if (visible) config.hiddenFonts.remove(this.source);
+        else config.hiddenFonts.add(this.source);
+    }
+
+    public @Nullable String getBuiltInName() {
+        String[] fontSource = this.source.split("/");
+        return fontSource.length == 2 && fontSource[0].equals("builtin") ?
+                fontSource[1] : null;
+    }
+
     public @Nullable Component error() {
         if (this.checked) return this.error;
         this.error = getError(fontFile);

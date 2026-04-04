@@ -58,7 +58,9 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
     }
 
     public void updateEntries() {
-        this.replaceEntries(BigSignWriter.AVAILABLE_FONTS.stream().map(Entry::new).toList());
+        this.replaceEntries(BigSignWriter.AVAILABLE_FONTS.stream()
+                .filter(FontInfo::isVisible).map(Entry::new).toList()
+        );
         this.addEntryToTop(new Entry(null));
         super.setSelected(this
                 .children()

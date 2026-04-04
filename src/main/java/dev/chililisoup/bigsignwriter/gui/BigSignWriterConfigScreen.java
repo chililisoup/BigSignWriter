@@ -18,6 +18,7 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,31 +34,37 @@ import java.util.function.Function;
 
 import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.*;
 
-//? if >= 1.21.3 {
-import net.minecraft.client.renderer.RenderPipelines;
+//? if >= 1.21.11 {
+import net.minecraft.util.Util;
 //?} else {
-/*import com.mojang.blaze3d.systems.RenderSystem;
+/*import net.minecraft.Util;
 *///?}
+
+//? if < 1.21.3 {
+/*import com.mojang.blaze3d.systems.RenderSystem;
+*///?} else {
+import net.minecraft.client.renderer.RenderPipelines;
+//?}
 
 //? if >= 1.21.9 {
 import net.minecraft.client.input.InputWithModifiers;
 //?}
 
 public class BigSignWriterConfigScreen extends Screen {
-    private static final Component TITLE = Component.translatable("bigsignwriter.config");
+    private static final Component SCREEN_TITLE = Component.translatable("bigsignwriter.config");
     private static final int MARGIN = 16;
 
     private final MainConfig workingConfig = MAIN_CONFIG.createCopy();
     private final MainConfig defaults = new MainConfig();
     private final Component[] title;
 
-    private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
+    private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this, 33, 60);
     private final TabManager tabManager = new TabManager(this::addRenderableWidget, this::removeWidget);
     private @Nullable ConfigTabNavigationBar tabNavigationBar;
     private final Screen parent;
 
     public BigSignWriterConfigScreen(Screen parent) {
-        super(TITLE);
+        super(SCREEN_TITLE);
         this.parent = parent;
         this.tabManager.setTabArea(ScreenRectangle.empty());
 
@@ -89,13 +96,35 @@ public class BigSignWriterConfigScreen extends Screen {
         this.tabNavigationBar.selectTab(0, false);
         this.addRenderableWidget(this.tabNavigationBar);
 
-        this.layout.addToFooter(Button.builder(CommonComponents.GUI_DONE, button -> this.onClose()).width(200).build());
+        GridLayout footerButtons = new GridLayout().columnSpacing(8).rowSpacing(4);
+        footerButtons.addChild(Button.builder(Component.translatable("bigsignwriter.config.openFontsFolder"), button ->
+                Util.getPlatform().openPath(BigSignWriter.getFontsDir())
+        ).width(120).build(), 0, 0);
+        footerButtons.addChild(Button.builder(Component.translatable("bigsignwriter.config.reloadFonts"), button -> {
+            BigSignWriter.reloadFonts();
+            this.reload();
+        }).width(120).build(), 0, 1);
+        footerButtons.addChild(Button.builder(CommonComponents.GUI_DONE, button ->
+                this.onClose()
+        ).width(248).build(), 1, 0, 1, 2);
+        this.layout.addToFooter(footerButtons);
 
         this.layout.visitWidgets(button -> {
             button.setTabOrderGroup(1);
             this.addRenderableWidget(button);
         });
         this.repositionElements();
+    }
+
+    private void reload() {
+        if (this.tabNavigationBar == null) return;
+
+        int selectedTab = this.tabNavigationBar.tabs.indexOf(this.tabManager.getCurrentTab());
+        if (selectedTab < 0) return;
+
+        this.rebuildWidgets();
+        if (this.tabNavigationBar != null)
+            this.tabNavigationBar.selectTab(selectedTab, false);
     }
 
     @Override
@@ -387,7 +416,6 @@ public class BigSignWriterConfigScreen extends Screen {
                     //10;
             layout.container.setWidth(screenRectangle.width() + 2 * scrollbarReserve);
             FrameLayout.alignInRectangle(layout, screenRectangle, 0.5F, 0F);
-            FrameLayout.alignInRectangle(layout.content, screenRectangle, 0.5F, 0F);
             layout.container.refreshScrollAmount();
         }
 
@@ -505,7 +533,7 @@ public class BigSignWriterConfigScreen extends Screen {
             });
         }
 
-        private static class OptionElement<T> implements LayoutElement {
+        private static class OptionElement<T> extends AbstractLayoutElement {
             private T value;
             private final T defaultValue;
             private final Consumer<T> onChange;
@@ -513,10 +541,6 @@ public class BigSignWriterConfigScreen extends Screen {
             private final Button resetButton;
             private final Component name;
             private final Component description;
-
-            private int x = 0;
-            private int y = 0;
-            private int width = 150;
 
             OptionElement(
                     T value,
@@ -547,59 +571,16 @@ public class BigSignWriterConfigScreen extends Screen {
             }
 
             @Override
-            public int getX() {
-                return this.x;
-            }
-
-            @Override
-            public void setX(int x) {
-                this.x = x;
-                this.arrangeElements();
-            }
-
-            @Override
-            public int getY() {
-                return this.y;
-            }
-
-            @Override
-            public void setY(int y) {
-                this.y = y;
-                this.arrangeElements();
-            }
-
-            @Override
-            public void setPosition(int x, int y) {
-                this.x = x;
-                this.y = y;
-                this.arrangeElements();
-            }
-
-            @Override
-            public int getWidth() {
-                return this.width;
-            }
-
-            public void setWidth(int width) {
-                this.width = width;
-                this.arrangeElements();
-            }
-
-            @Override
-            public int getHeight() {
-                return 20;
-            }
-
-            private void arrangeElements() {
+            protected void arrangeElements() {
+                this.controller.widget().setPosition(this.x, this.y);
+                this.controller.widget().setWidth(this.width - 22);
                 this.resetButton.setPosition(this.x + this.width - 20, this.y);
-                this.controller.widget().setPosition(x, y);
-                this.controller.widget().setWidth(width - 22);
             }
 
             @Override
             public void visitWidgets(@NotNull Consumer<AbstractWidget> widgetVisitor) {
-                widgetVisitor.accept(this.resetButton);
                 widgetVisitor.accept(this.controller.widget());
+                widgetVisitor.accept(this.resetButton);
             }
 
             private interface OptionController<T> {
@@ -734,7 +715,7 @@ public class BigSignWriterConfigScreen extends Screen {
     }
 
     private class FontsTab extends ConfigTab<FontsTab.FontsSidePanel> {
-        private @Nullable FontElement selected = null;
+        private @Nullable BigSignWriterConfigScreen.FontsTab.FontButton selected = null;
 
         public FontsTab() {
             super(Component.translatable("bigsignwriter.config.fonts"));
@@ -757,7 +738,10 @@ public class BigSignWriterConfigScreen extends Screen {
 
         @Override
         public void arrangeElements(int contentWidth) {
-            this.getContent().visitWidgets(widget -> widget.setWidth(contentWidth));
+            this.getContent().visitChildren(element -> {
+                if (element instanceof FontElement fontElement)
+                    fontElement.setWidth(contentWidth);
+            });
         }
 
         private static Component infoLine(String key, Object object) {
@@ -770,11 +754,83 @@ public class BigSignWriterConfigScreen extends Screen {
             );
         }
 
-        private class FontElement extends AbstractButton {
+        private class FontElement extends AbstractLayoutElement {
+            private final FontButton fontButton;
+            private final Button fontVisibilityButton;
+
+            private FontElement(FontInfo fontInfo) {
+                this.fontButton = new FontButton(fontInfo);
+                this.fontVisibilityButton = new FontVisibilityButton(fontInfo);
+                this.height = 24;
+            }
+
+            @Override
+            protected void arrangeElements() {
+                this.fontButton.setPosition(this.x, this.y);
+                this.fontButton.setWidth(this.width - 22);
+                this.fontVisibilityButton.setPosition(this.x + this.width - 20, this.y + 2);
+            }
+
+            @Override
+            public void visitWidgets(@NotNull Consumer<AbstractWidget> widgetVisitor) {
+                widgetVisitor.accept(this.fontButton);
+                widgetVisitor.accept(this.fontVisibilityButton);
+            }
+        }
+
+        //? if >= 1.21.11 {
+        private class FontVisibilityButton extends Button.Plain {
+        //?} else
+        //private class FontVisibilityButton extends Button {
+            private static final Identifier VISIBLE_SPRITE = BigSignWriter.id("visible");
+            private static final Identifier HIDDEN_SPRITE = BigSignWriter.id("hidden");
+
+            private boolean fontVisible;
+
+            protected FontVisibilityButton(FontInfo fontInfo) {
+                super(0, 0, 20, 20, Component.empty(), button -> {
+                    if (button instanceof FontVisibilityButton fontVisibilityButton) {
+                        fontVisibilityButton.fontVisible = !fontVisibilityButton.fontVisible;
+                        fontInfo.setVisible(
+                                BigSignWriterConfigScreen.this.workingConfig,
+                                fontVisibilityButton.fontVisible
+                        );
+                    }
+                }, Button.DEFAULT_NARRATION);
+                this.fontVisible = fontInfo.isVisible(BigSignWriterConfigScreen.this.workingConfig);
+            }
+
+            @Override
+            //? if >= 1.21.11 {
+            protected void extractContents(
+            //?} else
+            //protected void extractWidgetRenderState(
+                    @NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick
+            ) {
+                //? if >= 26.1 {
+                super.extractContents(
+                //?} else
+                //super.extractWidgetRenderState(
+                        guiGraphics, mouseX, mouseY, partialTick
+                );
+
+                guiGraphics.blitSprite(
+                        //? if >= 1.21.3
+                        RenderPipelines.GUI_TEXTURED,
+                        this.fontVisible ? VISIBLE_SPRITE : HIDDEN_SPRITE,
+                        this.getX() + 2,
+                        this.getY() + 2,
+                        16,
+                        16
+                );
+            }
+        }
+
+        private class FontButton extends AbstractButton {
             private final FontInfo fontInfo;
             private final Component[] fontPreview;
 
-            public FontElement(FontInfo fontInfo) {
+            public FontButton(FontInfo fontInfo) {
                 super(0, 0, 0, 24, Component.literal(fontInfo.name()));
                 this.fontInfo = fontInfo;
                 this.fontPreview = fontInfo.getPreview();
@@ -878,39 +934,57 @@ public class BigSignWriterConfigScreen extends Screen {
             private final ArrayList<Component> infoLines = new ArrayList<>();
             private @Nullable List<Component[]> wrappedFontPreview = null;
 
-            private final Button copyButton = Button.builder(Component.literal("Copy"), button -> {
-                if (FontsTab.this.selected != null)
-                    BigSignWriter.saveFontToFile(FontsTab.this.selected.fontInfo);
-            }).width(40).build();
-
-            private final Button zoomButton = Button.builder(Component.literal("\uD83D\uDD0D+"), button -> {
-                PREVIEW_LINE_HEIGHT += 6;
-                if (PREVIEW_LINE_HEIGHT > 36) PREVIEW_LINE_HEIGHT = 12;
+            private final Button zoomOutButton = Button.builder(Component.literal("\uD83D\uDD0D-"), button -> {
+                PREVIEW_LINE_HEIGHT = Math.max(PREVIEW_LINE_HEIGHT - 6, 12);
                 FontsTab.this.redoLayout();
             }).width(20).build();
 
+            private final Button zoomInButton = Button.builder(Component.literal("\uD83D\uDD0D+"), button -> {
+                PREVIEW_LINE_HEIGHT = Math.min(PREVIEW_LINE_HEIGHT + 6, 36);
+                FontsTab.this.redoLayout();
+            }).width(20).build();
+
+            private final Button copyButton = Button.builder(Component.translatable("bigsignwriter.config.fonts.createCopy"), button -> {
+                if (FontsTab.this.selected != null) {
+                    BigSignWriter.saveFontToFile(FontsTab.this.selected.fontInfo);
+                    BigSignWriterConfigScreen.this.reload();
+                }
+            }).tooltip(Tooltip.create(Component.translatable("bigsignwriter.config.fonts.createCopy.desc"))).build();
+
             @Override
             protected void addExtraWidgets(Consumer<AbstractWidget> widgetConsumer) {
+                widgetConsumer.accept(this.zoomOutButton);
+                widgetConsumer.accept(this.zoomInButton);
                 widgetConsumer.accept(this.copyButton);
-                widgetConsumer.accept(this.zoomButton);
+            }
+
+            private int afterInfoLines() {
+                return this.getY() + 27 + this.infoLines.size() * 12;
             }
 
             @Override
             protected void arrangeSelf() {
-                this.zoomButton.visible = FontsTab.this.selected != null;
-                this.copyButton.visible = FontsTab.this.selected != null
-                        && FontsTab.this.selected.fontInfo.source.equals("Built-in");
-                if (FontsTab.this.selected == null) {
+                FontButton selected = FontsTab.this.selected;
+                this.zoomOutButton.visible = selected != null && selected.fontInfo.isWorking();
+                this.zoomInButton.visible = this.zoomOutButton.visible;
+                this.copyButton.visible = this.zoomOutButton.visible
+                        && selected.fontInfo.isBuiltIn();
+                if (selected == null) {
                     this.height = this.maxHeight;
                     return;
                 }
-                FontInfo fontInfo = FontsTab.this.selected.fontInfo;
+                FontInfo fontInfo = selected.fontInfo;
 
                 infoLines.clear();
                 Optional.ofNullable(fontInfo.credits()).ifPresent(
                         credits -> infoLines.add(infoLine("bigsignwriter.font.info.credits", credits))
                 );
-                infoLines.add(infoLine("bigsignwriter.font.info.source", fontInfo.source));
+                infoLines.add(infoLine(
+                        "bigsignwriter.font.info.source",
+                        fontInfo.isBuiltIn() ?
+                                Component.translatable("bigsignwriter.font.info.source.builtIn") :
+                                fontInfo.source
+                ));
                 infoLines.add(infoLine("bigsignwriter.font.info.characterCount", fontInfo.characters().size()));
 
                 this.wrappedFontPreview = GraphicsHelper.getWrappedFontPreview(
@@ -920,16 +994,18 @@ public class BigSignWriterConfigScreen extends Screen {
                         PREVIEW_LINE_HEIGHT
                 );
 
-                int afterInfoLines = this.getY() + 27 + this.infoLines.size() * 12;
                 int previewHeight = this.wrappedFontPreview.size() * (PREVIEW_LINE_HEIGHT + PREVIEW_GAP) - PREVIEW_GAP;
-                int bottom = afterInfoLines + 10 + previewHeight;
+                int bottom = this.afterInfoLines() + 10 + previewHeight;
                 this.height = Math.max(bottom - this.getY(), this.maxHeight);
             }
 
             @Override
             protected void arrangeOthers() {
-                this.copyButton.setPosition(this.getRight() - 60, this.getY() + 20);
-                this.zoomButton.setPosition(this.getRight() - 20, this.getY() + 20);
+                int y = this.afterInfoLines() + 10;
+                this.zoomOutButton.setPosition(this.getX(), y);
+                this.zoomInButton.setPosition(this.getX() + 22, y);
+                this.copyButton.setPosition(this.getX() + 44, y);
+                this.copyButton.setWidth(this.getWidth() - 44);
             }
 
             @Override
@@ -958,7 +1034,7 @@ public class BigSignWriterConfigScreen extends Screen {
                         this.getY() + 34 + i * 12
                 );
 
-                int afterInfoLines = this.getY() + 27 + this.infoLines.size() * 12;
+                int afterInfoLines = this.afterInfoLines();
                 guiGraphics.fill(this.getX(), afterInfoLines, this.getRight(), afterInfoLines + 1, 0xFFFFFFFF);
 
                 Component error = fontInfo.error();
@@ -981,11 +1057,69 @@ public class BigSignWriterConfigScreen extends Screen {
                             this.wrappedFontPreview.get(i),
                             0F,
                             this.getX(),
-                            afterInfoLines + 10 + i * (PREVIEW_LINE_HEIGHT + PREVIEW_GAP),
+                            afterInfoLines + 30 + PREVIEW_GAP + i * (PREVIEW_LINE_HEIGHT + PREVIEW_GAP),
                             PREVIEW_LINE_HEIGHT
                     );
                 }
             }
         }
+    }
+
+    private static abstract class AbstractLayoutElement implements LayoutElement {
+        protected int x = 0;
+        protected int y = 0;
+        protected int width = 150;
+        protected int height = 20;
+
+        @Override
+        public int getX() {
+            return this.x;
+        }
+
+        @Override
+        public void setX(int x) {
+            this.x = x;
+            this.arrangeElements();
+        }
+
+        @Override
+        public int getY() {
+            return this.y;
+        }
+
+        @Override
+        public void setY(int y) {
+            this.y = y;
+            this.arrangeElements();
+        }
+
+        @Override
+        public void setPosition(int x, int y) {
+            this.x = x;
+            this.y = y;
+            this.arrangeElements();
+        }
+
+        @Override
+        public int getWidth() {
+            return this.width;
+        }
+
+        public void setWidth(int width) {
+            this.width = width;
+            this.arrangeElements();
+        }
+
+        @Override
+        public int getHeight() {
+            return this.height;
+        }
+
+        public void setHeight(int height) {
+            this.height = height;
+            this.arrangeElements();
+        }
+
+        abstract protected void arrangeElements();
     }
 }

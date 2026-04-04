@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +16,12 @@ import java.util.List;
 *///?}
 
 //? if >= 1.21.11 {
-import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 //?} else {
-/*import net.minecraft.util.Mth;
-import net.minecraft.Util;
-//? if > 1.21.3
+/*import net.minecraft.Util;
+//? if > 1.21.3 {
 import net.minecraft.client.gui.components.AbstractWidget;
+//?}
 *///?}
 
 public final class GraphicsHelper {

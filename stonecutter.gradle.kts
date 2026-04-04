@@ -17,6 +17,10 @@ stonecutter parameters {
             replace("popPose", "popMatrix")
         }
 
+        string(current.parsed.eq("1.21.9")) {
+            replace("guiGraphics.renderOutline(", "guiGraphics.submitOutline(")
+        }
+
         string(current.parsed >= "1.21.11") {
             replace("ResourceLocation", "Identifier")
             replace(".location()", ".identifier()")

@@ -105,7 +105,7 @@ public class BigSignWriter {
         selectFont(SELECTED_FONT);
     }
 
-    private static @NotNull Path getFontsDir() {
+    public static @NotNull Path getFontsDir() {
         Path fontsDir = BigSignWriterConfig.getConfigDir().resolve("fonts");
         try {
             Files.createDirectories(fontsDir);
@@ -145,13 +145,16 @@ public class BigSignWriter {
     }
 
     public static void saveFontToFile(FontInfo fontInfo) {
+        String name = fontInfo.getBuiltInName();
+        if (name == null) return;
+
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Path configFonts = getFontsDir();
 
         try {
             Files.createDirectories(configFonts);
 
-            String path = fontInfo.name() + "_copy";
+            String path = name + "_copy";
             Path target = configFonts.resolve(path + ".json");
             int i = 1;
             while (Files.exists(target)) {
@@ -159,6 +162,7 @@ public class BigSignWriter {
             }
 
             getFont(gson, target).save(fontInfo.fontFile);
+            reloadFonts();
         } catch (Exception e) {
             LOGGER.error("Error saving font", e);
         }
@@ -182,11 +186,11 @@ public class BigSignWriter {
             Files.createDirectories(configFonts);
 
             return BuiltInFonts.get().entrySet().stream().map(entry -> {
+                String path = entry.getKey();
                 FontSupplier fontSupplier = entry.getValue();
                 FontFile fontFile = fontSupplier.get();
-                FontInfo fontInfo = fontFile.createInfo("Built-in");
+                FontInfo fontInfo = fontFile.createInfo("builtin/" + path);
 
-                String path = entry.getKey();
                 if (path.equals("default")) DEFAULT_FONT = fontInfo;
                 Path target = configFonts.resolve(path + ".json");
                 if (Files.notExists(target)) return fontInfo;

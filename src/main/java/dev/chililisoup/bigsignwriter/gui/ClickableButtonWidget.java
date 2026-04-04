@@ -10,7 +10,10 @@ import net.minecraft.client.input.MouseButtonEvent;
 import org.jetbrains.annotations.NotNull;
 //?}
 
-public class ClickableButtonWidget extends Button/*? if >= 1.21.11 {*/.Plain/*?}*/ {
+//? if >= 1.21.11 {
+public class ClickableButtonWidget extends Button.Plain {
+//?} else
+//public class ClickableButtonWidget extends Button {
     public ClickableButtonWidget(int x, int y, int width, int height, Component message, OnPress onPress) {
         super(x, y, width, height, message, onPress, Button.DEFAULT_NARRATION);
     }

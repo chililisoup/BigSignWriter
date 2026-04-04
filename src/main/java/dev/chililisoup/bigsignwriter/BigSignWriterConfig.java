@@ -4,16 +4,19 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-//? if fabric
-import net.fabricmc.loader.api.FabricLoader;
-//? if neoforge
-//import net.neoforged.fml.loading.FMLPaths;
 
 import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.List;
+
+//? if fabric
+import net.fabricmc.loader.api.FabricLoader;
+//? if neoforge
+//import net.neoforged.fml.loading.FMLPaths;
 
 public class BigSignWriterConfig {
     public static final MainConfig MAIN_CONFIG = new MainConfig();
@@ -31,13 +34,20 @@ public class BigSignWriterConfig {
         public double buttonsAlignmentY = 0.25;
         public boolean fontSelectorCoversDoneButton = true;
         public boolean showReloadButton = false;
+        public HashSet<String> hiddenFonts = new HashSet<>(List.of(
+                "builtin/monospace"
+        ));
 
         public PersistentConfig copyFrom(PersistentConfig other) {
             for (Field field : PersistentConfig.class.getDeclaredFields()) {
                 try {
+                    if (field.getType() == HashSet.class) continue;
                     field.set(this, field.get(other));
                 } catch (IllegalAccessException ignored) {}
             }
+
+            this.hiddenFonts = new HashSet<>(other.hiddenFonts);
+
             return this;
         }
 
