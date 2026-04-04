@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.regex.Pattern;
 
 //? if fabric {
 import net.fabricmc.loader.api.FabricLoader;
@@ -118,7 +117,7 @@ public class BigSignWriter {
 
     public static void reloadFonts() {
         int selectedFontIndex = AVAILABLE_FONTS.indexOf(SELECTED_FONT);
-        copyBuiltInFonts();
+        List<FontInfo> builtInFonts = copyBuiltInFonts();
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -133,14 +132,36 @@ public class BigSignWriter {
         Arrays.sort(jsonFiles, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
 
         AVAILABLE_FONTS.clear();
+        AVAILABLE_FONTS.addAll(builtInFonts);
         AVAILABLE_FONTS.addAll(Arrays.stream(jsonFiles).map(file -> {
             String fileName = file.getName();
             FontInfo fontInfo = getFont(gson, file.toPath()).load().createInfo(fileName);
             if (fileName.equals("default.json")) DEFAULT_FONT = fontInfo;
             return fontInfo;
         }).toList());
+        AVAILABLE_FONTS.sort((a, b) -> a.name().compareToIgnoreCase(b.name()));
         reselectFont(selectedFontIndex);
         LOGGER.info("Fonts loaded!");
+    }
+
+    public static void saveFontToFile(FontInfo fontInfo) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Path configFonts = getFontsDir();
+
+        try {
+            Files.createDirectories(configFonts);
+
+            String path = fontInfo.name() + "_copy";
+            Path target = configFonts.resolve(path + ".json");
+            int i = 1;
+            while (Files.exists(target)) {
+                target = configFonts.resolve(path + "_" + i++ + ".json");
+            }
+
+            getFont(gson, target).save(fontInfo.fontFile);
+        } catch (Exception e) {
+            LOGGER.error("Error saving font", e);
+        }
     }
 
     private static BigSignWriterConfig.ConfigInterface<FontFile> getFont(Gson gson, Path path) {
@@ -153,46 +174,67 @@ public class BigSignWriter {
         );
     }
 
-    private static void copyBuiltInFonts() {
+    private static List<FontInfo> copyBuiltInFonts() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Path configFonts = getFontsDir();
 
         try {
             Files.createDirectories(configFonts);
 
-            BuiltInFonts.get().forEach((path, font) -> {
-                FontFile fontFile = font.get();
+            return BuiltInFonts.get().entrySet().stream().map(entry -> {
+                FontSupplier fontSupplier = entry.getValue();
+                FontFile fontFile = fontSupplier.get();
+                FontInfo fontInfo = fontFile.createInfo("Built-in");
+
+                String path = entry.getKey();
+                if (path.equals("default")) DEFAULT_FONT = fontInfo;
                 Path target = configFonts.resolve(path + ".json");
+                if (Files.notExists(target)) return fontInfo;
+
                 BigSignWriterConfig.ConfigInterface<FontFile> file = getFont(gson, target);
-
-                if (Files.notExists(target)) {
-                    file.save(fontFile);
-                    LOGGER.info("Copied built-in font: {}", fontFile.name);
-                    return;
-                }
-
                 FontFile existingFont = file.load();
-                Map<Character, Set<FontSupplier.PatchCharacter>> patches = font.patches();
+
+                Map<Character, Set<FontSupplier.PatchCharacter>> patches = fontSupplier.patches();
                 ArrayList<Character> changed = new ArrayList<>();
                 ArrayList<Character> patched = new ArrayList<>();
+
+                boolean canRemove = true;
                 for (char character : fontFile.characters.keySet()) {
-                    if (existingFont.characters.containsKey(character)) {
-                        if (!patches.containsKey(character)) continue;
-
-                        String existing = Pattern.quote(String.join("\n", existingFont.characters.get(character)));
-                        for (FontSupplier.PatchCharacter patch : patches.get(character)) {
-                            if (String.join("\n", patch.lines()).matches(existing)) {
-                                existingFont.characters.put(character, fontFile.characters.get(character));
-                                patched.add(character);
-                                break;
-                            }
-                        }
-
+                    if (!existingFont.characters.containsKey(character)) {
+                        existingFont.characters.put(character, fontFile.characters.get(character));
+                        changed.add(character);
                         continue;
                     }
 
-                    existingFont.characters.put(character, fontFile.characters.get(character));
-                    changed.add(character);
+                    String existing = String.join("\n", existingFont.characters.get(character));
+                    boolean match = false;
+
+                    if (patches.containsKey(character)) {
+                        for (FontSupplier.PatchCharacter patch : patches.get(character)) {
+                            if (String.join("\n", patch.lines()).equals(existing)) {
+                                existingFont.characters.put(character, fontFile.characters.get(character));
+                                patched.add(character);
+                                match = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!match) match = String
+                            .join("\n", fontFile.characters.get(character))
+                            .equals(existing);
+                    if (!match) canRemove = false;
+                }
+
+                canRemove = canRemove
+                        && existingFont.characters.size() == fontFile.characters.size()
+                        && existingFont.characters.keySet().equals(fontFile.characters.keySet());
+                if (canRemove) {
+                    File targetFile = target.toFile();
+                    if (targetFile.delete()) {
+                        LOGGER.info("Removed copy of built-in font '{}'", targetFile.getName());
+                        return fontInfo;
+                    } else LOGGER.error("Failed to remove copy of built-in font '{}'", targetFile.getName());
                 }
 
                 boolean needsSaved;
@@ -209,9 +251,12 @@ public class BigSignWriter {
                     if (!patched.isEmpty())
                         LOGGER.info("Patched outdated characters from built-in font '{}': {}", fontFile.name, patched);
                 }
-            });
+
+                return null;
+            }).filter(Objects::nonNull).toList();
         } catch (Exception e) {
             LOGGER.error("Error copying built-in fonts", e);
+            return List.of();
         }
     }
 }

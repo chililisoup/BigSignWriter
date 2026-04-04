@@ -36,7 +36,7 @@ public class FontFile {
         this.characterSeparator = characterSeparator;
     }
 
-    public final FontInfo createInfo(String fileName) {
-        return new FontInfo(this, fileName);
+    public final FontInfo createInfo(String source) {
+        return new FontInfo(this, source);
     }
 }

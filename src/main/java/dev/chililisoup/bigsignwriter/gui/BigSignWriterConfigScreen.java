@@ -16,7 +16,6 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -128,7 +127,7 @@ public class BigSignWriterConfigScreen extends Screen {
                 iconSize
         );
 
-        GraphicsHelper.drawFontPreview(guiGraphics, this.title, 1F, iconX - 4, 12, 17);
+        GraphicsHelper.drawFontPreview(guiGraphics, this.title, 1F, iconX - 4, 12, 18);
         String versionString = "§o" + BigSignWriter.VERSION;
         guiGraphics.text(this.font, versionString, iconX - 4 - font.width(versionString), 34, 0xFFAAAAAA);
 
@@ -310,8 +309,11 @@ public class BigSignWriterConfigScreen extends Screen {
                     0
             );
             this.sidePanel = this.buildSidePanel();
-            LinearLayout sidePanelLayout = LinearLayout.vertical();
-            sidePanelLayout.addChild(this.sidePanel);
+            GridLayout sidePanelLayout = new GridLayout();
+            sidePanelLayout.addChild(this.sidePanel, 0, 0);
+            this.sidePanel.addExtraWidgets(
+                    widget -> sidePanelLayout.addChild(widget, 0, 0)
+            );
             this.sidePanelLayout = new ScrollableLayout(
                     BigSignWriterConfigScreen.this.minecraft,
                     sidePanelLayout,
@@ -359,7 +361,8 @@ public class BigSignWriterConfigScreen extends Screen {
             int contentWidth = BigSignWriterConfigScreen.this.columnWidth() - MARGIN * 2;
             this.arrangeElements(contentWidth);
             this.sidePanel.setWidth(contentWidth);
-            this.sidePanel.arrangeSelf(screenRectangle.height());
+            this.sidePanel.maxHeight = screenRectangle.height();
+            this.sidePanel.arrangeSelf();
 
             doScrollableLayout(screenRectangle, this.layout);
 
@@ -370,6 +373,8 @@ public class BigSignWriterConfigScreen extends Screen {
                     screenRectangle.height()
             );
             doScrollableLayout(sideRectangle, this.sidePanelLayout);
+
+            this.sidePanel.arrangeOthers();
         }
 
         private static void doScrollableLayout(ScreenRectangle screenRectangle, ScrollableLayout layout) {
@@ -387,17 +392,25 @@ public class BigSignWriterConfigScreen extends Screen {
         }
 
         protected abstract static class SidePanel extends AbstractWidget {
+            int maxHeight = 0;
+
             public SidePanel() {
                 super(0, 0, 0, 0, CommonComponents.EMPTY);
             }
 
-            protected abstract void arrangeSelf(int maxHeight);
+            protected void addExtraWidgets(Consumer<AbstractWidget> widgetConsumer) {}
+
+            protected abstract void arrangeSelf();
+
+            protected void arrangeOthers() {}
 
             @Override
             protected void updateWidgetNarration(@NotNull NarrationElementOutput output) {}
 
             @Override
-            public void playDownSound(@NotNull SoundManager soundManager) {}
+            public boolean isActive() {
+                return false;
+            }
         }
     }
 
@@ -667,13 +680,14 @@ public class BigSignWriterConfigScreen extends Screen {
 
         private final class OptionsSidePanel extends SidePanel {
             @Override
-            protected void arrangeSelf(int maxHeight) {
-                this.height = maxHeight;
+            protected void arrangeSelf() {
+                this.height = this.maxHeight;
             }
 
             @Override
             protected void extractWidgetRenderState(@NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float a) {
                 AtomicReference<OptionElement<?>> hoveredOption = new AtomicReference<>();
+                AtomicReference<OptionElement<?>> focusedOption = new AtomicReference<>();
 
                 OptionsTab.this.getContent().visitChildren(element -> {
                     if (element instanceof OptionElement<?> optionElement) {
@@ -682,18 +696,19 @@ public class BigSignWriterConfigScreen extends Screen {
                         int top = optionElement.getY();
                         int bottom = top + optionElement.getHeight();
                         if (mouseX >= left && mouseX < right && mouseY >= top && mouseY < bottom)
-                            hoveredOption.compareAndSet(null, optionElement);
-                        else {
-                            AtomicBoolean focused = new AtomicBoolean(false);
-                            optionElement.visitWidgets(widget -> {
-                                if (widget.isFocused()) focused.set(true);
-                            });
-                            if (focused.get()) hoveredOption.compareAndSet(null, optionElement);
-                        }
+                            hoveredOption.set(optionElement);
+
+                        AtomicBoolean focused = new AtomicBoolean(false);
+                        optionElement.visitWidgets(widget -> {
+                            if (widget.isFocused()) focused.set(true);
+                        });
+                        if (focused.get()) focusedOption.set(optionElement);
                     }
                 });
 
-                if (hoveredOption.get() instanceof OptionElement<?> optionElement) {
+                OptionElement<?> optionElement = hoveredOption.get();
+                if (optionElement == null) optionElement = focusedOption.get();
+                if (optionElement != null) {
                     GraphicsHelper.drawScrollingString(
                             guiGraphics,
                             optionElement.name.copy().withStyle(ChatFormatting.BOLD),
@@ -857,20 +872,41 @@ public class BigSignWriterConfigScreen extends Screen {
         }
 
         private final class FontsSidePanel extends SidePanel {
+            private static int PREVIEW_LINE_HEIGHT = 18;
+            private static final int PREVIEW_GAP = 5;
+
             private final ArrayList<Component> infoLines = new ArrayList<>();
-            private @Nullable Component[] wrappedFontPreview = null;
+            private @Nullable List<Component[]> wrappedFontPreview = null;
+
+            private final Button copyButton = Button.builder(Component.literal("Copy"), button -> {
+                if (FontsTab.this.selected != null)
+                    BigSignWriter.saveFontToFile(FontsTab.this.selected.fontInfo);
+            }).width(40).build();
+
+            private final Button zoomButton = Button.builder(Component.literal("\uD83D\uDD0D+"), button -> {
+                PREVIEW_LINE_HEIGHT += 6;
+                if (PREVIEW_LINE_HEIGHT > 36) PREVIEW_LINE_HEIGHT = 12;
+                FontsTab.this.redoLayout();
+            }).width(20).build();
 
             @Override
-            protected void arrangeSelf(int maxHeight) {
+            protected void addExtraWidgets(Consumer<AbstractWidget> widgetConsumer) {
+                widgetConsumer.accept(this.copyButton);
+                widgetConsumer.accept(this.zoomButton);
+            }
+
+            @Override
+            protected void arrangeSelf() {
+                this.zoomButton.visible = FontsTab.this.selected != null;
+                this.copyButton.visible = FontsTab.this.selected != null
+                        && FontsTab.this.selected.fontInfo.source.equals("Built-in");
                 if (FontsTab.this.selected == null) {
-                    this.height = maxHeight;
+                    this.height = this.maxHeight;
                     return;
                 }
-
-                infoLines.clear();
-
                 FontInfo fontInfo = FontsTab.this.selected.fontInfo;
 
+                infoLines.clear();
                 Optional.ofNullable(fontInfo.credits()).ifPresent(
                         credits -> infoLines.add(infoLine("bigsignwriter.font.info.credits", credits))
                 );
@@ -881,13 +917,19 @@ public class BigSignWriterConfigScreen extends Screen {
                         fontInfo,
                         String.join("", fontInfo.characters().keySet().stream().map(String::valueOf).toArray(String[]::new)),
                         this.width,
-                        12
+                        PREVIEW_LINE_HEIGHT
                 );
 
                 int afterInfoLines = this.getY() + 27 + this.infoLines.size() * 12;
-                int previewHeight = (int) (12 * ((float) this.wrappedFontPreview.length / fontInfo.height()));
+                int previewHeight = this.wrappedFontPreview.size() * (PREVIEW_LINE_HEIGHT + PREVIEW_GAP) - PREVIEW_GAP;
                 int bottom = afterInfoLines + 10 + previewHeight;
-                this.height = Math.max(bottom - this.getY(), maxHeight);
+                this.height = Math.max(bottom - this.getY(), this.maxHeight);
+            }
+
+            @Override
+            protected void arrangeOthers() {
+                this.copyButton.setPosition(this.getRight() - 60, this.getY() + 20);
+                this.zoomButton.setPosition(this.getRight() - 20, this.getY() + 20);
             }
 
             @Override
@@ -933,14 +975,16 @@ public class BigSignWriterConfigScreen extends Screen {
                     return;
                 }
 
-                if (this.wrappedFontPreview != null) GraphicsHelper.drawFontPreview(
-                        guiGraphics,
-                        this.wrappedFontPreview,
-                        0F,
-                        this.getX(),
-                        afterInfoLines + 10,
-                        (int) (12 * ((float) this.wrappedFontPreview.length / fontInfo.height()))
-                );
+                if (this.wrappedFontPreview != null) {
+                    for (int i = 0; i < this.wrappedFontPreview.size(); i++) GraphicsHelper.drawFontPreview(
+                            guiGraphics,
+                            this.wrappedFontPreview.get(i),
+                            0F,
+                            this.getX(),
+                            afterInfoLines + 10 + i * (PREVIEW_LINE_HEIGHT + PREVIEW_GAP),
+                            PREVIEW_LINE_HEIGHT
+                    );
+                }
             }
         }
     }

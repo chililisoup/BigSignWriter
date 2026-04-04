@@ -3,6 +3,7 @@ package dev.chililisoup.bigsignwriter.font.supplier;
 import dev.chililisoup.bigsignwriter.font.FontFile;
 
 import java.util.Map;
+import java.util.Set;
 
 import static java.util.Map.entry;
 
@@ -66,9 +67,9 @@ public class ThinFont implements FontSupplier {
                         "'-╹  "
                 }),
                 entry('K', new String[]{
-                        "╻  ᷺.·",
-                        "┃-< ",
-                        "╹  \uD804\uDC81˙·"
+                        "╻   ,╻",
+                        "┃-╻;' ",
+                        "╹  '╹·"
                 }),
                 entry('L', new String[]{
                         "╻    ",
@@ -146,5 +147,18 @@ public class ThinFont implements FontSupplier {
                         "·╹--·"
                 })
         ));
+    }
+
+    @Override
+    public Map<Character, Set<PatchCharacter>> patches() {
+        return Map.ofEntries(
+                entry('K', Set.of(
+                        PatchCharacter.of(
+                                "╻  ᷺.·",
+                                "┃-< ",
+                                "╹  \uD804\uDC81˙·"
+                        )
+                ))
+        );
     }
 }

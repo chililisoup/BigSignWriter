@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 public class FontInfo {
-    private final FontFile fontFile;
+    public final FontFile fontFile;
     public final String source;
     private boolean checked = false;
     private @Nullable Component error = null;
@@ -94,15 +94,19 @@ public class FontInfo {
         return null;
     }
 
+    public final Component[] getPreview(String text, String characterSeparator) {
+        return getFontPreview(this, text, characterSeparator);
+    }
+
     public final Component[] getPreview(String text) {
-        return getFontPreview(this, text);
+        return this.getPreview(text, this.characterSeparator());
     }
 
     public final Component[] getPreview() {
         return this.getPreview(this.name());
     }
 
-    private static Component[] getFontPreview(FontInfo fontInfo, String text) {
+    private static Component[] getFontPreview(FontInfo fontInfo, String text, String characterSeparator) {
         int height = fontInfo.height();
         ArrayList<ArrayList<String>> lines = new ArrayList<>(height);
         for (int i = 0; i < height; i++) lines.add(new ArrayList<>());
@@ -117,7 +121,6 @@ public class FontInfo {
         if (lines.isEmpty()) return new Component[0];
 
         Component[] preview = new Component[height];
-        String characterSeparator = fontInfo.characterSeparator();
         for (int i = 0; i < lines.size(); i++)
             preview[i] = Component.literal(String.join(characterSeparator, lines.get(i)));
 

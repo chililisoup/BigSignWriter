@@ -15,8 +15,6 @@ import java.util.List;
 *///?}
 
 //? if >= 1.21.11 {
-import net.minecraft.client.gui.ActiveTextCollector;
-import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 //?} else {
@@ -110,10 +108,7 @@ public final class GraphicsHelper {
         int previewWidth = font.width(fontPreview[0]);
         if (previewWidth <= scaledWidth) {
             for (int i = 0; i < fontPreview.length; i++)
-                //? if >= 1.21.11 {
-                guiGraphics.textRenderer().accept(TextAlignment.LEFT, 0, i * 9, fontPreview[i]);
-                //?} else
-                //guiGraphics.text(font, fontPreview[i], 0, i * 9, -1);
+                guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], 0, i * 9, -1, false);
         } else {
             int scaledHeight = (int) (height / scale);
             int hiddenWidth = previewWidth - scaledWidth;
@@ -121,14 +116,9 @@ public final class GraphicsHelper {
             double speed = Math.max(hiddenWidth * 0.5, 3.0);
             double scrollEnd = Math.sin((Math.PI / 2.0) * Math.cos((Math.PI * 2.0) * time / speed)) / 2.0 + 0.5;
             double scrollPos = Mth.lerp(scrollEnd, 0.0, hiddenWidth);
-            //? if >= 1.21.11 {
-            ActiveTextCollector.Parameters parameters = guiGraphics
-                    .textRenderer()
-                    .defaultParameters()
-                    .withScissor(0, scaledWidth, 0, scaledHeight);
-            //?} else if >= 1.21.4 {
-            /*guiGraphics.enableScissor(0, 0, scaledWidth, scaledHeight);
-            *///?} else {
+            //? if >= 1.21.4 {
+            guiGraphics.enableScissor(0, 0, scaledWidth, scaledHeight);
+            //?} else {
             /*Vector3f poseScale = guiGraphics.pose().last().pose().getScale(new Vector3f());
             Vector3f poseTranslation = guiGraphics.pose().last().pose().getTranslation(new Vector3f());
 
@@ -141,13 +131,9 @@ public final class GraphicsHelper {
             *///?}
 
             for (int i = 0; i < fontPreview.length; i++)
-                //? if >= 1.21.11 {
-                guiGraphics.textRenderer().accept(TextAlignment.LEFT, -(int) scrollPos, i * 9, parameters, fontPreview[i]);
-                //?} else
-                //guiGraphics.text(font, fontPreview[i], -(int) scrollPos, i * 9, -1);
+                guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], -(int) scrollPos, i * 9, -1, false);
 
-            //? if < 1.21.11
-            //guiGraphics.disableScissor();
+            guiGraphics.disableScissor();
         }
 
         //? if < 1.21.6 {
@@ -173,10 +159,7 @@ public final class GraphicsHelper {
         int previewWidth = font.width(fontPreview[0]);
         int xOffset = (int) (anchorX * previewWidth);
         for (int i = 0; i < fontPreview.length; i++)
-            //? if >= 1.21.11 {
-            guiGraphics.textRenderer().accept(TextAlignment.LEFT, -xOffset, i * 9, fontPreview[i]);
-            //?} else
-            //guiGraphics.text(font, fontPreview[i], -xOffset, i * 9, -1);
+            guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], -xOffset, i * 9, -1, false);
 
         //? if < 1.21.6 {
         /*guiGraphics.pose().popMatrix();
@@ -184,14 +167,16 @@ public final class GraphicsHelper {
         guiGraphics.pose().popMatrix();
     }
 
-    public static Component[] getWrappedFontPreview(FontInfo fontInfo, String text, int width, int lineHeight) {
-        if (fontInfo.isBroken()) return new Component[0];
+    public static List<Component[]> getWrappedFontPreview(FontInfo fontInfo, String text, int width, int lineHeight) {
+        if (fontInfo.isBroken()) return List.of();
 
         Font font = Minecraft.getInstance().font;
         float scale = (lineHeight / 9F) / (float) fontInfo.height();
-        float separatorWidth = font.width(fontInfo.characterSeparator()) * scale;
+        String characterSeparator = fontInfo.characterSeparator();
+        if (characterSeparator.isEmpty()) characterSeparator = " ";
+        float separatorWidth = font.width(characterSeparator) * scale;
 
-        ArrayList<Component> previewLines = new ArrayList<>();
+        ArrayList<Component[]> previewLines = new ArrayList<>();
         StringBuilder runningString = new StringBuilder();
         float runningWidth = 0F;
         for (char chr : text.toCharArray()) {
@@ -199,10 +184,9 @@ public final class GraphicsHelper {
 
             float chrWidth = font.width(top) * scale;
             if (runningWidth > 0 && runningWidth + chrWidth > width) {
-                if (!runningString.isEmpty()) {
-                    if (!previewLines.isEmpty()) previewLines.add(Component.empty());
-                    previewLines.addAll(List.of(fontInfo.getPreview(runningString.toString())));
-                }
+                if (!runningString.isEmpty())
+                    previewLines.add(fontInfo.getPreview(runningString.toString(), characterSeparator));
+
                 runningWidth = chrWidth + separatorWidth;
                 runningString = new StringBuilder(String.valueOf(chr));
             } else {
@@ -211,20 +195,9 @@ public final class GraphicsHelper {
             }
         }
 
-        if (!runningString.isEmpty()) {
-            if (!previewLines.isEmpty()) previewLines.add(Component.empty());
-            previewLines.addAll(List.of(fontInfo.getPreview(runningString.toString())));
-        }
+        if (!runningString.isEmpty())
+            previewLines.add(fontInfo.getPreview(runningString.toString(), characterSeparator));
 
-        return previewLines.toArray(Component[]::new);
-
-//        drawFontPreview(
-//                guiGraphics,
-//                previewLines.toArray(Component[]::new),
-//                0F,
-//                x,
-//                y,
-//                (int) (lineHeight * ((float) previewLines.size() / fontInfo.height()))
-//        );
+        return previewLines;
     }
 }
