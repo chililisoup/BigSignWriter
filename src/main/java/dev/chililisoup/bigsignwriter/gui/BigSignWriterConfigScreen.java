@@ -995,7 +995,7 @@ public class BigSignWriterConfigScreen extends Screen {
                 );
 
                 int previewHeight = this.wrappedFontPreview.size() * (PREVIEW_LINE_HEIGHT + PREVIEW_GAP) - PREVIEW_GAP;
-                int bottom = this.afterInfoLines() + 10 + previewHeight;
+                int bottom = this.afterInfoLines() + 30 + PREVIEW_GAP + previewHeight;
                 this.height = Math.max(bottom - this.getY(), this.maxHeight);
             }
 
