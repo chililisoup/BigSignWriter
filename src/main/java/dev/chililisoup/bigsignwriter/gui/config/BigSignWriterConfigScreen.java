@@ -1,16 +1,15 @@
-package dev.chililisoup.bigsignwriter.gui;
+package dev.chililisoup.bigsignwriter.gui.config;
 
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.font.FontInfo;
+import dev.chililisoup.bigsignwriter.gui.*;
 import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.components.tabs.Tab;
 import net.minecraft.client.gui.components.tabs.TabManager;
-import net.minecraft.client.gui.components.tabs.TabNavigationBar;
 import net.minecraft.client.gui.layouts.*;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -30,7 +29,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.*;
 
@@ -244,84 +242,6 @@ public class BigSignWriterConfigScreen extends Screen {
         return this.width / 2 - (MARGIN * 3 / 2);
     }
 
-    private static class ConfigTabNavigationBar extends TabNavigationBar {
-        private final int x;
-        private final int y;
-
-        public ConfigTabNavigationBar(int x, int y, int width, TabManager tabManager, Iterable<Tab> tabs) {
-            super(width, tabManager, tabs);
-            this.x = x;
-            this.y = y;
-        }
-
-        //? if < 26.1 {
-        /*public void updateWidth(int width) {
-            this.width = width;
-            this.arrangeElements();
-        }
-        *///?}
-
-        @Override
-        public void arrangeElements() {
-            super.arrangeElements();
-            this.layout.setX(this.layout.getX() + this.x);
-            this.layout.setY(this.y);
-        }
-
-        @Override
-        //? if >= 26.1 {
-        public void extractRenderState(
-        //?} else
-        //public void render(
-                GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick
-        ) {
-            //? if < 1.21.3
-            //RenderSystem.enableBlend();
-
-            guiGraphics.blit(
-                    //? if >= 1.21.3
-                    RenderPipelines.GUI_TEXTURED,
-                    Screen.HEADER_SEPARATOR,
-                    this.x,
-                    this.layout.getY() + this.layout.getHeight() - 2,
-                    0.0F,
-                    0.0F,
-                    ((TabButton) this.children().getFirst()).getX() - this.x,
-                    2,
-                    32,
-                    2
-            );
-
-            int afterLastTab = ((TabButton) this.children().getLast()).getRight();
-            guiGraphics.blit(
-                    //? if >= 1.21.3
-                    RenderPipelines.GUI_TEXTURED,
-                    Screen.HEADER_SEPARATOR,
-                    afterLastTab,
-                    this.layout.getY() + this.layout.getHeight() - 2,
-                    0.0F,
-                    0.0F,
-                    this.x + this.width - afterLastTab,
-                    2,
-                    32,
-                    2
-            );
-
-            //? if < 1.21.3
-            //RenderSystem.disableBlend();
-
-            for (GuiEventListener child : this.children())
-                ((TabButton) child)
-                        //? if >= 26.1 {
-                        .extractRenderState(
-                        //?} else {
-                        /*.render(
-                        *///?}
-                                guiGraphics, mouseX, mouseY, partialTick
-                        );
-        }
-    }
-
     private abstract class ConfigTab<T extends ConfigTab.SidePanel> implements Tab {
         private final Component title;
         private final ScrollableLayout layout;
@@ -455,7 +375,7 @@ public class BigSignWriterConfigScreen extends Screen {
                     workingConfig.buttonsX,
                     defaults.buttonsX,
                     value -> workingConfig.buttonsX = value,
-                    option -> new OptionElement.IntegerController(option, -500, 500, 5),
+                    option -> new OptionController.IntegerController(option, -500, 500, 5),
                     Component.translatable("bigsignwriter.config.buttonsX"),
                     Component.translatable("bigsignwriter.config.buttonsX.desc")
             ));
@@ -463,7 +383,7 @@ public class BigSignWriterConfigScreen extends Screen {
                     workingConfig.buttonsY,
                     defaults.buttonsY,
                     value -> workingConfig.buttonsY = value,
-                    option -> new OptionElement.IntegerController(option, -500, 500, 5),
+                    option -> new OptionController.IntegerController(option, -500, 500, 5),
                     Component.translatable("bigsignwriter.config.buttonsY"),
                     Component.translatable("bigsignwriter.config.buttonsY.desc")
             ));
@@ -471,7 +391,7 @@ public class BigSignWriterConfigScreen extends Screen {
                     workingConfig.buttonsAlignmentX,
                     defaults.buttonsAlignmentX,
                     value -> workingConfig.buttonsAlignmentX = value,
-                    option -> new OptionElement.DoubleController(option, 0.0, 1.0, 0.01)
+                    option -> new OptionController.DoubleController(option, 0.0, 1.0, 0.01)
                             .withValueFormatter(value -> (int) Math.round(value * 100) + "%"),
                     Component.translatable("bigsignwriter.config.buttonsAlignmentX"),
                     Component.translatable("bigsignwriter.config.buttonsAlignmentX.desc")
@@ -480,7 +400,7 @@ public class BigSignWriterConfigScreen extends Screen {
                     workingConfig.buttonsAlignmentY,
                     defaults.buttonsAlignmentY,
                     value -> workingConfig.buttonsAlignmentY = value,
-                    option -> new OptionElement.DoubleController(option, 0.0, 1.0, 0.01)
+                    option -> new OptionController.DoubleController(option, 0.0, 1.0, 0.01)
                             .withValueFormatter(value -> (int) Math.round(value * 100) + "%"),
                     Component.translatable("bigsignwriter.config.buttonsAlignmentY"),
                     Component.translatable("bigsignwriter.config.buttonsAlignmentY.desc")
@@ -489,7 +409,7 @@ public class BigSignWriterConfigScreen extends Screen {
                     workingConfig.fontSelectorCoversDoneButton,
                     defaults.fontSelectorCoversDoneButton,
                     value -> workingConfig.fontSelectorCoversDoneButton = value,
-                    OptionElement.BooleanController::new,
+                    OptionController.BooleanController::new,
                     Component.translatable("bigsignwriter.config.fontSelectorCoversDoneButton"),
                     Component.translatable("bigsignwriter.config.fontSelectorCoversDoneButton.desc")
             ));
@@ -497,7 +417,7 @@ public class BigSignWriterConfigScreen extends Screen {
                     workingConfig.showReloadButton,
                     defaults.showReloadButton,
                     value -> workingConfig.showReloadButton = value,
-                    OptionElement.BooleanController::new,
+                    OptionController.BooleanController::new,
                     Component.translatable("bigsignwriter.config.showReloadButton"),
                     Component.translatable("bigsignwriter.config.showReloadButton.desc")
             ));
@@ -505,7 +425,7 @@ public class BigSignWriterConfigScreen extends Screen {
                     workingConfig.characterSeparatorOverrideEnabled,
                     defaults.characterSeparatorOverrideEnabled,
                     value -> workingConfig.characterSeparatorOverrideEnabled = value,
-                    OptionElement.BooleanController::new,
+                    OptionController.BooleanController::new,
                     Component.translatable("bigsignwriter.config.characterSeparatorOverrideEnabled"),
                     Component.translatable("bigsignwriter.config.characterSeparatorOverrideEnabled.desc")
             ));
@@ -513,7 +433,7 @@ public class BigSignWriterConfigScreen extends Screen {
                     workingConfig.characterSeparatorOverride,
                     defaults.characterSeparatorOverride,
                     value -> workingConfig.characterSeparatorOverride = value,
-                    OptionElement.StringController::new,
+                    OptionController.StringController::new,
                     Component.translatable("bigsignwriter.config.characterSeparatorOverride"),
                     Component.translatable("bigsignwriter.config.characterSeparatorOverride.desc")
             ));
@@ -531,132 +451,6 @@ public class BigSignWriterConfigScreen extends Screen {
                 if (element instanceof OptionElement<?> optionElement)
                     optionElement.setWidth(contentWidth);
             });
-        }
-
-        private static class OptionElement<T> extends AbstractLayoutElement {
-            private T value;
-            private final T defaultValue;
-            private final Consumer<T> onChange;
-            private final OptionController<T> controller;
-            private final Button resetButton;
-            private final Component name;
-            private final Component description;
-
-            OptionElement(
-                    T value,
-                    T defaultValue,
-                    Consumer<T> onChange,
-                    Function<OptionElement<T>, OptionController<T>> controllerBuilder,
-                    Component name,
-                    Component description
-            ) {
-                this.value = value;
-                this.defaultValue = defaultValue;
-                this.onChange = onChange;
-                this.resetButton = Button.builder(
-                        Component.literal("⭯"),
-                        button -> this.setValue(this.defaultValue)
-                ).width(20).build();
-                this.resetButton.active = !defaultValue.equals(value);
-                this.name = name;
-                this.description = description;
-                this.controller = controllerBuilder.apply(this);
-            }
-
-            public void setValue(T value) {
-                this.value = value;
-                this.resetButton.active = !defaultValue.equals(value);
-                this.controller.setValue(value);
-                this.onChange.accept(value);
-            }
-
-            @Override
-            protected void arrangeElements() {
-                this.controller.widget().setPosition(this.x, this.y);
-                this.controller.widget().setWidth(this.width - 22);
-                this.resetButton.setPosition(this.x + this.width - 20, this.y);
-            }
-
-            @Override
-            public void visitWidgets(@NotNull Consumer<AbstractWidget> widgetVisitor) {
-                widgetVisitor.accept(this.controller.widget());
-                widgetVisitor.accept(this.resetButton);
-            }
-
-            private interface OptionController<T> {
-                void setValue(T value);
-
-                AbstractWidget widget();
-            }
-
-            private record BooleanController(TickBox tickBox) implements OptionController<Boolean> {
-                private BooleanController(OptionElement<Boolean> option) {
-                    this(new TickBox(option.value, option::setValue, option.name));
-                }
-
-                @Override
-                public void setValue(Boolean value) {
-                    this.tickBox.value = value;
-                }
-
-                @Override
-                public AbstractWidget widget() {
-                    return this.tickBox;
-                }
-            }
-
-            private record IntegerController(IntegerSlider slider) implements OptionController<Integer> {
-                private IntegerController(OptionElement<Integer> option, int min, int max, int step) {
-                    this(new IntegerSlider(option.value, min, max, step, option::setValue, option.name));
-                }
-
-                @Override
-                public void setValue(Integer value) {
-                    this.slider.setValueFrom(value);
-                }
-
-                @Override
-                public AbstractWidget widget() {
-                    return this.slider;
-                }
-            }
-
-            private record DoubleController(DoubleSlider slider) implements OptionController<Double> {
-                private DoubleController(OptionElement<Double> option, double min, double max, double step) {
-                    this(new DoubleSlider(option.value, min, max, step, option::setValue, option.name));
-                }
-
-                public DoubleController withValueFormatter(Function<Double, String> valueFormatter) {
-                    this.slider.setValueFormatter(valueFormatter);
-                    return this;
-                }
-
-                @Override
-                public void setValue(Double value) {
-                    this.slider.setValueFrom(value);
-                }
-
-                @Override
-                public AbstractWidget widget() {
-                    return this.slider;
-                }
-            }
-
-            private record StringController(LabeledEditBox editBox) implements OptionController<String> {
-                private StringController(OptionElement<String> option) {
-                    this(new LabeledEditBox(option.value, 20, option::setValue, option.name));
-                }
-
-                @Override
-                public void setValue(String value) {
-                    this.editBox.setValueSilent(value);
-                }
-
-                @Override
-                public AbstractWidget widget() {
-                    return this.editBox;
-                }
-            }
         }
 
         private final class OptionsSidePanel extends SidePanel {
@@ -778,17 +572,14 @@ public class BigSignWriterConfigScreen extends Screen {
             }
         }
 
-        //? if >= 1.21.11 {
-        private class FontVisibilityButton extends Button.Plain {
-        //?} else
-        //private class FontVisibilityButton extends Button {
+        private class FontVisibilityButton extends IconButton {
             private static final Identifier VISIBLE_SPRITE = BigSignWriter.id("visible");
             private static final Identifier HIDDEN_SPRITE = BigSignWriter.id("hidden");
 
             private boolean fontVisible;
 
-            protected FontVisibilityButton(FontInfo fontInfo) {
-                super(0, 0, 20, 20, Component.empty(), button -> {
+            public FontVisibilityButton(FontInfo fontInfo) {
+                super(button -> {
                     if (button instanceof FontVisibilityButton fontVisibilityButton) {
                         fontVisibilityButton.fontVisible = !fontVisibilityButton.fontVisible;
                         fontInfo.setVisible(
@@ -796,33 +587,13 @@ public class BigSignWriterConfigScreen extends Screen {
                                 fontVisibilityButton.fontVisible
                         );
                     }
-                }, Button.DEFAULT_NARRATION);
+                });
                 this.fontVisible = fontInfo.isVisible(BigSignWriterConfigScreen.this.workingConfig);
             }
 
             @Override
-            //? if >= 1.21.11 {
-            protected void extractContents(
-            //?} else
-            //protected void extractWidgetRenderState(
-                    @NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick
-            ) {
-                //? if >= 26.1 {
-                super.extractContents(
-                //?} else
-                //super.extractWidgetRenderState(
-                        guiGraphics, mouseX, mouseY, partialTick
-                );
-
-                guiGraphics.blitSprite(
-                        //? if >= 1.21.3
-                        RenderPipelines.GUI_TEXTURED,
-                        this.fontVisible ? VISIBLE_SPRITE : HIDDEN_SPRITE,
-                        this.getX() + 2,
-                        this.getY() + 2,
-                        16,
-                        16
-                );
+            protected Identifier getSprite() {
+                return this.fontVisible ? VISIBLE_SPRITE : HIDDEN_SPRITE;
             }
         }
 
@@ -1063,63 +834,5 @@ public class BigSignWriterConfigScreen extends Screen {
                 }
             }
         }
-    }
-
-    private static abstract class AbstractLayoutElement implements LayoutElement {
-        protected int x = 0;
-        protected int y = 0;
-        protected int width = 150;
-        protected int height = 20;
-
-        @Override
-        public int getX() {
-            return this.x;
-        }
-
-        @Override
-        public void setX(int x) {
-            this.x = x;
-            this.arrangeElements();
-        }
-
-        @Override
-        public int getY() {
-            return this.y;
-        }
-
-        @Override
-        public void setY(int y) {
-            this.y = y;
-            this.arrangeElements();
-        }
-
-        @Override
-        public void setPosition(int x, int y) {
-            this.x = x;
-            this.y = y;
-            this.arrangeElements();
-        }
-
-        @Override
-        public int getWidth() {
-            return this.width;
-        }
-
-        public void setWidth(int width) {
-            this.width = width;
-            this.arrangeElements();
-        }
-
-        @Override
-        public int getHeight() {
-            return this.height;
-        }
-
-        public void setHeight(int height) {
-            this.height = height;
-            this.arrangeElements();
-        }
-
-        abstract protected void arrangeElements();
     }
 }
