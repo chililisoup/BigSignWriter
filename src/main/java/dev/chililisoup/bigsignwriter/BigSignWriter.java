@@ -119,26 +119,21 @@ public class BigSignWriter {
         int selectedFontIndex = AVAILABLE_FONTS.indexOf(SELECTED_FONT);
         List<FontInfo> builtInFonts = copyBuiltInFonts();
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-        Path fontsDir = getFontsDir();
-        File[] jsonFiles = fontsDir.toFile().listFiles((dir, name) -> name.endsWith(".json"));
-
-        if (jsonFiles == null || jsonFiles.length == 0) {
-            LOGGER.error("Failed to load or create any font files. Mod behavior from here is undefined. Please report!");
-            return;
-        }
-
-        Arrays.sort(jsonFiles, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
-
         AVAILABLE_FONTS.clear();
         AVAILABLE_FONTS.addAll(builtInFonts);
-        AVAILABLE_FONTS.addAll(Arrays.stream(jsonFiles).map(file -> {
-            String fileName = file.getName();
-            FontInfo fontInfo = getFont(gson, file.toPath()).load().createInfo(fileName);
-            if (fileName.equals("default.json")) DEFAULT_FONT = fontInfo;
-            return fontInfo;
-        }).toList());
+
+        File[] jsonFiles = getFontsDir().toFile().listFiles((dir, name) -> name.endsWith(".json"));
+        if (jsonFiles != null && jsonFiles.length > 0) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+            AVAILABLE_FONTS.addAll(Arrays.stream(jsonFiles).map(file -> {
+                String fileName = file.getName();
+                FontInfo fontInfo = getFont(gson, file.toPath()).load().createInfo(fileName);
+                if (fileName.equals("default.json")) DEFAULT_FONT = fontInfo;
+                return fontInfo;
+            }).toList());
+        }
+
         AVAILABLE_FONTS.sort((a, b) -> a.name().compareToIgnoreCase(b.name()));
         reselectFont(selectedFontIndex);
         LOGGER.info("Fonts loaded!");
