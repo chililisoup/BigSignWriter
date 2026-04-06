@@ -27,7 +27,7 @@
   "bigsignwriter.config.buttonsAlignmentY.desc": "Vertical screen alignment for mod buttons (0%: top, 100%: bottom)",
   "bigsignwriter.config.fontSelectorCoversDoneButton": "Font Selector Covers Done Button",
   "bigsignwriter.config.fontSelectorCoversDoneButton.desc": "Disables the \"Done\" button when the font selector is open.",
-  "bigsignwriter.config.showReloadButton": "Show Reload Button",
+  "bigsignwriter.config.showReloadButton": "Show Reload Fonts Button",
   "bigsignwriter.config.showReloadButton.desc": "Whether to show the reload fonts button next to the font selector",
   "bigsignwriter.config.characterSeparatorOverride": "Character Separator Override",
   "bigsignwriter.config.characterSeparatorOverride.desc": "Overrides the separator string to place between characters. Only active when enabled. Does not save between sessions.",

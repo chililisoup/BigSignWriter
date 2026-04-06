@@ -17,6 +17,13 @@ stonecutter parameters {
             replace("popPose", "popMatrix")
         }
 
+        string(current.parsed > "1.21.6") {
+            replace(
+                "dev.chililisoup.bigsignwriter.util.VersionHelper.KeyEvent",
+                "net.minecraft.client.input.KeyEvent"
+            )
+        }
+
         string(current.parsed.eq("1.21.9")) {
             replace("guiGraphics.renderOutline(", "guiGraphics.submitOutline(")
         }

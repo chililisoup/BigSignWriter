@@ -1,5 +1,6 @@
 package dev.chililisoup.bigsignwriter.mixin;
 
+import com.google.common.collect.ImmutableMap;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -15,7 +16,10 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
@@ -30,7 +34,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 //? if >= 1.21.9 {
 import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
 //?}
 
 //? if >= 26.1 {
@@ -38,6 +41,8 @@ import org.joml.Vector2f;
 //?}
 
 import java.util.*;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.*;
 
@@ -80,6 +85,164 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         return Math.max(this.messages.length - bigSignWriter$getHeight(), 0);
     }
 
+    @Unique
+    private int bigSignWriter$getCursorPos() {
+        return this.signField != null ?
+                Math.min(this.signField.getCursorPos(), this.messages[this.line].length()) :
+                0;
+    }
+
+    @Unique
+    private TreeMap<Integer, Integer[]> bigSignWriter$getSplitIndices(boolean afterSeparator) {
+        int startLine = this.line;
+        int firstWidth = this.font.width(this.messages[startLine]);
+        if (firstWidth == 0) return new TreeMap<>();
+        int endLine = this.bigSignWriter$getEndLine();
+
+        TreeMap<Integer, Integer[]> splitMap = new TreeMap<>();
+        splitMap.put(0, IntStream.of(new int[endLine - startLine]).boxed().toArray(Integer[]::new));
+
+        for (int i = startLine + 1; i < endLine; i++) {
+            if (firstWidth != this.font.width(this.messages[i]))
+                return splitMap;
+        }
+
+        String characterSeparator = BigSignWriter.CHARACTER_SEPARATOR;
+        HashSet<Integer> widths = new HashSet<>();
+        Stream<String> messageStream = Arrays.stream(
+                Arrays.copyOfRange(this.messages, startLine, endLine)
+        );
+        List<ImmutableMap<Integer, Integer>> separatorMap;
+
+        if (characterSeparator.isEmpty()) {
+            separatorMap = messageStream.map(message -> {
+                ImmutableMap.Builder<Integer, Integer> indices = ImmutableMap.builder();
+
+                List<String> splitMessage = this.font.getSplitter()
+                        .splitLines(message.replaceAll(" ", "\u0000"), 0, Style.EMPTY)
+                        .stream().map(FormattedText::getString).toList();
+
+                int runningIndex = 0;
+                for (String chr : splitMessage) {
+                    runningIndex += chr.length();
+
+                    int width = this.font.width(message.substring(0, runningIndex));
+                    if (width == 0) continue;
+                    indices.put(width, runningIndex);
+                    widths.add(width);
+                }
+
+                return indices.build();
+            }).toList();
+        } else {
+            separatorMap = messageStream.map(message -> {
+                ImmutableMap.Builder<Integer, Integer> indices = ImmutableMap.builder();
+
+                int endWidth = this.font.width(message);
+                indices.put(endWidth, message.length());
+                widths.add(endWidth);
+
+                for (int index = message.indexOf(characterSeparator);
+                     index >= 0;
+                     index = message.indexOf(characterSeparator, index + 1)
+                ) {
+                    int usedIndex = afterSeparator ? index + characterSeparator.length() : index;
+                    int width = this.font.width(message.substring(0, usedIndex));
+                    if (width == endWidth || width == 0) continue;
+                    indices.put(width, usedIndex);
+                    widths.add(width);
+                }
+
+                return indices.build();
+            }).toList();
+        }
+
+        for (int width : widths) {
+            Integer[] indices = new Integer[separatorMap.size()];
+
+            boolean matching = true;
+            for (int i = 0; i < separatorMap.size(); i++) {
+                ImmutableMap<Integer, Integer> splits = separatorMap.get(i);
+                if (splits.containsKey(width)) indices[i] = splits.get(width);
+                else {
+                    matching = false;
+                    break;
+                }
+            }
+
+            if (matching) splitMap.put(width, indices);
+        }
+
+        return splitMap;
+    }
+
+    @Unique
+    private void bigSignWriter$deleteBigChar(KeyEvent keyEvent) {
+        if (this.signField == null) return;
+
+        if (keyEvent.hasControlDown()) {
+            this.bigSignWriter$clearSign();
+            return;
+        }
+
+        int cursorPos = this.bigSignWriter$getCursorPos();
+        if (cursorPos == 0) return;
+
+        boolean atEnd = cursorPos == this.messages[this.line].length();
+        TreeMap<Integer, Integer[]> splitIndices = this.bigSignWriter$getSplitIndices(!atEnd);
+        if (splitIndices.isEmpty()) {
+            this.bigSignWriter$clearSign();
+            return;
+        }
+
+        int startLine = this.line;
+        int endLine = this.bigSignWriter$getEndLine();
+        int width = this.font.width(this.messages[this.line].substring(0, cursorPos));
+
+        Map.Entry<Integer, Integer[]> endSplit = splitIndices.lowerEntry(width + 1);
+        if (endSplit == null) {
+            this.bigSignWriter$clearSign();
+            return;
+        }
+        Map.Entry<Integer, Integer[]> startSplit = splitIndices.lowerEntry(endSplit.getKey());
+        if (startSplit == null) {
+            startSplit = endSplit;
+            endSplit = splitIndices.higherEntry(width);
+            if (endSplit == null) {
+                this.bigSignWriter$clearSign();
+                return;
+            }
+        }
+
+        for (int i = startLine; i < endLine; i++) {
+            //noinspection UnusedAssignment
+            this.line = i;
+            this.setMessage(
+                    this.messages[i].substring(0, startSplit.getValue()[i - startLine])
+                    + this.messages[i].substring(endSplit.getValue()[i - startLine])
+            );
+        }
+        this.line = startLine;
+        if (this.signField != null) this.signField.setCursorPos(
+                cursorPos - (endSplit.getValue()[0] - startSplit.getValue()[0])
+        );
+    }
+
+    @Unique
+    private void bigSignWriter$moveCursor(boolean higher) {
+        if (this.signField == null) return;
+
+        TreeMap<Integer, Integer[]> splitIndices = this.bigSignWriter$getSplitIndices(true);
+        int cursorPos = this.bigSignWriter$getCursorPos();
+        int width = this.font.width(this.messages[this.line].substring(0, cursorPos));
+
+        Map.Entry<Integer, Integer[]> split = higher ?
+                splitIndices.higherEntry(width) :
+                splitIndices.lowerEntry(width);
+
+        if (split != null) this.signField.setCursorPos(split.getValue()[0], false);
+    }
+
     @Unique private @Nullable Button doneButton;
 
     @Shadow /*? if >= 1.21.2 {*/ protected /*?} else {*/ /*private *//*?}*/ @Final SignBlockEntity sign;
@@ -114,10 +277,31 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 y,
                 20,
                 () -> {
-                    if (BigSignWriter.enabled())
+                    if (BigSignWriter.enabled()) {
+                        if (this.signField == null) return;
+
+                        int cursorPos = this.bigSignWriter$getCursorPos();
+                        int width = this.font.width(this.messages[this.line].substring(0, cursorPos));
                         this.line = Math.min(this.line, this.bigSignWriter$getEffectiveBottomLine());
-                    else if (this.signField != null)
-                        this.signField.setCursorToEnd();
+
+                        TreeMap<Integer, Integer[]> splitIndices = this.bigSignWriter$getSplitIndices(true);
+                        if (splitIndices.containsKey(width)) this.signField.setCursorPos(splitIndices.get(width)[0], false);
+                        else {
+                            Map.Entry<Integer, Integer[]> lowerSplit = splitIndices.lowerEntry(width);
+                            Map.Entry<Integer, Integer[]> higherSplit = splitIndices.higherEntry(width);
+
+                            if (lowerSplit != null && higherSplit != null) {
+                                int lowerDist = width - lowerSplit.getKey();
+                                int higherDist = higherSplit.getKey() - width;
+                                this.signField.setCursorPos((lowerDist < higherDist ?
+                                        lowerSplit :
+                                        higherSplit
+                                ).getValue()[0], false);
+                            } else if (lowerSplit != null) this.signField.setCursorPos(lowerSplit.getValue()[0], false);
+                            else if (higherSplit != null) this.signField.setCursorPos(higherSplit.getValue()[0], false);
+                            else this.signField.setCursorToEnd();
+                        }
+                    }
                 }
         );
 
@@ -163,8 +347,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     /*private void charTypedInject(char chr, int modifiers, CallbackInfoReturnable<Boolean> cir) {
     *///?} else
     private void charTypedInject(CharacterEvent characterEvent, CallbackInfoReturnable<Boolean> cir) {
-        if (!BigSignWriter.enabled()) return;
-
+        if (!BigSignWriter.enabled() || this.signField == null) return;
         cir.setReturnValue(true);
 
         //? if >= 1.21.9
@@ -174,126 +357,101 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
         int startLine = this.line;
         int endLine = this.bigSignWriter$getEndLine();
+        int endLength = this.messages[this.line].length();
+        int cursorPos = this.bigSignWriter$getCursorPos();
+
+        Integer[] split;
+        if (cursorPos <= 0) {
+            split = IntStream.of(new int[endLine - startLine]).boxed().toArray(Integer[]::new);
+            cursorPos = 0;
+        } else if (cursorPos == endLength) {
+            split = Arrays.stream(
+                    Arrays.copyOfRange(this.messages, startLine, endLine)
+            ).map(String::length).toArray(Integer[]::new);
+        } else {
+            TreeMap<Integer, Integer[]> splitIndices = this.bigSignWriter$getSplitIndices(true);
+            if (splitIndices.isEmpty()) {
+                split = Arrays.stream(
+                        Arrays.copyOfRange(this.messages, startLine, endLine)
+                ).map(String::length).toArray(Integer[]::new);
+                cursorPos = endLength;
+            } else {
+                int width = this.font.width(this.messages[this.line].substring(0, cursorPos));
+                if (splitIndices.containsKey(width)) split = splitIndices.get(width);
+                else {
+                    split = splitIndices.lastEntry().getValue();
+                    cursorPos = endLength;
+                }
+            }
+        }
+
+        boolean atEnd = split[0] == endLength;
+        int newCursorPos = -1;
+
         for (int i = startLine; i < endLine; i++) {
             int charLine = i - startLine;
-            if (charLine >= bigChar.length || bigChar[charLine] == null) continue;
-            String string = this.messages[i].concat(
-                    (this.messages[i].isEmpty() ? "" : BigSignWriter.CHARACTER_SEPARATOR).concat(bigChar[charLine])
-            );
+            if (charLine >= split.length || charLine >= bigChar.length || bigChar[charLine] == null) continue;
 
-            if (this.font.width(string) > this.sign.getMaxTextLineWidth())
+            String separator = this.messages[i].isEmpty() ? "" : BigSignWriter.CHARACTER_SEPARATOR;
+            String addition = atEnd ? separator + bigChar[charLine] : bigChar[charLine] + separator;
+            String message = this.messages[i].substring(0, split[charLine]) + addition + this.messages[i].substring(split[charLine]);
+
+            if (this.font.width(message) > this.sign.getMaxTextLineWidth())
                 continue;
 
             this.line = i;
-            this.setMessage(string);
+            this.setMessage(message);
+            if (charLine == 0) newCursorPos = cursorPos + addition.length();
         }
-        this.line = startLine;
 
-        if (this.signField != null)
-            this.signField.setCursorToEnd();
+        this.line = startLine;
+        if (this.signField != null) {
+            if (newCursorPos >= 0)
+                this.signField.setCursorPos(newCursorPos, false);
+            else this.signField.setCursorPos(cursorPos);
+        }
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     //? if < 1.21.9 {
-    /*private void deleteOrClamp(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+    /*private void keyPressedInject(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
     *///?} else
-    private void deleteOrClamp(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
-        if (!BigSignWriter.enabled()) return;
-        //? if >= 1.21.9
-        int keyCode = keyEvent.key();
+    private void keyPressedInject(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
+        if (!BigSignWriter.enabled() || this.signField == null) return;
+        //? if < 1.21.9
+        //KeyEvent keyEvent = new KeyEvent(keyCode, scanCode, modifiers);
 
-        if (keyCode == 265) {
+        if (keyEvent.isUp()) {
             this.line--;
             if (this.line < 0)
                 this.line = this.bigSignWriter$getEffectiveBottomLine();
-            if (this.signField != null)
-                this.signField.setCursorToEnd();
+            this.signField.setCursorToEnd();
             cir.setReturnValue(true);
             return;
-        } else if (keyCode == 264 || keyCode == 257 || keyCode == 335) {
-            if (keyCode == 264) this.line++; // Arrow key down
-            else { // Enter
+        } else if (keyEvent.isDown() || keyEvent.isConfirmation()) {
+            if (keyEvent.isDown()) this.line++;
+            else {
                 if (this.line == 0 && bigSignWriter$getHeight() * 2 > this.messages.length)
                     this.line = this.bigSignWriter$getEffectiveBottomLine();
                 else this.line += bigSignWriter$getHeight();
             }
             if (this.line > this.bigSignWriter$getEffectiveBottomLine())
                 this.line = 0;
-            if (this.signField != null)
-                this.signField.setCursorToEnd();
+            this.signField.setCursorToEnd();
+            cir.setReturnValue(true);
+            return;
+        } else if (keyEvent.isLeft() || keyEvent.isRight()) {
+            if (keyEvent.hasControlDown()) {
+                if (keyEvent.isLeft()) this.signField.setCursorToStart();
+                else this.signField.setCursorToEnd();
+            } else this.bigSignWriter$moveCursor(keyEvent.isRight());
             cir.setReturnValue(true);
             return;
         }
 
-        if (keyCode != 259) return;
+        if (keyEvent.key() != 259) return;
         cir.setReturnValue(true);
-
-        String characterSeparator = BigSignWriter.CHARACTER_SEPARATOR.isEmpty() ?
-                BigSignWriter.getBigChar(' ').orElse(new String[]{""})[0] :
-                BigSignWriter.CHARACTER_SEPARATOR;
-
-        if (
-                //? if < 1.21.9 {
-                /*Screen.hasControlDown() ||
-                *///?} else
-                keyEvent.hasControlDown() ||
-                characterSeparator.isEmpty()
-        ) {
-            this.bigSignWriter$clearSign();
-            return;
-        }
-
-        int startLine = this.line;
-        int endLine = this.bigSignWriter$getEndLine();
-        int firstWidth = this.font.width(this.messages[startLine]);
-        for (int i = startLine + 1; i < endLine; i++) {
-            if (firstWidth != this.font.width(this.messages[i])) {
-                this.bigSignWriter$clearSign();
-                return;
-            }
-        }
-
-        List<HashMap<Integer, Integer>> separatorIndices = Arrays.stream(
-                Arrays.copyOfRange(this.messages, startLine, endLine)
-        ).map(message -> {
-            HashMap<Integer, Integer> indices = new HashMap<>();
-
-            for (int index = message.indexOf(characterSeparator);
-                 index >= 0;
-                 index = message.indexOf(characterSeparator, index + 1)
-            ) {
-                indices.put(this.font.width(message.substring(index)), index);
-            }
-
-            return indices;
-        }).toList();
-
-        List<Integer> matchingSeparatorLengths = separatorIndices.getFirst()
-                .keySet().stream().filter(length -> separatorIndices.stream().allMatch(
-                        map -> map.containsKey(length)
-                )
-        ).toList();
-
-        if (matchingSeparatorLengths.isEmpty()) {
-            this.bigSignWriter$clearSign();
-            return;
-        }
-
-        int index = Collections.min(matchingSeparatorLengths);
-
-        for (int i = startLine; i < endLine; i++) {
-            String message = this.messages[i];
-
-            this.line = i;
-            this.setMessage(message.substring(
-                    0,
-                    separatorIndices.get(i - startLine).get(index)
-            ));
-        }
-        this.line = startLine;
-
-        if (this.signField != null)
-            this.signField.setCursorToEnd();
+        this.bigSignWriter$deleteBigChar(keyEvent);
     }
 
     //? if >= 26.1
@@ -308,27 +466,41 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             ),
             cancellable = true
     )
-    private void drawExtraLines(
+    private void drawBigCursor(
             GuiGraphicsExtractor guiGraphics,
             //? if >= 26.1
             Vector2f cursorPosOutput,
             CallbackInfo ci,
-            @Local(ordinal = 0) boolean blink,
-            @Local(ordinal = 0) int color
+            @Local(ordinal = 0) int color,
+            @Local(ordinal = 0) boolean showCursor,
+            @Local(ordinal = 1) int cursorPos
     ) {
-        if (!BigSignWriter.enabled()) return;
+        if (!BigSignWriter.enabled() || this.signField == null) return;
 
+        if (!showCursor) {
+            ci.cancel();
+            return;
+        }
+
+        String topLine = this.messages[this.line] == null ? "" : this.messages[this.line];
         int lineHeight = this.sign.getTextLineHeight();
-        int opaqueColor = -16777216 | color;
+        int opaqueColor = 0xFF000000 | color;
 
-        for (int i = this.line; i < this.bigSignWriter$getEndLine(); i++) {
-            if (!blink) continue;
+        if (cursorPos <= 0 || topLine.length() == cursorPos) {
+            for (int i = this.line; i < this.bigSignWriter$getEndLine(); i++) {
+                String message = this.messages[i] == null ? "" : this.messages[i];
+                int cursorX = this.font.width(message) / 2;
+                if (cursorPos <= 0) cursorX *= -1;
+                int cursorY = (i - 2) * lineHeight;
 
-            String string = this.messages[i] == null ? "" : this.messages[i];
-            int lineX = this.font.width(string) / 2;
-            int lineY = (i - 2) * lineHeight;
+                guiGraphics.fill(cursorX, cursorY - 1, cursorX + 1, cursorY + lineHeight, opaqueColor);
+            }
+        } else {
+            int cursorPosition = this.font.width(topLine.substring(0, Math.min(cursorPos, topLine.length())));
+            int cursorX = cursorPosition - this.font.width(topLine) / 2;
+            int cursorY = (this.line - 2) * lineHeight;
 
-            guiGraphics.fill(lineX, lineY - 1, lineX + 1, lineY + lineHeight, opaqueColor);
+            guiGraphics.fill(cursorX, cursorY - 1, cursorX + 1, cursorY + lineHeight * bigSignWriter$getHeight(), opaqueColor);
         }
 
         ci.cancel();
@@ -349,7 +521,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             )
     )
     private boolean hideUnderscore(
-            GuiGraphicsExtractor instance,
+            GuiGraphicsExtractor guiGraphics,
             Font font,
             //? if < 21.6
             //String string,
