@@ -136,6 +136,13 @@ dependencies {
     }
 }
 
+java {
+    // Set to the lowest target Java version to prevent
+    // incorrect IDE warnings when in higher Java version modules
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
 modstitch.onEnable {
     modstitch.moddevgradle {
         tasks.named("createMinecraftArtifacts") {
