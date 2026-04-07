@@ -8,7 +8,7 @@ import java.util.Set;
 
 import static java.util.Map.entry;
 
-public class SharpFont implements FontSupplier {
+public class SharpFont extends AbstractFontSupplier {
     @Override
     public FontFile get() {
         return new FontFile("Sharp", "Hugleton, DebornMC", Map.<Character, String[]>ofEntries(

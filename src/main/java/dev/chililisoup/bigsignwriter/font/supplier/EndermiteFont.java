@@ -7,7 +7,7 @@ import java.util.Map;
 import static java.util.Map.entry;
 
 @SuppressWarnings("UnnecessaryUnicodeEscape")
-public class EndermiteFont implements FontSupplier {
+public class EndermiteFont extends AbstractFontSupplier {
     @Override
     public FontFile get() {
         return new FontFile("Endermite", "Opticality", 3, Map.<Character, String[]>ofEntries(

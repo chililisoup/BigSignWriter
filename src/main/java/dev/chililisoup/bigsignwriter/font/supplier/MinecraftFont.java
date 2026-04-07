@@ -6,7 +6,7 @@ import java.util.Map;
 
 import static java.util.Map.entry;
 
-public class MinecraftFont implements FontSupplier {
+public class MinecraftFont extends AbstractFontSupplier {
     @Override
     public FontFile get() {
         return new FontFile("Minecraft", "Mojang, chililisoup", " ", Map.<Character, String[]>ofEntries(

@@ -9,24 +9,24 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public interface FontSupplier {
-    FontFile get();
+public abstract class AbstractFontSupplier {
+    public abstract FontFile get();
 
-    default Map<Character, Set<PatchCharacter>> patches() {
+    public Map<Character, Set<PatchCharacter>> patches() {
         HashMap<Character, Set<PatchCharacter>> baseMap = new HashMap<>();
         this.appendRecolourfulContainersGuiFix(baseMap);
         return baseMap;
     }
 
-    default void appendRecolourfulContainersGuiFix(HashMap<Character, Set<PatchCharacter>> baseMap) {
+    protected final void appendStringReplacement(HashMap<Character, Set<PatchCharacter>> baseMap, String from, String to) {
         this.get().characters.forEach((character, lines) -> {
-            if (!String.join("", lines).contains(" ")) return;
+            if (!String.join("", lines).contains(to)) return;
 
             baseMap.merge(
                     character,
                     Set.of(PatchCharacter.of(
                             Arrays.stream(lines)
-                                    .map(line -> line.replace(' ', '\u2009'))
+                                    .map(line -> line.replace(to, from))
                                     .toArray(String[]::new)
                     )),
                     (baseSet, fixSet) -> {
@@ -39,7 +39,15 @@ public interface FontSupplier {
         });
     }
 
-    record PatchCharacter(String... lines) {
+    protected final void appendRecolourfulContainersGuiFix(HashMap<Character, Set<PatchCharacter>> baseMap) {
+        this.appendStringReplacement(baseMap, " ", " ");
+    }
+
+    protected final void appendMediumVerticalBarAnnihilator(HashMap<Character, Set<PatchCharacter>> baseMap) {
+        this.appendStringReplacement(baseMap, "❙", "𜷴");
+    }
+
+    public record PatchCharacter(String... lines) {
         static PatchCharacter of(String... lines) {
             return new PatchCharacter(lines);
         }

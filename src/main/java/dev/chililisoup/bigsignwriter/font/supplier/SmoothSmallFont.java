@@ -9,7 +9,7 @@ import java.util.Set;
 
 import static java.util.Map.entry;
 
-public class SmoothSmallFont implements FontSupplier {
+public class SmoothSmallFont extends AbstractFontSupplier {
     @Override
     public FontFile get() {
         return new FontFile("Smooth Small", "chililisoup, Opticality", 2, Map.<Character, String[]>ofEntries(

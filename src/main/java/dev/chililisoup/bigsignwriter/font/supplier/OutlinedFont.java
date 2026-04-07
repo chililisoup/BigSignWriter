@@ -6,7 +6,7 @@ import java.util.Map;
 
 import static java.util.Map.entry;
 
-public class OutlinedFont implements FontSupplier {
+public class OutlinedFont extends AbstractFontSupplier {
     @Override
     public FontFile get() {
         return new FontFile("Outlined", "chililisoup", " ", Map.<Character, String[]>ofEntries(

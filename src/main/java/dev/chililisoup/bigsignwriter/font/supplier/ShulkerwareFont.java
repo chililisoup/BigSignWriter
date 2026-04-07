@@ -13,7 +13,7 @@ import java.util.Map;
 
 import static java.util.Map.entry;
 
-public class ShulkerwareFont implements FontSupplier {
+public class ShulkerwareFont extends AbstractFontSupplier {
     @Override
     public FontFile get() {
         return new FontFile("SHULKERWARE", "adhill", "   ", Map.<Character, String[]>ofEntries(

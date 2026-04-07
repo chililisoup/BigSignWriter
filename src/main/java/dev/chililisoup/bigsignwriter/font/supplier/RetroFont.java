@@ -6,7 +6,7 @@ import java.util.Map;
 
 import static java.util.Map.entry;
 
-public class RetroFont implements FontSupplier {
+public class RetroFont extends AbstractFontSupplier {
     @Override
     public FontFile get() {
         return new FontFile("Retro", "DebornMC", "   ", Map.<Character, String[]>ofEntries(

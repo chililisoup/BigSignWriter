@@ -6,7 +6,7 @@ import java.util.Map;
 
 import static java.util.Map.entry;
 
-public class SmallFont implements FontSupplier {
+public class SmallFont extends AbstractFontSupplier {
     @Override
     public FontFile get() {
         return new FontFile("Small", "chililisoup", 2, "", Map.<Character, String[]>ofEntries(

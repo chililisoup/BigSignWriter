@@ -8,7 +8,7 @@ import java.util.Set;
 
 import static java.util.Map.entry;
 
-public class DefaultFont implements FontSupplier {
+public class DefaultFont extends AbstractFontSupplier {
     @Override
     public FontFile get() {
         return new FontFile("Default", "chililisoup", Map.<Character, String[]>ofEntries(

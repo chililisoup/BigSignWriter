@@ -7,7 +7,7 @@ import java.util.Map;
 import static java.util.Map.entry;
 
 public class BuiltInFonts {
-    public static Map<String, FontSupplier> get() {
+    public static Map<String, AbstractFontSupplier> get() {
         return Map.ofEntries(
                 entry("default", new DefaultFont()),
                 entry("sharp", new SharpFont()),

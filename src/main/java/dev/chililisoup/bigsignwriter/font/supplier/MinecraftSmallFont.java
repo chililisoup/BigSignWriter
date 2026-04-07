@@ -3,12 +3,13 @@ package dev.chililisoup.bigsignwriter.font.supplier;
 
 import dev.chililisoup.bigsignwriter.font.FontFile;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import static java.util.Map.entry;
 
-public class MinecraftSmallFont implements FontSupplier {
+public class MinecraftSmallFont extends AbstractFontSupplier {
     @Override
     public FontFile get() {
         return new FontFile("Minecraft Small", "Mojang, chililisoup", 2, "", Map.<Character, String[]>ofEntries(
@@ -49,11 +50,11 @@ public class MinecraftSmallFont implements FontSupplier {
                         "\uD833\uDD0D\uD836\uDE9D \uD836\uDE9D\uD833\uDD0D"
                 }),
                 entry('I', new String[]{
-                        "\uD833\uDEA8❙\uD833\uDEA8",
+                        "\uD833\uDEA8𜷴\uD833\uDEA8",
                         "\uD833\uDD18\uD833\uDD0D\uD833\uDD18"
                 }),
                 entry('J', new String[]{
-                        "  ❙",
+                        "  𜷴",
                         "\uD833\uDD1C\uD833\uDD18\uD833\uDD12"
                 }),
                 entry('K', new String[]{
@@ -61,7 +62,7 @@ public class MinecraftSmallFont implements FontSupplier {
                         "\uD833\uDD0D\uD836\uDE9D \uD836\uDE9D\uD833\uDD0D"
                 }),
                 entry('L', new String[]{
-                        "❙  ",
+                        "𜷴  ",
                         "\uD833\uDD2C\uD833\uDD18\uD833\uDD27"
                 }),
                 entry('M', new String[]{
@@ -93,19 +94,19 @@ public class MinecraftSmallFont implements FontSupplier {
                         "\uD833\uDD1C\uD833\uDD18\uD833\uDD12"
                 }),
                 entry('T', new String[]{
-                        "\uD83E\uDF82❙\uD83E\uDF82",
+                        "\uD83E\uDF82𜷴\uD83E\uDF82",
                         " \uD833\uDD0D "
                 }),
                 entry('U', new String[]{
-                        "❙ܼ ܼ❙",
+                        "𜷴ܼ ܼ𜷴",
                         "\uD833\uDD1D\uD833\uDD18\uD833\uDD12"
                 }),
                 entry('V', new String[]{
-                        "❙ܼ ܼ❙",
+                        "𜷴ܼ ܼ𜷴",
                         "᤺\uD83E\uDFE4\uD833\uDD18\uD83E\uDFE4᤺"
                 }),
                 entry('W', new String[]{
-                        "❙ܼ ܼ❙",
+                        "𜷴ܼ ܼ𜷴",
                         "\uD833\uDD15\uD833\uDEA8\uD833\uDD25"
                 }),
                 entry('X', new String[]{
@@ -161,11 +162,11 @@ public class MinecraftSmallFont implements FontSupplier {
                         "\uD833\uDD84\uD833\uDEA0\uD833\uDD5B"
                 }),
                 entry('k', new String[]{
-                        "❙ܼܼ\uD833\uDD51",
+                        "𜷴ܼܼ\uD833\uDD51",
                         "\uD833\uDD0F\uD833\uDD1C"
                 }),
                 entry('l', new String[]{
-                        "❙᤺",
+                        "𜷴᤺",
                         "\uD833\uDD1D"
                 }),
                 entry('m', new String[]{
@@ -197,7 +198,7 @@ public class MinecraftSmallFont implements FontSupplier {
                         "\uD833\uDD29\uD833\uDD1A\uD833\uDD11"
                 }),
                 entry('t', new String[]{
-                        "\uD833\uDD09❙\uD833\uDD09",
+                        "\uD833\uDD09𜷴\uD833\uDD09",
                         "ܼ᤺\uD833\uDD0D\uD833\uDEA0"
                 }),
                 entry('u', new String[]{
@@ -229,7 +230,7 @@ public class MinecraftSmallFont implements FontSupplier {
                         " "
                 }),
                 entry('1', new String[]{
-                        "\uD834\uDD6D\uD834\uDD6D\uD833\uDD00❙ ",
+                        "\uD834\uDD6D\uD834\uDD6D\uD833\uDD00𜷴 ",
                         "\uD833\uDD27\uD833\uDD0D\uD833\uDD27"
                 }),
                 entry('2', new String[]{
@@ -313,7 +314,7 @@ public class MinecraftSmallFont implements FontSupplier {
                         "   "
                 }),
                 entry('!', new String[]{
-                        "❙",
+                        "𜷴",
                         "\uD833\uDD00"
                 }),
                 entry('@', new String[]{
@@ -381,7 +382,7 @@ public class MinecraftSmallFont implements FontSupplier {
                         " \uD833\uDD0A "
                 }),
                 entry('|', new String[]{
-                        "❙",
+                        "𜷴",
                         "\uD833\uDD0D"
                 }),
                 entry(':', new String[]{
@@ -397,7 +398,7 @@ public class MinecraftSmallFont implements FontSupplier {
 
     @Override
     public Map<Character, Set<PatchCharacter>> patches() {
-        return Map.ofEntries(
+        HashMap<Character, Set<PatchCharacter>> baseMap = new HashMap<>(Map.ofEntries(
                 entry('m', Set.of(
                         PatchCharacter.of(
                                 "▂ܼܼܼ\uD833\uDEA0ܼܼ",
@@ -410,7 +411,10 @@ public class MinecraftSmallFont implements FontSupplier {
                                 "\uD833\uDD0D\uD836\uDE9D \uD836\uDE9D\uD833\uDD0D"
                         )
                 ))
-        );
+        ));
+        
+        this.appendMediumVerticalBarAnnihilator(baseMap);
+        return baseMap;
     }
 }
 //?}

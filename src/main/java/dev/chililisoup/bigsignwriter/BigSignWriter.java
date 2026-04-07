@@ -6,7 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import dev.chililisoup.bigsignwriter.font.BuiltInFonts;
 import dev.chililisoup.bigsignwriter.font.FontFile;
 import dev.chililisoup.bigsignwriter.font.FontInfo;
-import dev.chililisoup.bigsignwriter.font.supplier.FontSupplier;
+import dev.chililisoup.bigsignwriter.font.supplier.AbstractFontSupplier;
 import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -182,7 +182,7 @@ public class BigSignWriter {
 
             return BuiltInFonts.get().entrySet().stream().map(entry -> {
                 String path = entry.getKey();
-                FontSupplier fontSupplier = entry.getValue();
+                AbstractFontSupplier fontSupplier = entry.getValue();
                 FontFile fontFile = fontSupplier.get();
                 FontInfo fontInfo = fontFile.createInfo("builtin/" + path);
 
@@ -193,7 +193,7 @@ public class BigSignWriter {
                 BigSignWriterConfig.ConfigInterface<FontFile> file = getFont(gson, target);
                 FontFile existingFont = file.load();
 
-                Map<Character, Set<FontSupplier.PatchCharacter>> patches = fontSupplier.patches();
+                Map<Character, Set<AbstractFontSupplier.PatchCharacter>> patches = fontSupplier.patches();
                 ArrayList<Character> changed = new ArrayList<>();
                 ArrayList<Character> patched = new ArrayList<>();
 
@@ -209,7 +209,7 @@ public class BigSignWriter {
                     boolean match = false;
 
                     if (patches.containsKey(character)) {
-                        for (FontSupplier.PatchCharacter patch : patches.get(character)) {
+                        for (AbstractFontSupplier.PatchCharacter patch : patches.get(character)) {
                             if (String.join("\n", patch.lines()).equals(existing)) {
                                 existingFont.characters.put(character, fontFile.characters.get(character));
                                 patched.add(character);

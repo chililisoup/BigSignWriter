@@ -119,7 +119,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 ImmutableMap.Builder<Integer, Integer> indices = ImmutableMap.builder();
 
                 List<String> splitMessage = this.font.getSplitter()
-                        .splitLines(message.replaceAll(" ", "\u0000"), 0, Style.EMPTY)
+                        .splitLines(message.replace(" ", "\u0000"), 0, Style.EMPTY)
                         .stream().map(FormattedText::getString).toList();
 
                 int runningIndex = 0;

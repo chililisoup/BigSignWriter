@@ -3,11 +3,13 @@ package dev.chililisoup.bigsignwriter.font.supplier;
 
 import dev.chililisoup.bigsignwriter.font.FontFile;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static java.util.Map.entry;
 
-public class HappyGhastFont implements FontSupplier {
+public class HappyGhastFont extends AbstractFontSupplier {
     @Override
     public FontFile get() {
         return new FontFile("Happy Ghast", "chililisoup", 2, "", Map.<Character, String[]>ofEntries(
@@ -44,7 +46,7 @@ public class HappyGhastFont implements FontSupplier {
                         "𜶫▂𜵜"
                 }),
                 entry('H', new String[]{
-                        "▌ܼ ܼ❙",
+                        "▌ܼ ܼ𜷴",
                         "▌🮂𜶘"
                 }),
                 entry('I', new String[]{
@@ -65,10 +67,10 @@ public class HappyGhastFont implements FontSupplier {
                 }),
                 entry('M', new String[]{
                         "𜷥𜶚𜶚",
-                        "▌ܼܼ𜺨ܼܼ❙"
+                        "▌ܼܼ𜺨ܼܼ𜷴"
                 }),
                 entry('N', new String[]{
-                        "▌𜶄ܼܼ❙",
+                        "▌𜶄ܼܼ𜷴",
                         "▌᤺𜺨𜶪"
                 }),
                 entry('O', new String[]{
@@ -93,18 +95,18 @@ public class HappyGhastFont implements FontSupplier {
                 }),
                 entry('T', new String[]{
                         "◚▜◚",
-                        " ܼܼ❙ "
+                        " ܼܼ𜷴 "
                 }),
                 entry('U', new String[]{
-                        "▌ ᤺❙",
+                        "▌ ᤺𜷴",
                         "𜶫▂𜵛"
                 }),
                 entry('V', new String[]{
-                        "▌ ᤺❙",
+                        "▌ ᤺𜷴",
                         "𜴅𜶀𜴒"
                 }),
                 entry('W', new String[]{
-                        "▌ ᤺❙",
+                        "▌ ᤺𜷴",
                         "𜶫𜵛𜵛"
                 }),
                 entry('X', new String[]{
@@ -132,7 +134,7 @@ public class HappyGhastFont implements FontSupplier {
                         "𜶜𜶭𜵚"
                 }),
                 entry('4', new String[]{
-                        "𜷥🯤 ❙",
+                        "𜷥🯤 𜷴",
                         "🮂🮂𜶘"
                 }),
                 entry('5', new String[]{
@@ -160,6 +162,13 @@ public class HappyGhastFont implements FontSupplier {
                         "𜶫𜶱𜵛"
                 })
         ));
+    }
+
+    @Override
+    public Map<Character, Set<PatchCharacter>> patches() {
+        HashMap<Character, Set<PatchCharacter>> baseMap = new HashMap<>();
+        this.appendMediumVerticalBarAnnihilator(baseMap);
+        return baseMap;
     }
 }
 //?}
