@@ -147,9 +147,9 @@ public class EndermiteFont implements FontSupplier {
                         "𜵈𜶬▂🯥"
                 }),
                 entry('`', new String[]{
-                        "𜺠\u073C ",
-                        " 𜺨\uD836\uDE9D",
-                        "  "
+                        "𜶀",
+                        " ",
+                        " "
                 }),
                 entry('1', new String[]{
                         "\u073C\u073C𜺠▖ ",
@@ -252,9 +252,9 @@ public class EndermiteFont implements FontSupplier {
                         " "
                 }),
                 entry('~', new String[]{
-                        "𜺠𜴉𜴉𜺠𜺠𜴉",
-                        "    ",
-                        "    "
+                        "𜺠𜴧▂𜴉",
+                        "    ",
+                        "    "
                 }),
                 entry('!', new String[]{
                         " ▖ ",
