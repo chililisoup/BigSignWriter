@@ -18,6 +18,7 @@ public class BuiltInFonts {
                 //? if >= 1.21.4 {
                 entry("smooth_small", new SmoothSmallFont()),
                 entry("happy_ghast", new HappyGhastFont()),
+                entry("endermite", new EndermiteFont()),
                 entry("minecraft_striped", new MinecraftStripedFont()),
                 entry("minecraft_small", new MinecraftSmallFont()),
                 //?}
