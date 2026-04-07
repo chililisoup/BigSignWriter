@@ -224,7 +224,8 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         }
         this.line = startLine;
         if (this.signField != null) this.signField.setCursorPos(
-                cursorPos - (endSplit.getValue()[0] - startSplit.getValue()[0])
+                cursorPos - (endSplit.getValue()[0] - startSplit.getValue()[0]),
+                false
         );
     }
 
@@ -277,9 +278,10 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 y,
                 20,
                 () -> {
-                    if (BigSignWriter.enabled()) {
-                        if (this.signField == null) return;
+                    if (this.signField == null) return;
+                    this.signField.setSelectionPos(this.signField.getCursorPos());
 
+                    if (BigSignWriter.enabled()) {
                         int cursorPos = this.bigSignWriter$getCursorPos();
                         int width = this.font.width(this.messages[this.line].substring(0, cursorPos));
                         this.line = Math.min(this.line, this.bigSignWriter$getEffectiveBottomLine());
@@ -408,7 +410,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         if (this.signField != null) {
             if (newCursorPos >= 0)
                 this.signField.setCursorPos(newCursorPos, false);
-            else this.signField.setCursorPos(cursorPos);
+            else this.signField.setCursorPos(cursorPos, false);
         }
     }
 
