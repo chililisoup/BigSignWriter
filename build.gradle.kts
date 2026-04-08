@@ -136,13 +136,6 @@ dependencies {
     }
 }
 
-java {
-    // Set to the lowest target Java version to prevent
-    // incorrect IDE warnings when in higher Java version modules
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
-}
-
 modstitch.onEnable {
     modstitch.moddevgradle {
         tasks.named("createMinecraftArtifacts") {
@@ -167,27 +160,34 @@ modstitch.onEnable {
     }
 }
 
-tasks.named("generateModMetadata") {
-    dependsOn("stonecutterGenerate")
-}
+tasks {
+    processResources {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
 
-tasks.named("jar") {
-    dependsOn("filterArtifacts")
-}
-tasks.register<Delete>("filterArtifacts") {
-    if (modstitch.isLoom)
-        delete(layout.buildDirectory.dir("resources/main/META-INF"))
-    else if (modstitch.isModDevGradleRegular)
-        delete(layout.buildDirectory.file("resources/main/META-INF/mods.toml"))
-    else
-        delete(layout.buildDirectory.file("resources/main/META-INF/neoforge.mods.toml"))
-}
+    named("generateModMetadata") {
+        dependsOn("stonecutterGenerate")
+    }
 
-tasks.register<Delete>("buildCollectAndClean") {
-    group = "build"
+    named("jar") {
+        dependsOn("filterArtifacts")
+    }
 
-    delete(layout.buildDirectory.dir("libs"))
-    delete(layout.buildDirectory.dir("devlibs"))
+    register<Delete>("filterArtifacts") {
+        if (modstitch.isLoom)
+            delete(layout.buildDirectory.dir("resources/main/META-INF"))
+        else if (modstitch.isModDevGradleRegular)
+            delete(layout.buildDirectory.file("resources/main/META-INF/mods.toml"))
+        else
+            delete(layout.buildDirectory.file("resources/main/META-INF/neoforge.mods.toml"))
+    }
 
-    dependsOn("buildAndCollect")
+    register<Delete>("buildCollectAndClean") {
+        group = "build"
+
+        delete(layout.buildDirectory.dir("libs"))
+        delete(layout.buildDirectory.dir("devlibs"))
+
+        dependsOn("buildAndCollect")
+    }
 }
