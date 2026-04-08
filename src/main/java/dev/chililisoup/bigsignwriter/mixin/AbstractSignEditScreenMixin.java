@@ -186,9 +186,12 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         }
 
         int cursorPos = this.bigSignWriter$getCursorPos();
-        if (cursorPos == 0) return;
-
         boolean atEnd = cursorPos == this.messages[this.line].length();
+        if (cursorPos == 0) {
+            if (atEnd) this.bigSignWriter$clearSign();
+            return;
+        }
+
         TreeMap<Integer, Integer[]> splitIndices = this.bigSignWriter$getSplitIndices(!atEnd);
         if (splitIndices.isEmpty()) {
             this.bigSignWriter$clearSign();
@@ -242,6 +245,8 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 splitIndices.lowerEntry(width);
 
         if (split != null) this.signField.setCursorPos(split.getValue()[0], false);
+        else if (higher) this.signField.setCursorToEnd();
+        else this.signField.setCursorToStart();
     }
 
     @Unique private @Nullable Button doneButton;
@@ -485,14 +490,15 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         }
 
         String topLine = this.messages[this.line] == null ? "" : this.messages[this.line];
+        boolean atEnd = topLine.length() == cursorPos;
         int lineHeight = this.sign.getTextLineHeight();
         int opaqueColor = 0xFF000000 | color;
 
-        if (cursorPos <= 0 || topLine.length() == cursorPos) {
+        if (cursorPos <= 0 || atEnd) {
             for (int i = this.line; i < this.bigSignWriter$getEndLine(); i++) {
                 String message = this.messages[i] == null ? "" : this.messages[i];
                 int cursorX = this.font.width(message) / 2;
-                if (cursorPos <= 0) cursorX *= -1;
+                if (cursorPos <= 0 && !atEnd) cursorX *= -1;
                 int cursorY = (i - 2) * lineHeight;
 
                 guiGraphics.fill(cursorX, cursorY - 1, cursorX + 1, cursorY + lineHeight, opaqueColor);
