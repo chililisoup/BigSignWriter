@@ -344,6 +344,7 @@ public class BigSignWriterConfigScreen extends Screen {
 
             public SidePanel() {
                 super(0, 0, 0, 0, CommonComponents.EMPTY);
+                this.active = false;
             }
 
             protected void addExtraWidgets(Consumer<AbstractWidget> widgetConsumer) {}
@@ -354,11 +355,6 @@ public class BigSignWriterConfigScreen extends Screen {
 
             @Override
             protected void updateWidgetNarration(@NotNull NarrationElementOutput output) {}
-
-            @Override
-            public boolean isActive() {
-                return false;
-            }
         }
     }
 
