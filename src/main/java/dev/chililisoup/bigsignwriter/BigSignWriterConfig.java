@@ -18,7 +18,7 @@ import net.fabricmc.loader.api.FabricLoader;
 //? if neoforge
 //import net.neoforged.fml.loading.FMLPaths;
 
-public class BigSignWriterConfig {
+public abstract class BigSignWriterConfig {
     public static final MainConfig MAIN_CONFIG = new MainConfig();
 
     public static void init() {}
@@ -109,7 +109,7 @@ public class BigSignWriterConfig {
         try {
             Files.createDirectories(configDir);
         } catch (IOException e) {
-            BigSignWriter.LOGGER.error("Failed to create config directory: {}", configDir, e);
+            BigSignWriter.LOGGER.error(BigSignWriter.LOGGER_PREFIX + "Failed to create config directory: {}", configDir, e);
         }
         return configDir;
     }
@@ -131,7 +131,7 @@ public class BigSignWriterConfig {
         persistentConfig.save(new PersistentConfig().copyFrom(MAIN_CONFIG));
         BigSignWriter.reselectFont();
 
-        BigSignWriter.LOGGER.info("Config saved!");
+        BigSignWriter.LOGGER.info(BigSignWriter.LOGGER_PREFIX + "Config saved!");
     }
 
     public static void reloadConfig() {
@@ -140,7 +140,7 @@ public class BigSignWriterConfig {
         MAIN_CONFIG.copyFrom(persistentConfig.load());
         persistentConfig.save(new PersistentConfig().copyFrom(MAIN_CONFIG));
 
-        BigSignWriter.LOGGER.debug("Config loaded!");
+        BigSignWriter.LOGGER.debug(BigSignWriter.LOGGER_PREFIX + "Config loaded!");
     }
 
     record ConfigInterface<T>(Gson gson, TypeToken<T> typeToken, Path path, T defaultConfig) {
@@ -152,7 +152,7 @@ public class BigSignWriterConfig {
                 this.save(defaultConfig);
                 return defaultConfig;
             } catch (Exception e) {
-                BigSignWriter.LOGGER.error("Failed to load config: {}", path.getFileName(), e);
+                BigSignWriter.LOGGER.error(BigSignWriter.LOGGER_PREFIX + "Failed to load config: {}", path.getFileName(), e);
                 return defaultConfig;
             }
         }

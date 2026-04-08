@@ -28,6 +28,7 @@ import net.fabricmc.loader.api.FabricLoader;
 public class BigSignWriter {
     public static final String MOD_ID = "bigsignwriter";
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
+    public static final String LOGGER_PREFIX = "[BSW] ";
     public static final Identifier ICON = id("icon.png");
     public static final String VERSION;
 
@@ -110,7 +111,7 @@ public class BigSignWriter {
         try {
             Files.createDirectories(fontsDir);
         } catch (IOException e) {
-            LOGGER.error("Failed to create fonts directory: {}", fontsDir, e);
+            LOGGER.error(LOGGER_PREFIX + "Failed to create fonts directory: {}", fontsDir, e);
         }
         return fontsDir;
     }
@@ -136,7 +137,7 @@ public class BigSignWriter {
 
         AVAILABLE_FONTS.sort((a, b) -> a.name().compareToIgnoreCase(b.name()));
         reselectFont(selectedFontIndex);
-        LOGGER.info("Fonts loaded!");
+        LOGGER.info(LOGGER_PREFIX + "Fonts loaded!");
     }
 
     public static void saveFontToFile(FontInfo fontInfo) {
@@ -159,7 +160,7 @@ public class BigSignWriter {
             getFont(gson, target).save(fontInfo.fontFile);
             reloadFonts();
         } catch (Exception e) {
-            LOGGER.error("Error saving font", e);
+            LOGGER.error(LOGGER_PREFIX + "Error saving font", e);
         }
     }
 
@@ -231,9 +232,9 @@ public class BigSignWriter {
                 if (canRemove) {
                     File targetFile = target.toFile();
                     if (targetFile.delete()) {
-                        LOGGER.info("Removed copy of built-in font '{}'", targetFile.getName());
+                        LOGGER.info(LOGGER_PREFIX + "Removed copy of built-in font '{}'", targetFile.getName());
                         return fontInfo;
-                    } else LOGGER.error("Failed to remove copy of built-in font '{}'", targetFile.getName());
+                    } else LOGGER.error(LOGGER_PREFIX + "Failed to remove copy of built-in font '{}'", targetFile.getName());
                 }
 
                 boolean needsSaved;
@@ -246,15 +247,15 @@ public class BigSignWriter {
                     file.save(existingFont);
 
                     if (!changed.isEmpty())
-                        LOGGER.info("Merged new characters from built-in font '{}': {}", fontFile.name, changed);
+                        LOGGER.info(LOGGER_PREFIX + "Merged new characters from built-in font '{}': {}", fontFile.name, changed);
                     if (!patched.isEmpty())
-                        LOGGER.info("Patched outdated characters from built-in font '{}': {}", fontFile.name, patched);
+                        LOGGER.info(LOGGER_PREFIX + "Patched outdated characters from built-in font '{}': {}", fontFile.name, patched);
                 }
 
                 return null;
             }).filter(Objects::nonNull).toList();
         } catch (Exception e) {
-            LOGGER.error("Error copying built-in fonts", e);
+            LOGGER.error(LOGGER_PREFIX + "Error copying built-in fonts", e);
             return List.of();
         }
     }
