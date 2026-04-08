@@ -2,11 +2,19 @@ package dev.chililisoup.bigsignwriter.font.supplier;
 
 import dev.chililisoup.bigsignwriter.font.FontFile;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static java.util.Map.entry;
 
 public class SmallFont extends AbstractFontSupplier {
+    private static final String VERT_3PX =
+            //? if >= 1.21.4 {
+            "𜷴";
+            //?} else
+            //"❙";
+    
     @Override
     public FontFile get() {
         return new FontFile("Small", "chililisoup", 2, "", Map.<Character, String[]>ofEntries(
@@ -16,7 +24,7 @@ public class SmallFont extends AbstractFontSupplier {
                 }),
                 entry('A', new String[]{
                         "\uD83E\uDF33\uD83E\uDF36",
-                        "❙ ❙"
+                        VERT_3PX + " " + VERT_3PX
                 }),
                 entry('a', new String[]{
                         "\uD83E\uDF0B\uD83E\uDF22",
@@ -56,11 +64,14 @@ public class SmallFont extends AbstractFontSupplier {
                 }),
                 entry('F', new String[]{
                         "\uD83E\uDF34\uD83E\uDF12",
-                        "▍  "
+                        //? if >= 1.21.4 {
+                        "𜷴᤺ "
+                        //?} else
+                        //"▍  "
                 }),
                 entry('f', new String[]{
                         "\uD83E\uDF35\uD83E\uDF30",
-                        "᤺❙ "
+                        "᤺" + VERT_3PX + " "
                 }),
                 entry('G', new String[]{
                         "\uD83E\uDF14\uD83E\uDF08",
@@ -72,11 +83,11 @@ public class SmallFont extends AbstractFontSupplier {
                 }),
                 entry('H', new String[]{
                         "\uD83E\uDF32\uD83E\uDF37",
-                        "❙ ❙"
+                        VERT_3PX + " " + VERT_3PX
                 }),
                 entry('h', new String[]{
                         "\uD83E\uDF32\uD83E\uDF0Fܼܼ",
-                        "❙ ❙"
+                        VERT_3PX + " " + VERT_3PX
                 }),
                 entry('I', new String[]{
                         "\uD83E\uDF28\uD83E\uDF02",
@@ -87,7 +98,10 @@ public class SmallFont extends AbstractFontSupplier {
                         "\uD83E\uDF37\uD83E\uDF2D"
                 }),
                 entry('J', new String[]{
-                        "  ▍",
+                        //? if >= 1.21.4 {
+                        " ᤺𜷴",
+                        //?} else
+                        //"  ▍",
                         "\uD83E\uDF22\uD83E\uDF18"
                 }),
                 entry('j', new String[]{
@@ -96,14 +110,17 @@ public class SmallFont extends AbstractFontSupplier {
                 }),
                 entry('K', new String[]{
                         "\uD83E\uDF32\uD83E\uDF05",
-                        "❙᤺\uD83E\uDF27"
+                        VERT_3PX + "᤺\uD83E\uDF27"
                 }),
                 entry('k', new String[]{
-                        "❙ܼܼ\uD83E\uDF16",
+                        VERT_3PX + "ܼܼ\uD83E\uDF16",
                         "\uD83E\uDF15\uD83E\uDF22"
                 }),
                 entry('L', new String[]{
-                        "▍  ",
+                        //? if >= 1.21.4 {
+                        "𜷴᤺ ",
+                        //?} else
+                        //"▍  ",
                         "\uD83E\uDF32\uD83E\uDF2D"
                 }),
                 entry('l', new String[]{
@@ -112,19 +129,19 @@ public class SmallFont extends AbstractFontSupplier {
                 }),
                 entry('M', new String[]{
                         "\uD83E\uDF3A\uD83E\uDF3B",
-                        "❙ ❙"
+                        VERT_3PX + " " + VERT_3PX
                 }),
                 entry('m', new String[]{
                         "\uD83E\uDF2D\uD83E\uDF2D",
                         "\uD83E\uDF15\uD83E\uDF28"
                 }),
                 entry('N', new String[]{
-                        "\uD83E\uDF3Aܼܼ❙",
-                        "❙᤺\uD83E\uDF2C"
+                        "\uD83E\uDF3Aܼܼ" + VERT_3PX,
+                        VERT_3PX + "᤺\uD83E\uDF2C"
                 }),
                 entry('n', new String[]{
                         "\uD83E\uDF2D\uD83E\uDF0Fܼܼ",
-                        "❙ ❙"
+                        VERT_3PX + " " + VERT_3PX
                 }),
                 entry('O', new String[]{
                         "\uD83E\uDF14\uD83E\uDF27",
@@ -136,7 +153,10 @@ public class SmallFont extends AbstractFontSupplier {
                 }),
                 entry('P', new String[]{
                         "\uD83E\uDF34\uD83E\uDF17",
-                        "▍  "
+                        //? if >= 1.21.4 {
+                        "𜷴᤺ "
+                        //?} else
+                        //"▍  "
                 }),
                 entry('p', new String[]{
                         "\uD83E\uDF1A\uD83E\uDF22",
@@ -152,11 +172,11 @@ public class SmallFont extends AbstractFontSupplier {
                 }),
                 entry('R', new String[]{
                         "\uD83E\uDF34\uD83E\uDF17",
-                        "❙ ❙"
+                        VERT_3PX + " " + VERT_3PX
                 }),
                 entry('r', new String[]{
                         "\uD83E\uDF2D\uD83E\uDF0Fܼܼ",
-                        "❙ \uD83E\uDF01"
+                        VERT_3PX + " \uD83E\uDF01"
                 }),
                 entry('S', new String[]{
                         "\uD83E\uDF24\uD83E\uDF12",
@@ -168,14 +188,14 @@ public class SmallFont extends AbstractFontSupplier {
                 }),
                 entry('T', new String[]{
                         "\uD83E\uDF28\uD83E\uDF02",
-                        "ܼܼ❙ "
+                        "ܼܼ" + VERT_3PX + " "
                 }),
                 entry('t', new String[]{
                         "\uD83E\uDF37\uD83E\uDF2D",
                         "᤺\uD83E\uDF09\uD83E\uDF2D"
                 }),
                 entry('U', new String[]{
-                        "❙ ❙",
+                        VERT_3PX + " " + VERT_3PX,
                         "\uD83E\uDF23\uD83E\uDF18"
                 }),
                 entry('u', new String[]{
@@ -183,7 +203,7 @@ public class SmallFont extends AbstractFontSupplier {
                         "\uD83E\uDF23\uD83E\uDF37"
                 }),
                 entry('V', new String[]{
-                        "❙ ❙",
+                        VERT_3PX + " " + VERT_3PX,
                         "\uD83E\uDF23\uD83E\uDF05"
                 }),
                 entry('v', new String[]{
@@ -191,7 +211,7 @@ public class SmallFont extends AbstractFontSupplier {
                         "\uD83E\uDF23\uD83E\uDF05"
                 }),
                 entry('W', new String[]{
-                        "❙ ❙",
+                        VERT_3PX + " " + VERT_3PX,
                         "\uD83E\uDF1D\uD83E\uDF2C"
                 }),
                 entry('w', new String[]{
@@ -199,16 +219,16 @@ public class SmallFont extends AbstractFontSupplier {
                         "\uD83E\uDF3A\uD83E\uDF3B"
                 }),
                 entry('X', new String[]{
-                        "❙ܼܼ\uD83E\uDF18",
-                        "\uD83E\uDF14᤺❙"
+                        VERT_3PX + "ܼܼ\uD83E\uDF18",
+                        "\uD83E\uDF14᤺" + VERT_3PX
                 }),
                 entry('x', new String[]{
                         "\uD83E\uDF0F \uD83E\uDF1E",
                         "\uD83E\uDF17\uD83E\uDF27"
                 }),
                 entry('Y', new String[]{
-                        "❙ܼܼ\uD83E\uDF18",
-                        "᤺❙ "
+                        VERT_3PX + "ܼܼ\uD83E\uDF18",
+                        "᤺" + VERT_3PX + " "
                 }),
                 entry('y', new String[]{
                         "\uD83E\uDF13 \uD83E\uDF26",
@@ -236,7 +256,10 @@ public class SmallFont extends AbstractFontSupplier {
                 }),
                 entry('4', new String[]{
                         "\uD83E\uDF33\uD83E\uDF37",
-                        "  ▍"
+                        //? if >= 1.21.4 {
+                        " ᤺𜷴"
+                        //?} else
+                        //"  ▍"
                 }),
                 entry('5', new String[]{
                         "\uD83E\uDF34\uD83E\uDF12",
@@ -271,7 +294,7 @@ public class SmallFont extends AbstractFontSupplier {
                         "\uD83E\uDF00᤺\uD83E\uDF00᤺"
                 }),
                 entry('!', new String[]{
-                        "❙",
+                        VERT_3PX,
                         "\uD83E\uDF03"
                 }),
                 entry('@', new String[]{
@@ -371,8 +394,8 @@ public class SmallFont extends AbstractFontSupplier {
                         "ܼܼ\uD83E\uDF20 "
                 }),
                 entry('|', new String[]{
-                        "❙",
-                        "❙"
+                        VERT_3PX,
+                        VERT_3PX
                 }),
                 entry(';', new String[]{
                         "\uD83E\uDF0E",
@@ -392,4 +415,45 @@ public class SmallFont extends AbstractFontSupplier {
                 })
         ));
     }
+
+    //? if >= 1.21.4 {
+    @Override
+    public Map<Character, Set<PatchCharacter>> patches() {
+        HashMap<Character, Set<PatchCharacter>> baseMap = new HashMap<>(Map.ofEntries(
+                entry('F', Set.of(
+                        PatchCharacter.of(
+                                "\uD83E\uDF34\uD83E\uDF12",
+                                "▍  "
+                        )
+                )),
+                entry('J', Set.of(
+                        PatchCharacter.of(
+                                "  ▍",
+                                "\uD83E\uDF22\uD83E\uDF18"
+                        )
+                )),
+                entry('L', Set.of(
+                        PatchCharacter.of(
+                                "▍  ",
+                                "\uD83E\uDF32\uD83E\uDF2D"
+                        )
+                )),
+                entry('P', Set.of(
+                        PatchCharacter.of(
+                                "\uD83E\uDF34\uD83E\uDF17",
+                                "▍  "
+                        )
+                )),
+                entry('4', Set.of(
+                        PatchCharacter.of(
+                                "\uD83E\uDF33\uD83E\uDF37",
+                                "  ▍"
+                        )
+                ))
+        ));
+
+        this.appendMediumVerticalBarAnnihilator(baseMap);
+        return baseMap;
+    }
+    //?}
 }
