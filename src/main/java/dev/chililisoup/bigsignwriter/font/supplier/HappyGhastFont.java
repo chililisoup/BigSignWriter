@@ -123,7 +123,7 @@ public class HappyGhastFont extends AbstractFontSupplier {
                 }),
                 entry('a', new String[]{
                         "𜷋◛𜷋",
-                        "𜶫▂𜶧"
+                        "𜶫▂𜶦"
                 }),
                 entry('b', new String[]{
                         "▌𜷋𜶻",
@@ -142,8 +142,8 @@ public class HappyGhastFont extends AbstractFontSupplier {
                         "𜶫𜶷𜶹"
                 }),
                 entry('f', new String[]{
-                        "ܼܼ𜵈▛𜴤",
-                        "𜶘𜵊𜺨᤺"
+                        " 𜷥𜴤",
+                        "᤺𜺨▌🮂"
                 }),
                 entry('g', new String[]{
                         "𜷋◛◛",
@@ -155,7 +155,7 @@ public class HappyGhastFont extends AbstractFontSupplier {
                 }),
                 entry('i', new String[]{
                         " 𜴳 ",
-                        "ܼܼ𜴹𜷚𜶬"
+                        "ܼܼ𜴶▌𜶮"
                 }),
                 entry('j', new String[]{
                         "  𜴳",
@@ -166,7 +166,7 @@ public class HappyGhastFont extends AbstractFontSupplier {
                         "▌𜴆𜶁"
                 }),
                 entry('l', new String[]{
-                        " ▌ ",
+                        "᤺▘▌ ",
                         " 𜶫▂"
                 }),
                 entry('m', new String[]{
@@ -198,8 +198,8 @@ public class HappyGhastFont extends AbstractFontSupplier {
                         "𜶶𜶷𜵕"
                 }),
                 entry('t', new String[]{
-                        "ܼܼ𜷴𜷴ܼܼ ",
-                        "𜴢𜷂𜶬"
+                        " ▌ ",
+                        "᤺𜺨𜶫𜶮"
                 }),
                 entry('u', new String[]{
                         "◛ܼ ܼ▖",
@@ -270,8 +270,8 @@ public class HappyGhastFont extends AbstractFontSupplier {
                         "𜶫𜶱𜵛"
                 }),
                 entry('-', new String[]{
-                        "▂▂▂",
-                        "🮂🮂🮂"
+                        "   ",
+                        "◚◚◚"
                 }),
                 entry('=', new String[]{
                         "◛◛◛",
@@ -283,7 +283,7 @@ public class HappyGhastFont extends AbstractFontSupplier {
                 }),
                 entry('!', new String[]{
                         " ▌▛",
-                        " 𜶮 "
+                        " 𜴳 "
                 }),
                 entry('@', new String[]{
                         "𜷥◚𜶚",
@@ -302,7 +302,7 @@ public class HappyGhastFont extends AbstractFontSupplier {
                         "𜴐𜺨᤺𜴳"
                 }),
                 entry('^', new String[]{
-                        "𜴵◚𜴤",
+                        "𜷡𜴗𜶠",
                         "   "
                 }),
                 entry('&', new String[]{
@@ -326,8 +326,8 @@ public class HappyGhastFont extends AbstractFontSupplier {
                         "◛◛◛"
                 }),
                 entry('+', new String[]{
-                        "▂▆▂",
-                        "🮂🮅🮂"
+                        " ◛ ",
+                        "◚▌◚"
                 }),
                 entry('[', new String[]{
                         " ▌◚",
@@ -378,8 +378,8 @@ public class HappyGhastFont extends AbstractFontSupplier {
                         "𜴐𜴁 "
                 }),
                 entry('?', new String[]{
-                        "𜴵◚𜵞",
-                        " 𜶮 "
+                        "𜴵𜵿𜵞",
+                        " 𜴳 "
                 }),
                 entry('|', new String[]{
                         " ▌ ",
