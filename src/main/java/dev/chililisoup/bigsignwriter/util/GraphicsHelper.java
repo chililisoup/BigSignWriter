@@ -142,7 +142,7 @@ public final class GraphicsHelper {
         guiGraphics.pose().popMatrix();
     }
 
-    public static void drawFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, float anchorX, int x, int y, int height) {
+    public static void drawFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, float anchorX, int x, int y, int height, int gap) {
         float scale = (height / 9F) / (float) fontPreview.length;
 
         //? if < 1.21.6 {
@@ -159,12 +159,16 @@ public final class GraphicsHelper {
         int previewWidth = font.width(fontPreview[0]);
         int xOffset = (int) (anchorX * previewWidth);
         for (int i = 0; i < fontPreview.length; i++)
-            guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], -xOffset, i * 9, -1, false);
+            guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], -xOffset, i * (9 + gap), -1, false);
 
         //? if < 1.21.6 {
         /*guiGraphics.pose().popMatrix();
         *///?} else
         guiGraphics.pose().popMatrix();
+    }
+
+    public static void drawFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, float anchorX, int x, int y, int height) {
+        drawFontPreview(guiGraphics, fontPreview, anchorX, x, y, height, 0);
     }
 
     public static List<Component[]> getWrappedFontPreview(FontInfo fontInfo, String text, int width, int lineHeight) {

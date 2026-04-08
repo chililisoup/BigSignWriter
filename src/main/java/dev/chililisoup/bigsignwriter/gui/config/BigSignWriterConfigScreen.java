@@ -696,7 +696,6 @@ public class BigSignWriterConfigScreen extends Screen {
 
         private final class FontsSidePanel extends SidePanel {
             private static int PREVIEW_LINE_HEIGHT = 18;
-            private static final int PREVIEW_GAP = 5;
 
             private final ArrayList<Component> infoLines = new ArrayList<>();
             private @Nullable List<Component[]> wrappedFontPreview = null;
@@ -723,6 +722,20 @@ public class BigSignWriterConfigScreen extends Screen {
                 widgetConsumer.accept(this.zoomOutButton);
                 widgetConsumer.accept(this.zoomInButton);
                 widgetConsumer.accept(this.copyButton);
+            }
+
+            private int gapMargin() {
+                FontButton selected = FontsTab.this.selected;
+                if (selected == null) return 0;
+
+                return Mth.ceil(
+                        PREVIEW_LINE_HEIGHT * (10F * selected.fontInfo.height() - 1F)
+                                / (9F * selected.fontInfo.height()) - PREVIEW_LINE_HEIGHT
+                );
+            }
+
+            private int previewGap() {
+                return (int) (5F * PREVIEW_LINE_HEIGHT / 18F) + this.gapMargin();
             }
 
             private int afterInfoLines() {
@@ -761,8 +774,10 @@ public class BigSignWriterConfigScreen extends Screen {
                         PREVIEW_LINE_HEIGHT
                 );
 
-                int previewHeight = this.wrappedFontPreview.size() * (PREVIEW_LINE_HEIGHT + PREVIEW_GAP) - PREVIEW_GAP;
-                int bottom = this.afterInfoLines() + 30 + PREVIEW_GAP + previewHeight;
+                int previewGap = this.previewGap();
+                int previewHeight = this.wrappedFontPreview.size() * (PREVIEW_LINE_HEIGHT + previewGap)
+                        - previewGap + this.gapMargin();
+                int bottom = this.afterInfoLines() + 30 + previewGap + previewHeight;
                 this.height = Math.max(bottom - this.getY(), this.maxHeight);
             }
 
@@ -819,13 +834,15 @@ public class BigSignWriterConfigScreen extends Screen {
                 }
 
                 if (this.wrappedFontPreview != null) {
+                    int previewGap = this.previewGap();
                     for (int i = 0; i < this.wrappedFontPreview.size(); i++) GraphicsHelper.drawFontPreview(
                             guiGraphics,
                             this.wrappedFontPreview.get(i),
                             0F,
                             this.getX(),
-                            afterInfoLines + 30 + PREVIEW_GAP + i * (PREVIEW_LINE_HEIGHT + PREVIEW_GAP),
-                            PREVIEW_LINE_HEIGHT
+                            afterInfoLines + 30 + previewGap + i * (PREVIEW_LINE_HEIGHT + previewGap),
+                            PREVIEW_LINE_HEIGHT,
+                            1
                     );
                 }
             }
