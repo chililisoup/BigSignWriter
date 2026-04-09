@@ -24,7 +24,7 @@ public abstract class IconButton extends Button.Plain {
     //protected void extractWidgetRenderState(
             @NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick
     ) {
-        //? if >= 26.1 {
+        //? if >= 1.21.11 {
         super.extractContents(
         //?} else
         //super.extractWidgetRenderState(
