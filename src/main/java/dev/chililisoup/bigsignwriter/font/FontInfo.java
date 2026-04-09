@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 
 public class FontInfo {
@@ -16,6 +17,9 @@ public class FontInfo {
     public final String source;
     private boolean checked = false;
     private @Nullable Component error = null;
+    private int minWidth;
+    private int maxWidth;
+    private float avgWidth;
 
     FontInfo(FontFile fontFile, String source) {
         this.fontFile = fontFile;
@@ -69,6 +73,18 @@ public class FontInfo {
         else config.hiddenFonts.add(this.source);
     }
 
+    public String widthInfo() {
+        if (this.isBroken()) return "UNFIXED";
+        return this.minWidth == this.maxWidth ?
+                String.valueOf(this.minWidth) :
+                String.format(
+                        "%d-%d ~%.2f",
+                        this.minWidth,
+                        this.maxWidth,
+                        this.avgWidth
+                );
+    }
+
     public @Nullable String getBuiltInName() {
         String[] fontSource = this.source.split("/");
         return fontSource.length == 2 && fontSource[0].equals("builtin") ?
@@ -77,31 +93,35 @@ public class FontInfo {
 
     public @Nullable Component error() {
         if (this.checked) return this.error;
-        this.error = getError(fontFile);
+        this.error = this.extractInfo(fontFile);
         this.checked = true;
         return this.error;
     }
 
-    private static @Nullable Component getError(FontFile fontFile) {
+    private @Nullable Component extractInfo(FontFile fontFile) {
         if (fontFile.height <= 0) return Component.translatable(
                 "bigsignwriter.font.error.invalidHeight",
                 fontFile.height
         );
 
         Font font = Minecraft.getInstance().font;
+        ArrayList<Integer> allWidths = new ArrayList<>(fontFile.characters.size());
+
         for (Map.Entry<Character, String[]> entry : fontFile.characters.entrySet()) {
             char baseChar = entry.getKey();
             String[] bigChar = entry.getValue();
 
             if (bigChar.length != fontFile.height) return Component.translatable(
                     "bigsignwriter.font.error.wrongLineCount",
-                    baseChar,
+                    String.valueOf(baseChar),
                     bigChar.length,
                     fontFile.height
             );
 
             int[] widths = new int[bigChar.length];
-            widths[0] = font.width(bigChar[0]);
+            int topWidth = font.width(bigChar[0]);
+            widths[0] = topWidth;
+            allWidths.add(topWidth);
             boolean unfixed = false;
             for (int i = 1; i < bigChar.length; i++) {
                 widths[i] = font.width(bigChar[i]);
@@ -109,10 +129,14 @@ public class FontInfo {
             }
             if (unfixed) return Component.translatable(
                     "bigsignwriter.font.error.unfixedWidth",
-                    baseChar,
+                    String.valueOf(baseChar),
                     Arrays.toString(widths)
             );
         }
+
+        this.minWidth = Collections.min(allWidths);
+        this.maxWidth = Collections.max(allWidths);
+        this.avgWidth = (float) allWidths.stream().mapToInt(Integer::intValue).sum() / allWidths.size();
 
         return null;
     }

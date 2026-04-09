@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-//? if > 1.21.6 {
+//? if >= 1.21.9 {
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -120,7 +120,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
                         this.getBottom(),
                         0x40FFFFFF
                 );
-                //? if > 1.21.6
+                //? if >= 1.21.9
                 guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
             }
 
@@ -140,7 +140,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
             return;
         }
 
-        //? if > 1.21.6
+        //? if >= 1.21.9
         if (this.isHovered()) guiGraphics.requestCursor(CursorType.DEFAULT);
 
         //? if >= 26.1 {
@@ -160,7 +160,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
         if (!this.open) {
         //?} else
         //if (!this.open && this.isMouseOver(mouseX, mouseY)) {
-            //? if > 1.21.6
+            //? if >= 1.21.9
             int button = mouseButtonEvent.button();
             if (button == 0) {
                 this.setOpen(true);
@@ -175,7 +175,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
         return super.mouseClicked(mouseButtonEvent, bl);
     }
 
-    //? if > 1.21.6 {
+    //? if >= 1.21.9 {
     @Override
     public boolean mouseReleased(@NotNull MouseButtonEvent mouseButtonEvent) {
         return this.open && super.mouseReleased(mouseButtonEvent);
@@ -249,7 +249,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
             
             if (hovered) {
                 guiGraphics.fill(left, top, left + width, top + height, 0x40FFFFFF);
-                //? if > 1.21.6
+                //? if >= 1.21.9
                 guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
             }
 

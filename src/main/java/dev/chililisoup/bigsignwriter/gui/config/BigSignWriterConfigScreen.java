@@ -45,6 +45,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 //?}
 
 //? if >= 1.21.9 {
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import net.minecraft.client.input.InputWithModifiers;
 //?}
 
@@ -492,7 +493,7 @@ public class BigSignWriterConfigScreen extends Screen {
                     guiGraphics.fill(this.getX(), this.getY() + 15, this.getRight(), this.getY() + 16, 0xFFFFFFFF);
 
                     guiGraphics.textWithWordWrap(
-                            BigSignWriterConfigScreen.this.minecraft.font,
+                            BigSignWriterConfigScreen.this.font,
                             optionElement.description,
                             this.getX(),
                             this.getY() + 25,
@@ -648,16 +649,21 @@ public class BigSignWriterConfigScreen extends Screen {
                     );
                 }
 
-                if (this.isHovered()) guiGraphics.fill(
-                        left + 2,
-                        top + 2,
-                        right - 2,
-                        bottom - 2,
-                        0x40FFFFFF
-                );
+                if (this.isHovered()) {
+                    guiGraphics.fill(
+                            left + 2,
+                            top + 2,
+                            right - 2,
+                            bottom - 2,
+                            0x40FFFFFF
+                    );
+
+                    //? if >= 1.21.9
+                    guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
+                }
 
                 if (this.fontInfo.error() != null) {
-                    Font font = BigSignWriterConfigScreen.this.minecraft.font;
+                    Font font = BigSignWriterConfigScreen.this.font;
                     Component errorMarker = Component.literal("⚠").withStyle(ChatFormatting.RED);
                     int errorMarkerWidth = font.width(errorMarker);
                     guiGraphics.text(
@@ -766,6 +772,7 @@ public class BigSignWriterConfigScreen extends Screen {
                                 fontInfo.source
                 ));
                 infoLines.add(infoLine("bigsignwriter.font.info.characterCount", fontInfo.characters().size()));
+                if (fontInfo.isWorking()) infoLines.add(infoLine("bigsignwriter.font.info.width", fontInfo.widthInfo()));
 
                 this.wrappedFontPreview = GraphicsHelper.getWrappedFontPreview(
                         fontInfo,
@@ -822,7 +829,7 @@ public class BigSignWriterConfigScreen extends Screen {
                 Component error = fontInfo.error();
                 if (error != null) {
                     guiGraphics.textWithWordWrap(
-                            BigSignWriterConfigScreen.this.minecraft.font,
+                            BigSignWriterConfigScreen.this.font,
                             error.copy().withStyle(ChatFormatting.RED),
                             this.getX(),
                             afterInfoLines + 10,

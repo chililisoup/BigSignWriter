@@ -7,6 +7,7 @@
   "bigsignwriter.font.info.source": "Source: %s",
   "bigsignwriter.font.info.source.builtIn": "Built-in",
   "bigsignwriter.font.info.characterCount": "Unique Characters: %s",
+  "bigsignwriter.font.info.width": "Width: %s",
   "bigsignwriter.font.error.invalidHeight": "Invalid height (%s)!",
   "bigsignwriter.font.error.wrongLineCount": "Either the character '%s' has an incorrect number of lines (%s), or the font's height has been misset (%s)!",
   "bigsignwriter.font.error.unfixedWidth": "Character '%s' does not have a fixed width! %s",
