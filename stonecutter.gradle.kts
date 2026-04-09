@@ -24,7 +24,7 @@ stonecutter parameters {
             )
         }
 
-        string(current.parsed.eq("1.21.9")) {
+        string(current.parsed >= "1.21.9" && current.parsed < "1.21.11") {
             replace("guiGraphics.renderOutline(", "guiGraphics.submitOutline(")
         }
 
