@@ -13,11 +13,6 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 
-//? if fabric
-import net.fabricmc.loader.api.FabricLoader;
-//? if neoforge
-//import net.neoforged.fml.loading.FMLPaths;
-
 public abstract class BigSignWriterConfig {
     public static final MainConfig MAIN_CONFIG = new MainConfig();
 
@@ -101,11 +96,7 @@ public abstract class BigSignWriterConfig {
     }
 
     static Path getConfigDir() {
-        //? if fabric {
-        Path configDir = FabricLoader.getInstance().getConfigDir().resolve(BigSignWriter.MOD_ID);
-        //?} else
-        //Path configDir = FMLPaths.CONFIGDIR.get().resolve(BigSignWriter.MOD_ID);
-        
+        Path configDir = BigSignWriter.CONFIG_DIR;
         try {
             Files.createDirectories(configDir);
         } catch (IOException e) {

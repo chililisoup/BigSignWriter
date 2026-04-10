@@ -19,18 +19,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-//? if fabric {
-import net.fabricmc.loader.api.FabricLoader;
-//?} else {
-/*import net.neoforged.fml.ModList;
-*///?}
-
 public final class BigSignWriter {
     public static final String MOD_ID = "bigsignwriter";
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     public static final String LOGGER_PREFIX = "[BSW] ";
     public static final Identifier ICON = id("icon.png");
-    public static final String VERSION;
+    public static String VERSION;
+    public static Path CONFIG_DIR;
 
     public static final ArrayList<FontInfo> AVAILABLE_FONTS = new ArrayList<>();
     public static @Nullable FontInfo SELECTED_FONT = null;
@@ -41,18 +36,12 @@ public final class BigSignWriter {
         return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 
-    public static void initialize() {
+    public static void initialize(String version, Path configDir) {
+        VERSION = version;
+        CONFIG_DIR = configDir;
+
         BigSignWriterConfig.init();
         reloadFonts();
-    }
-
-    static {
-        VERSION =
-                //? if fabric {
-                FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow().getMetadata().getVersion().getFriendlyString();
-                //?} else {
-                /*ModList.get().getModFileById(MOD_ID).versionString();
-                *///?}
     }
 
     public static boolean enabled() {
