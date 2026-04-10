@@ -103,6 +103,7 @@ public class FontInfo {
                 "bigsignwriter.font.error.invalidHeight",
                 fontFile.height
         );
+        if (fontFile.characters.isEmpty()) return null;
 
         Font font = Minecraft.getInstance().font;
         ArrayList<Integer> allWidths = new ArrayList<>(fontFile.characters.size());

@@ -25,7 +25,7 @@ import net.fabricmc.loader.api.FabricLoader;
 /*import net.neoforged.fml.ModList;
 *///?}
 
-public class BigSignWriter {
+public final class BigSignWriter {
     public static final String MOD_ID = "bigsignwriter";
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     public static final String LOGGER_PREFIX = "[BSW] ";
