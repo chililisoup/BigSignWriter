@@ -14,7 +14,7 @@ import static java.util.Map.entry;
 public class QueatsProMonospaceFont extends AbstractFontSupplier {
     @Override
     public FontFile get() {
-        return new FontFile("Queats Pro Monospace", "adhill")
+        return new FontFile("Queats Pro Monospace", "adhillisepic")
                 .parentFont("queats_pro")
                 .characters(
                         entry('I', new String[]{
@@ -165,7 +165,7 @@ public class QueatsProMonospaceFont extends AbstractFontSupplier {
                                 "      ",
                                 "  █  ",
                                 "      ",
-                                " 🬻█  "
+                                " 🬵▊🬝  "
                         }),
                         entry('<', new String[]{
                                 "      ",
@@ -208,6 +208,12 @@ public class QueatsProMonospaceFont extends AbstractFontSupplier {
                                 "  🬂   ",
                                 "      ",
                                 "      "
+                        }),
+                        entry(',', new String[]{
+                                "      ",
+                                "      ",
+                                "      ",
+                                " 🬵▊🬝  "
                         }),
                         entry('.', new String[]{
                                 "      ",

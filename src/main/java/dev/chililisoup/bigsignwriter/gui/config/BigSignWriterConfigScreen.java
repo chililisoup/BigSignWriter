@@ -768,14 +768,14 @@ public class BigSignWriterConfigScreen extends Screen {
                 Optional.ofNullable(fontInfo.credits()).ifPresent(
                         credits -> infoLines.add(infoLine("bigsignwriter.font.info.credits", credits))
                 );
-                infoLines.add(infoLine(
-                        "bigsignwriter.font.info.source",
-                        fontInfo.isBuiltIn() ?
-                                Component.translatable("bigsignwriter.font.info.source.builtIn") :
-                                fontInfo.source
-                ));
+                infoLines.add(infoLine("bigsignwriter.font.info.source", fontInfo.source));
                 FontInfo parentFont = fontInfo.parentFont();
-                if (parentFont != null) infoLines.add(infoLine("bigsignwriter.font.info.parentFont", parentFont.name()));
+                if (parentFont != null) infoLines.add(infoLine(
+                        fontInfo.parentIsImplicit() ?
+                                "bigsignwriter.font.info.parentFont.implicit" :
+                                "bigsignwriter.font.info.parentFont",
+                        parentFont.name()
+                ));
                 infoLines.add(infoLine("bigsignwriter.font.info.characterCount", fontInfo.characters().size()));
                 if (fontInfo.isWorking()) infoLines.add(infoLine("bigsignwriter.font.info.width", fontInfo.widthInfo()));
 

@@ -14,7 +14,7 @@ import static java.util.Map.entry;
 public class QueatsLazySundayFont extends AbstractFontSupplier {
     @Override
     public FontFile get() {
-        return new FontFile("Queats Lazy Sunday", "adhill")
+        return new FontFile("Queats Lazy Sunday", "adhillisepic")
                 .parentFont("queats_pro_monospace")
                 .characters(
                         entry('J', new String[]{
@@ -106,12 +106,6 @@ public class QueatsLazySundayFont extends AbstractFontSupplier {
                                 "█🬻▊▊🬱",
                                 "█  █",
                                 "█  █"
-                        }),
-                        entry('q', new String[]{
-                                "      ",
-                                "🬻▌🬄🬌█",
-                                "🬊▌🬓🬹█",
-                                "    █"
                         }),
                         entry('r', new String[]{
                                 "      ",

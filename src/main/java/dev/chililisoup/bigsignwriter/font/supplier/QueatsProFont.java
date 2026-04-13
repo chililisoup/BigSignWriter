@@ -14,7 +14,7 @@ import static java.util.Map.entry;
 public class QueatsProFont extends AbstractFontSupplier {
     @Override
     public FontFile get() {
-        return new FontFile("Queats Pro", "adhill")
+        return new FontFile("Queats Pro", "adhillisepic")
                 .characters(
                         entry('A', new String[]{
                                 " 🬵█🬱 ",
@@ -512,7 +512,7 @@ public class QueatsProFont extends AbstractFontSupplier {
                                 "   ",
                                 " █",
                                 "   ",
-                                "🬻█"
+                                "🬵▊🬝"
                         }),
                         entry('<', new String[]{
                                 "     ",
@@ -566,7 +566,7 @@ public class QueatsProFont extends AbstractFontSupplier {
                                 "   ",
                                 "   ",
                                 "   ",
-                                "🬻█"
+                                "🬵▊🬝"
                         }),
                         entry('.', new String[]{
                                 "  ",

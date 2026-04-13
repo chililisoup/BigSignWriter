@@ -14,7 +14,7 @@ import static java.util.Map.entry;
 public class ShulkerwareFont extends AbstractFontSupplier {
     @Override
     public FontFile get() {
-        return new FontFile("SHULKERWARE", "adhill")
+        return new FontFile("SHULKERWARE", "adhillisepic")
                 .characterSeparator("   ")
                 .characters(
                         entry('A', new String[] {

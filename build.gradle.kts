@@ -1,4 +1,5 @@
 plugins {
+    id("idea")
     id("dev.kikugie.stonecutter")
     id("dev.isxander.modstitch.base")
 }
@@ -130,6 +131,13 @@ dependencies {
     if (modstitch.isLoom) {
         prop("deps.fapi") { modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:${it}") }
         prop("deps.modmenu") { modstitchModImplementation("com.terraformersmc:modmenu:${it}") }
+    }
+}
+
+idea {
+    module {
+        isDownloadSources = true
+        isDownloadJavadoc = true
     }
 }
 

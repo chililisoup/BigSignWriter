@@ -77,14 +77,21 @@ public class FontInfo {
 
         if (this.parentFont == null) return null;
 
-        for (char chr : this.parentFont.characters().keySet()) {
-            if (!this.characters().containsKey(chr)
-                    && !this.characters().containsKey(Character.toUpperCase(chr))
-            ) return this.parentFont;
+        if (this.parentFont.height() == this.height()) {
+            boolean explicit = !this.parentIsImplicit();
+            for (char chr : this.parentFont.characters().keySet()) {
+                if (!this.characters().containsKey(chr)
+                        && (explicit || !this.characters().containsKey(Character.toUpperCase(chr)))
+                ) return this.parentFont;
+            }
         }
 
         this.parentFont = null;
         return null;
+    }
+
+    public boolean parentIsImplicit() {
+        return this.fontFile.parentFont == null;
     }
 
     public boolean isBroken() {

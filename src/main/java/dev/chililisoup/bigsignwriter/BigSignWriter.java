@@ -48,21 +48,31 @@ public final class BigSignWriter {
         return SELECTED_FONT != null;
     }
 
-    public static Optional<String[]> getBigChar(char chr, @Nullable FontInfo fontInfo) {
+    private static Optional<String[]> getBigChar(char chr, @Nullable FontInfo fontInfo, @Nullable String[] fallback) {
         if (fontInfo == null)
-            return Optional.empty();
+            return Optional.ofNullable(fallback);
 
         if (fontInfo.characters() == null)
-            return Optional.empty();
+            return Optional.ofNullable(fallback);
 
         if (fontInfo.characters().containsKey(chr))
             return Optional.of(fontInfo.characters().get(chr));
 
-        char upper = Character.toUpperCase(chr);
-        if (fontInfo.characters().containsKey(upper))
-            return Optional.of(fontInfo.characters().get(upper));
+        if (fallback == null) {
+            char upper = Character.toUpperCase(chr);
+            if (fontInfo.characters().containsKey(upper)) {
+                fallback = fontInfo.characters().get(upper);
+                return fontInfo.parentIsImplicit() ?
+                        Optional.of(fallback) :
+                        getBigChar(chr, fontInfo.parentFont(), fallback);
+            }
+        }
 
-        return getBigChar(chr, fontInfo.parentFont());
+        return getBigChar(chr, fontInfo.parentFont(), fallback);
+    }
+
+    public static Optional<String[]> getBigChar(char chr, @Nullable FontInfo fontInfo) {
+        return getBigChar(chr, fontInfo, null);
     }
 
     public static Optional<String[]> getBigChar(char chr) {
@@ -206,6 +216,23 @@ public final class BigSignWriter {
                     if (!match) canRemove = false;
                 }
 
+                for (char character : patches.keySet()) {
+                    if (fontFile.characters.containsKey(character)) continue;
+                    if (!existingFont.characters.containsKey(character)) continue;
+
+                    String existing = String.join("\n", existingFont.characters.get(character));
+
+                    for (AbstractFontSupplier.PatchCharacter patch : patches.get(character)) {
+                        if (String.join("\n", patch.lines()).equals(existing)) {
+                            existingFont.characters.remove(character);
+                            patched.add(character);
+                            break;
+                        }
+                    }
+
+                    if (existingFont.characters.containsKey(character)) canRemove = false;
+                }
+
                 canRemove = canRemove
                         && existingFont.characters.size() == fontFile.characters.size()
                         && existingFont.characters.keySet().equals(fontFile.characters.keySet());
@@ -224,6 +251,12 @@ public final class BigSignWriter {
                 }
                 if (!fontFile.name.equals(existingFont.name)) {
                     existingFont.name = fontFile.name;
+                    needsSaved = true;
+                }
+                if ((fontFile.parentFont == null && existingFont.parentFont != null)
+                        || (fontFile.parentFont != null && !fontFile.parentFont.equals(existingFont.parentFont))
+                ) {
+                    existingFont.parentFont = fontFile.parentFont;
                     needsSaved = true;
                 }
                 needsSaved = needsSaved || !changed.isEmpty() || !patched.isEmpty();
