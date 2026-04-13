@@ -15,6 +15,7 @@ stonecutter parameters {
             replace("net.minecraft.client.renderer.RenderType", "net.minecraft.client.renderer.RenderPipelines")
             replace("pushPose", "pushMatrix")
             replace("popPose", "popMatrix")
+            replace("guiGraphics.renderTooltip(", "guiGraphics.setTooltipForNextFrame(")
         }
 
         string(current.parsed > "1.21.6") {
