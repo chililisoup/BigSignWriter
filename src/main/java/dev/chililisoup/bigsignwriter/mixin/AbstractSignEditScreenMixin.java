@@ -18,9 +18,11 @@ import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
@@ -250,7 +252,8 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         else this.signField.setCursorToStart();
     }
 
-    @Unique private @Nullable Button doneButton;
+    @Unique private @Nullable Button bigSignWriter$doneButton;
+    @Unique private boolean bigSignWriter$ignoreNextRemoval = false;
 
     @Shadow /*? if >= 1.21.2 {*/ protected /*?} else {*/ /*private *//*?}*/ @Final SignBlockEntity sign;
     @Shadow private @Final String[] messages;
@@ -267,7 +270,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     )
     private GuiEventListener grabDoneButton(AbstractSignEditScreen instance, GuiEventListener guiEventListener, Operation<GuiEventListener> original) {
         GuiEventListener doneButton = original.call(instance, guiEventListener);
-        if (doneButton instanceof Button button) this.doneButton = button;
+        if (doneButton instanceof Button button) this.bigSignWriter$doneButton = button;
         return doneButton;
     }
 
@@ -324,7 +327,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
         fontSelector.setOnOpenChanged(instance -> {
             fontSelectorToggleButton.setMessage(bigSignWriter$getDropdownLabel(instance.isOpen()));
-            if (this.doneButton != null) this.doneButton.active =
+            if (this.bigSignWriter$doneButton != null) this.bigSignWriter$doneButton.active =
                     !MAIN_CONFIG.fontSelectorCoversDoneButton || !instance.isOpen();
         });
 
@@ -339,7 +342,10 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                     14,
                     14,
                     Component.literal("☰"),
-                    button -> this.minecraft.setScreen(new BigSignWriterConfigScreen(this))
+                    button -> {
+                        this.bigSignWriter$ignoreNextRemoval = true;
+                        this.minecraft.setScreen(new BigSignWriterConfigScreen(this));
+                    }
             );
             configButton.setTooltip(Tooltip.create(Component.translatable("bigsignwriter.config")));
             this.addRenderableWidget(configButton);
@@ -536,5 +542,19 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             boolean shadow
     ) {
         return !BigSignWriter.enabled();
+    }
+
+    @WrapWithCondition(
+            method = "removed", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;send(Lnet/minecraft/network/protocol/Packet;)V"
+    ))
+    private boolean skipPacket(ClientPacketListener instance, Packet<?> packet) {
+        return !this.bigSignWriter$ignoreNextRemoval;
+    }
+
+    @Inject(method = "removed", at = @At("TAIL"))
+    private void resetRemoveSkip(CallbackInfo ci) {
+        this.bigSignWriter$ignoreNextRemoval = false;
     }
 }
