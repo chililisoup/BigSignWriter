@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class FontFile {
-    private static final Comparator<Character> COMPARATOR = FontFile::compare;
+    public static final Comparator<Character> COMPARATOR = FontFile::compare;
 
     public String name;
     public @Nullable String credits = null;

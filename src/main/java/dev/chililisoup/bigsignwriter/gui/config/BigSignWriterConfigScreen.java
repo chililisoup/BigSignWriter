@@ -1,6 +1,7 @@
 package dev.chililisoup.bigsignwriter.gui.config;
 
 import dev.chililisoup.bigsignwriter.BigSignWriter;
+import dev.chililisoup.bigsignwriter.font.FontFile;
 import dev.chililisoup.bigsignwriter.font.FontInfo;
 import dev.chililisoup.bigsignwriter.gui.*;
 import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
@@ -23,10 +24,7 @@ import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -708,6 +706,7 @@ public class BigSignWriterConfigScreen extends Screen {
 
             private final ArrayList<Component> infoLines = new ArrayList<>();
             private @Nullable List<Component[]> wrappedFontPreview = null;
+            private boolean showInheritedCharacters = false;
 
             private final Button zoomOutButton = Button.builder(Component.literal("\uD83D\uDD0D-"), button -> {
                 PREVIEW_LINE_HEIGHT = Math.max(PREVIEW_LINE_HEIGHT - 6, 12);
@@ -726,11 +725,21 @@ public class BigSignWriterConfigScreen extends Screen {
                 }
             }).tooltip(Tooltip.create(Component.translatable("bigsignwriter.config.fonts.createCopy.desc"))).build();
 
+            private final TickBox inheritedCharactersToggle = new TickBox(
+                    false,
+                    value -> {
+                        this.showInheritedCharacters = value;
+                        FontsTab.this.redoLayout();
+                    },
+                    Component.translatable("bigsignwriter.config.fonts.showInheritedCharacters")
+            );
+
             @Override
             protected void addExtraWidgets(Consumer<AbstractWidget> widgetConsumer) {
                 widgetConsumer.accept(this.zoomOutButton);
                 widgetConsumer.accept(this.zoomInButton);
                 widgetConsumer.accept(this.copyButton);
+                widgetConsumer.accept(this.inheritedCharactersToggle);
             }
 
             private int gapMargin() {
@@ -751,6 +760,11 @@ public class BigSignWriterConfigScreen extends Screen {
                 return this.getY() + 27 + this.infoLines.size() * 12;
             }
 
+            private int buttonsHeight() {
+                return this.copyButton.visible && this.inheritedCharactersToggle.visible ?
+                        52 : 30;
+            }
+
             @Override
             protected void arrangeSelf() {
                 FontButton selected = FontsTab.this.selected;
@@ -758,6 +772,9 @@ public class BigSignWriterConfigScreen extends Screen {
                 this.zoomInButton.visible = this.zoomOutButton.visible;
                 this.copyButton.visible = this.zoomOutButton.visible
                         && selected.fontInfo.isBuiltIn();
+                this.inheritedCharactersToggle.visible = selected != null
+                        && !selected.fontInfo.parentIsImplicit()
+                        && selected.fontInfo.parentFont() != null;
                 if (selected == null) {
                     this.height = this.maxHeight;
                     return;
@@ -779,9 +796,19 @@ public class BigSignWriterConfigScreen extends Screen {
                 infoLines.add(infoLine("bigsignwriter.font.info.characterCount", fontInfo.characters().size()));
                 if (fontInfo.isWorking()) infoLines.add(infoLine("bigsignwriter.font.info.width", fontInfo.widthInfo()));
 
+                Set<Character> charSet;
+                if (this.showInheritedCharacters && this.inheritedCharactersToggle.visible) {
+                    charSet = new TreeSet<>(FontFile.COMPARATOR);
+                    FontInfo nextFont = fontInfo;
+                    while (nextFont != null) {
+                        charSet.addAll(nextFont.characters().keySet());
+                        nextFont = nextFont.parentFont();
+                    }
+                } else charSet = fontInfo.characters().keySet();
+
                 this.wrappedFontPreview = GraphicsHelper.getWrappedFontPreview(
                         fontInfo,
-                        String.join("", fontInfo.characters().keySet().stream().map(String::valueOf).toArray(String[]::new)),
+                        String.join("", charSet.stream().map(String::valueOf).toArray(String[]::new)),
                         this.width,
                         PREVIEW_LINE_HEIGHT
                 );
@@ -789,17 +816,28 @@ public class BigSignWriterConfigScreen extends Screen {
                 int previewGap = this.previewGap();
                 int previewHeight = this.wrappedFontPreview.size() * (PREVIEW_LINE_HEIGHT + previewGap)
                         - previewGap + this.gapMargin();
-                int bottom = this.afterInfoLines() + 30 + previewGap + previewHeight;
+                int bottom = this.afterInfoLines() + this.buttonsHeight() + previewGap + previewHeight;
                 this.height = Math.max(bottom - this.getY(), this.maxHeight);
             }
 
             @Override
             protected void arrangeOthers() {
                 int y = this.afterInfoLines() + 10;
+
+                if (this.inheritedCharactersToggle.visible) {
+                    this.copyButton.setPosition(this.getX(), y);
+                    this.copyButton.setWidth(this.getWidth());
+
+                    if (this.copyButton.visible) y += 22;
+                } else {
+                    this.copyButton.setPosition(this.getX() + 44, y);
+                    this.copyButton.setWidth(this.getWidth() - 44);
+                }
+
                 this.zoomOutButton.setPosition(this.getX(), y);
                 this.zoomInButton.setPosition(this.getX() + 22, y);
-                this.copyButton.setPosition(this.getX() + 44, y);
-                this.copyButton.setWidth(this.getWidth() - 44);
+                this.inheritedCharactersToggle.setPosition(this.getX() + 44, y);
+                this.inheritedCharactersToggle.setWidth(this.getWidth() - 44);
             }
 
             @Override
@@ -847,12 +885,13 @@ public class BigSignWriterConfigScreen extends Screen {
 
                 if (this.wrappedFontPreview != null) {
                     int previewGap = this.previewGap();
+                    int y = afterInfoLines + this.buttonsHeight() + previewGap;
                     for (int i = 0; i < this.wrappedFontPreview.size(); i++) GraphicsHelper.drawFontPreview(
                             guiGraphics,
                             this.wrappedFontPreview.get(i),
                             0F,
                             this.getX(),
-                            afterInfoLines + 30 + previewGap + i * (PREVIEW_LINE_HEIGHT + previewGap),
+                            y + i * (PREVIEW_LINE_HEIGHT + previewGap),
                             PREVIEW_LINE_HEIGHT,
                             1
                     );

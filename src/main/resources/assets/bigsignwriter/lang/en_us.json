@@ -18,6 +18,7 @@
   "bigsignwriter.config.fonts": "Fonts",
   "bigsignwriter.config.fonts.createCopy": "Create Local Copy",
   "bigsignwriter.config.fonts.createCopy.desc": "Saves a copy of this font to your fonts folder",
+  "bigsignwriter.config.fonts.showInheritedCharacters": "Show Inherited Characters",
   "bigsignwriter.config.buttonsX": "Buttons X",
   "bigsignwriter.config.buttonsX.desc": "Horizontal offset for mod buttons, from center of screen.",
   "bigsignwriter.config.buttonsY": "Buttons Y",
