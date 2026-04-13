@@ -7,7 +7,7 @@ import static java.util.Map.entry;
 public class MonospaceFont extends AbstractFontSupplier {
     @Override
     public FontFile get() {
-        return new FontFile("Monospace", "chililisoup")
+        return new FontFile("Default Monospace", "chililisoup")
                 .characters(
                         entry('I', new String[]{
                                 "███",

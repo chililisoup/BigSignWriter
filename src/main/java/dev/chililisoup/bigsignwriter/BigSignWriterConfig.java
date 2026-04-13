@@ -11,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
-import java.util.List;
 
 public abstract class BigSignWriterConfig {
     public static final MainConfig MAIN_CONFIG = new MainConfig();
@@ -29,9 +28,7 @@ public abstract class BigSignWriterConfig {
         public double buttonsAlignmentY = 0.25;
         public boolean fontSelectorCoversDoneButton = true;
         public boolean showReloadButton = false;
-        public HashSet<String> hiddenFonts = new HashSet<>(List.of(
-                "builtin/monospace"
-        ));
+        public HashSet<String> hiddenFonts = new HashSet<>();
 
         public PersistentConfig copyFrom(PersistentConfig other) {
             for (Field field : PersistentConfig.class.getDeclaredFields()) {

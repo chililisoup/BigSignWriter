@@ -62,17 +62,7 @@ public final class BigSignWriter {
         if (fontInfo.characters().containsKey(upper))
             return Optional.of(fontInfo.characters().get(upper));
 
-        FontInfo parentFont = fontInfo.parentFont();
-        if (parentFont == null)
-            return Optional.empty();
-
-        if (parentFont.characters().containsKey(chr))
-            return Optional.of(parentFont.characters().get(chr));
-
-        if (parentFont.characters().containsKey(upper))
-            return Optional.of(parentFont.characters().get(upper));
-
-        return Optional.empty();
+        return getBigChar(chr, fontInfo.parentFont());
     }
 
     public static Optional<String[]> getBigChar(char chr) {
@@ -227,11 +217,16 @@ public final class BigSignWriter {
                     } else LOGGER.error(LOGGER_PREFIX + "Failed to remove copy of built-in font '{}'", targetFile.getName());
                 }
 
-                boolean needsSaved;
+                boolean needsSaved = false;
                 if (fontFile.credits != null && !fontFile.credits.equals(existingFont.credits)) {
                     existingFont.credits = fontFile.credits;
                     needsSaved = true;
-                } else needsSaved = !changed.isEmpty() || !patched.isEmpty();
+                }
+                if (!fontFile.name.equals(existingFont.name)) {
+                    existingFont.name = fontFile.name;
+                    needsSaved = true;
+                }
+                needsSaved = needsSaved || !changed.isEmpty() || !patched.isEmpty();
 
                 if (needsSaved) {
                     file.save(existingFont);

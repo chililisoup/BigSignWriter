@@ -5,6 +5,7 @@ import dev.chililisoup.bigsignwriter.font.FontInfo;
 import dev.chililisoup.bigsignwriter.gui.*;
 import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
@@ -596,11 +597,13 @@ public class BigSignWriterConfigScreen extends Screen {
 
         private class FontButton extends AbstractButton {
             private final FontInfo fontInfo;
+            private final Component name;
             private final Component[] fontPreview;
 
             public FontButton(FontInfo fontInfo) {
                 super(0, 0, 0, 24, Component.literal(fontInfo.name()));
                 this.fontInfo = fontInfo;
+                this.name = Component.literal(fontInfo.name());
                 this.fontPreview = fontInfo.getPreview();
             }
 
@@ -657,7 +660,7 @@ public class BigSignWriterConfigScreen extends Screen {
                             bottom - 2,
                             0x40FFFFFF
                     );
-
+                    guiGraphics.setTooltipForNextFrame(Minecraft.getInstance().font, this.name, mouseX, mouseY);
                     //? if >= 1.21.9
                     guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
                 }
