@@ -412,12 +412,12 @@ public class BigSignWriterConfigScreen extends Screen {
                     Component.translatable("bigsignwriter.config.fontSelectorCoversDoneButton.desc")
             ));
             rowHelper.addChild(new OptionElement<>(
-                    workingConfig.showReloadButton,
-                    defaults.showReloadButton,
-                    value -> workingConfig.showReloadButton = value,
+                    workingConfig.showConfigButton,
+                    defaults.showConfigButton,
+                    value -> workingConfig.showConfigButton = value,
                     OptionController.BooleanController::new,
-                    Component.translatable("bigsignwriter.config.showReloadButton"),
-                    Component.translatable("bigsignwriter.config.showReloadButton.desc")
+                    Component.translatable("bigsignwriter.config.showConfigButton"),
+                    Component.translatable("bigsignwriter.config.showConfigButton.desc")
             ));
             rowHelper.addChild(new OptionElement<>(
                     workingConfig.characterSeparatorOverrideEnabled,

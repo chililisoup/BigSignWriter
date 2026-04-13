@@ -8,6 +8,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.gui.ClickableButtonWidget;
 import dev.chililisoup.bigsignwriter.gui.FontSelectionWidget;
+import dev.chililisoup.bigsignwriter.gui.config.BigSignWriterConfigScreen;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -277,7 +278,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
         FontSelectionWidget fontSelector = new FontSelectionWidget(
                 this.minecraft,
-                MAIN_CONFIG.showReloadButton ? 179 : 200,
+                200,
                 Math.min(200, this.height - y - 5),
                 x - 100,
                 y,
@@ -331,21 +332,17 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         this.addRenderableWidget(fontSelector);
         this.addRenderableOnly(fontSelectorToggleButton);
 
-        if (MAIN_CONFIG.showReloadButton) {
-            ClickableButtonWidget reloadButton = new ClickableButtonWidget(
-                    x + 80,
-                    y,
-                    20,
-                    20,
-                    Component.literal("\uD83D\uDDD8"),
-                    button -> {
-                        reloadConfig();
-                        BigSignWriter.reloadFonts();
-                        fontSelector.updateEntries();
-                    }
+        if (MAIN_CONFIG.showConfigButton) {
+            ClickableButtonWidget configButton = new ClickableButtonWidget(
+                    x - 118,
+                    y + 3,
+                    14,
+                    14,
+                    Component.literal("☰"),
+                    button -> this.minecraft.setScreen(new BigSignWriterConfigScreen(this))
             );
-            reloadButton.setTooltip(Tooltip.create(Component.translatable("bigsignwriter.reload")));
-            this.addRenderableWidget(reloadButton);
+            configButton.setTooltip(Tooltip.create(Component.translatable("bigsignwriter.config")));
+            this.addRenderableWidget(configButton);
         }
     }
 

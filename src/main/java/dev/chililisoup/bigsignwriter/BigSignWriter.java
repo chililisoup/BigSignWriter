@@ -88,8 +88,14 @@ public final class BigSignWriter {
                 BigSignWriterConfig.MAIN_CONFIG.characterSeparatorOverride;
     }
 
-    static void reselectFont(int index) {
-        selectFont((index >= 0 && index < AVAILABLE_FONTS.size()) ? AVAILABLE_FONTS.get(index) : null);
+    static void reselectFont(@Nullable String id) {
+        if (id != null) for (FontInfo fontInfo : AVAILABLE_FONTS) {
+            if (fontInfo.id.equals(id)) {
+                selectFont(fontInfo);
+                return;
+            }
+        }
+        selectFont(null);
     }
 
     static void reselectFont() {
@@ -107,7 +113,7 @@ public final class BigSignWriter {
     }
 
     public static void reloadFonts() {
-        int selectedFontIndex = AVAILABLE_FONTS.indexOf(SELECTED_FONT);
+        String selectedFontId = SELECTED_FONT != null ? SELECTED_FONT.id : null;
         List<FontInfo> builtInFonts = copyBuiltInFonts();
 
         AVAILABLE_FONTS.clear();
@@ -126,7 +132,7 @@ public final class BigSignWriter {
         }
 
         AVAILABLE_FONTS.sort((a, b) -> a.name().compareToIgnoreCase(b.name()));
-        reselectFont(selectedFontIndex);
+        reselectFont(selectedFontId);
         LOGGER.info(LOGGER_PREFIX + "Fonts loaded!");
     }
 
