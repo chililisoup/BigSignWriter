@@ -11,33 +11,39 @@ public class FontFile {
     private static final Comparator<Character> COMPARATOR = FontFile::compare;
 
     public String name;
-    public @Nullable String credits;
+    public @Nullable String credits = null;
     public int height = 4;
-    public @Nullable String characterSeparator;
+    public @Nullable String characterSeparator = null;
+    public @Nullable String parentFont = null;
     public Map<Character, String[]> characters;
 
     public FontFile() {}
 
-    public FontFile(String name, @NotNull String credits, Map<Character, String[]> characters) {
+    public FontFile(String name, @NotNull String credits) {
         this.name = name;
         this.credits = credits;
-        this.characters = new TreeMap<>(COMPARATOR);
-        this.characters.putAll(characters);
     }
 
-    public FontFile(String name, String credits, int height, Map<Character, String[]> characters) {
-        this(name, credits, characters);
+    public FontFile height(int height) {
         this.height = height;
+        return this;
     }
 
-    public FontFile(String name, String credits, @NotNull String characterSeparator, Map<Character, String[]> characters) {
-        this(name, credits, characters);
+    public FontFile characterSeparator(String characterSeparator) {
         this.characterSeparator = characterSeparator;
+        return this;
     }
 
-    public FontFile(String name, String credits, int height, @NotNull String characterSeparator, Map<Character, String[]> characters) {
-        this(name, credits, height, characters);
-        this.characterSeparator = characterSeparator;
+    public FontFile parentFont(String parentFont) {
+        this.parentFont = parentFont;
+        return this;
+    }
+
+    @SafeVarargs
+    public final FontFile characters(Map.Entry<Character, String[]>... entries) {
+        this.characters = new TreeMap<>(COMPARATOR);
+        this.characters.putAll(Map.ofEntries(entries));
+        return this;
     }
 
     public final FontInfo createInfo(String source) {

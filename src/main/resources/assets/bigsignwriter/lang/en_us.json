@@ -6,6 +6,7 @@
   "bigsignwriter.font.info.credits": "Credits: %s",
   "bigsignwriter.font.info.source": "Source: %s",
   "bigsignwriter.font.info.source.builtIn": "Built-in",
+  "bigsignwriter.font.info.parentFont": "Parent Font: %s",
   "bigsignwriter.font.info.characterCount": "Unique Characters: %s",
   "bigsignwriter.font.info.width": "Width: %s",
   "bigsignwriter.font.error.invalidHeight": "Invalid height (%s)!",

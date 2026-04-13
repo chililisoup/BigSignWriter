@@ -62,14 +62,15 @@ public final class BigSignWriter {
         if (fontInfo.characters().containsKey(upper))
             return Optional.of(fontInfo.characters().get(upper));
 
-        if (DEFAULT_FONT == null || fontInfo.name().equals("Default") || fontInfo.height() != 4)
+        FontInfo parentFont = fontInfo.parentFont();
+        if (parentFont == null)
             return Optional.empty();
 
-        if (DEFAULT_FONT.characters().containsKey(chr))
-            return Optional.of(DEFAULT_FONT.characters().get(chr));
+        if (parentFont.characters().containsKey(chr))
+            return Optional.of(parentFont.characters().get(chr));
 
-        if (DEFAULT_FONT.characters().containsKey(upper))
-            return Optional.of(DEFAULT_FONT.characters().get(upper));
+        if (parentFont.characters().containsKey(upper))
+            return Optional.of(parentFont.characters().get(upper));
 
         return Optional.empty();
     }

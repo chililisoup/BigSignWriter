@@ -771,6 +771,8 @@ public class BigSignWriterConfigScreen extends Screen {
                                 Component.translatable("bigsignwriter.font.info.source.builtIn") :
                                 fontInfo.source
                 ));
+                FontInfo parentFont = fontInfo.parentFont();
+                if (parentFont != null) infoLines.add(infoLine("bigsignwriter.font.info.parentFont", parentFont.name()));
                 infoLines.add(infoLine("bigsignwriter.font.info.characterCount", fontInfo.characters().size()));
                 if (fontInfo.isWorking()) infoLines.add(infoLine("bigsignwriter.font.info.width", fontInfo.widthInfo()));
 

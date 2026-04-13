@@ -15,7 +15,10 @@ import java.util.Map;
 public class FontInfo {
     public final FontFile fontFile;
     public final String source;
-    private boolean checked = false;
+    public final String id;
+    private @Nullable FontInfo parentFont = null;
+    private boolean parentChecked = false;
+    private boolean infoChecked = false;
     private @Nullable Component error = null;
     private int minWidth;
     private int maxWidth;
@@ -24,6 +27,13 @@ public class FontInfo {
     FontInfo(FontFile fontFile, String source) {
         this.fontFile = fontFile;
         this.source = source;
+
+        String builtInName = this.getBuiltInName();
+        if (builtInName != null) this.id = builtInName;
+        else {
+            int index = source.lastIndexOf(".json");
+            this.id = index > 0 ? source.substring(0, index) : source;
+        }
     }
 
     public String name() {
@@ -46,6 +56,35 @@ public class FontInfo {
 
     public Map<Character, String[]> characters() {
         return this.fontFile.characters;
+    }
+
+    public @Nullable FontInfo parentFont() {
+        if (this.parentChecked) return this.parentFont;
+        this.parentChecked = true;
+        if (this == BigSignWriter.DEFAULT_FONT) return null;
+
+        if (this.fontFile.parentFont == null) {
+            if (this.height() == 4) {
+                this.parentFont = BigSignWriter.DEFAULT_FONT;
+            } else return null;
+        } else for (FontInfo fontInfo : BigSignWriter.AVAILABLE_FONTS) {
+            if (this == fontInfo) continue;
+            if (fontInfo.id.equals(this.fontFile.parentFont)) {
+                this.parentFont = fontInfo;
+                break;
+            }
+        }
+
+        if (this.parentFont == null) return null;
+
+        for (char chr : this.parentFont.characters().keySet()) {
+            if (!this.characters().containsKey(chr)
+                    && !this.characters().containsKey(Character.toUpperCase(chr))
+            ) return this.parentFont;
+        }
+
+        this.parentFont = null;
+        return null;
     }
 
     public boolean isBroken() {
@@ -92,9 +131,9 @@ public class FontInfo {
     }
 
     public @Nullable Component error() {
-        if (this.checked) return this.error;
+        if (this.infoChecked) return this.error;
         this.error = this.extractInfo(fontFile);
-        this.checked = true;
+        this.infoChecked = true;
         return this.error;
     }
 
