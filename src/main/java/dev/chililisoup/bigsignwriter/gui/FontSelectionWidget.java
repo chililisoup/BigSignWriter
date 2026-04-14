@@ -250,8 +250,10 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
             if (hovered) {
                 guiGraphics.fill(left, top, left + width, top + height, 0x40FFFFFF);
                 guiGraphics.setTooltipForNextFrame(Minecraft.getInstance().font, this.name, mouseX, mouseY);
-                //? if >= 1.21.9
+                //? if >= 1.21.9 {
                 guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
+                //?} elif <= 1.21.1
+                //guiGraphics.flush();
             }
 
             if (this.fontPreview.length == 0)

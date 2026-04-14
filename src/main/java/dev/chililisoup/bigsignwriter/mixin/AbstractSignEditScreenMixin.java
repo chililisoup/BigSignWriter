@@ -345,6 +345,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                     button -> {
                         this.bigSignWriter$ignoreNextRemoval = true;
                         this.minecraft.setScreen(new BigSignWriterConfigScreen(this));
+                        this.bigSignWriter$ignoreNextRemoval = false;
                     }
             );
             configButton.setTooltip(Tooltip.create(Component.translatable("bigsignwriter.config")));
@@ -551,10 +552,5 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     ))
     private boolean skipPacket(ClientPacketListener instance, Packet<?> packet) {
         return !this.bigSignWriter$ignoreNextRemoval;
-    }
-
-    @Inject(method = "removed", at = @At("TAIL"))
-    private void resetRemoveSkip(CallbackInfo ci) {
-        this.bigSignWriter$ignoreNextRemoval = false;
     }
 }

@@ -7,16 +7,14 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 public class FontInfo {
     public final FontFile fontFile;
     public final String source;
     public final String id;
     private @Nullable FontInfo parentFont = null;
+    private @Nullable TreeSet<Character> cumalitiveCharacters = null;
     private boolean parentChecked = false;
     private boolean infoChecked = false;
     private @Nullable Component error = null;
@@ -58,6 +56,19 @@ public class FontInfo {
         return this.fontFile.characters;
     }
 
+    public Set<Character> cumulativeCharacters() {
+        if (this.cumalitiveCharacters != null) return this.cumalitiveCharacters;
+        if (!this.hasExplicitParent()) return this.characters().keySet();
+
+        this.cumalitiveCharacters = new TreeSet<>(FontFile.COMPARATOR);
+        FontInfo nextFont = this;
+        while (nextFont != null) {
+            this.cumalitiveCharacters.addAll(nextFont.characters().keySet());
+            nextFont = nextFont.parentFont();
+        }
+        return this.cumalitiveCharacters;
+    }
+
     public @Nullable FontInfo parentFont() {
         if (this.parentChecked) return this.parentFont;
         this.parentChecked = true;
@@ -92,6 +103,10 @@ public class FontInfo {
 
     public boolean parentIsImplicit() {
         return this.fontFile.parentFont == null;
+    }
+
+    public boolean hasExplicitParent() {
+        return !this.parentIsImplicit() && this.parentFont() != null;
     }
 
     public boolean isBroken() {

@@ -1,7 +1,6 @@
 package dev.chililisoup.bigsignwriter.gui.config;
 
 import dev.chililisoup.bigsignwriter.BigSignWriter;
-import dev.chililisoup.bigsignwriter.font.FontFile;
 import dev.chililisoup.bigsignwriter.font.FontInfo;
 import dev.chililisoup.bigsignwriter.gui.*;
 import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
@@ -534,13 +533,15 @@ public class BigSignWriterConfigScreen extends Screen {
             });
         }
 
-        private static Component infoLine(String key, Object object) {
+        private static Component infoLine(String key, Object... objects) {
             return Component.translatable(
                     key,
-                    (object instanceof Component component ?
-                            component.copy() :
-                            Component.literal(String.valueOf(object))
-                    ).withStyle(ChatFormatting.AQUA)
+                    Arrays.stream(objects).map(object -> (
+                            object instanceof Component component ?
+                                    component.copy() :
+                                    Component.literal(String.valueOf(object))
+                            ).withStyle(ChatFormatting.AQUA)
+                    ).toArray()
             );
         }
 
@@ -659,8 +660,10 @@ public class BigSignWriterConfigScreen extends Screen {
                             0x40FFFFFF
                     );
                     guiGraphics.setTooltipForNextFrame(Minecraft.getInstance().font, this.name, mouseX, mouseY);
-                    //? if >= 1.21.9
+                    //? if >= 1.21.9 {
                     guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
+                    //?} elif <= 1.21.1
+                    //guiGraphics.flush();
                 }
 
                 if (this.fontInfo.error() != null) {
@@ -773,8 +776,7 @@ public class BigSignWriterConfigScreen extends Screen {
                 this.copyButton.visible = this.zoomOutButton.visible
                         && selected.fontInfo.isBuiltIn();
                 this.inheritedCharactersToggle.visible = selected != null
-                        && !selected.fontInfo.parentIsImplicit()
-                        && selected.fontInfo.parentFont() != null;
+                        && selected.fontInfo.hasExplicitParent();
                 if (selected == null) {
                     this.height = this.maxHeight;
                     return;
@@ -793,19 +795,20 @@ public class BigSignWriterConfigScreen extends Screen {
                                 "bigsignwriter.font.info.parentFont",
                         parentFont.name()
                 ));
-                infoLines.add(infoLine("bigsignwriter.font.info.characterCount", fontInfo.characters().size()));
+                infoLines.add(
+                        fontInfo.hasExplicitParent() ?
+                                infoLine(
+                                        "bigsignwriter.font.info.characterCount.cumulative",
+                                        fontInfo.cumulativeCharacters().size(),
+                                        fontInfo.characters().size()
+                                ) :
+                                infoLine("bigsignwriter.font.info.characterCount", fontInfo.characters().size())
+                );
                 if (fontInfo.isWorking()) infoLines.add(infoLine("bigsignwriter.font.info.width", fontInfo.widthInfo()));
 
-                Set<Character> charSet;
-                if (this.showInheritedCharacters && this.inheritedCharactersToggle.visible) {
-                    charSet = new TreeSet<>(FontFile.COMPARATOR);
-                    FontInfo nextFont = fontInfo;
-                    while (nextFont != null) {
-                        charSet.addAll(nextFont.characters().keySet());
-                        nextFont = nextFont.parentFont();
-                    }
-                } else charSet = fontInfo.characters().keySet();
-
+                Set<Character> charSet = this.showInheritedCharacters ?
+                        fontInfo.cumulativeCharacters() :
+                        fontInfo.characters().keySet();
                 this.wrappedFontPreview = GraphicsHelper.getWrappedFontPreview(
                         fontInfo,
                         String.join("", charSet.stream().map(String::valueOf).toArray(String[]::new)),
