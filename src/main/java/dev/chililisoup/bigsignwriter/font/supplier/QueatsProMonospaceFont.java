@@ -42,10 +42,10 @@ public class QueatsProMonospaceFont extends AbstractFontSupplier {
                                 " █   "
                         }),
                         entry('i', new String[]{
-                                "   ▀ ",
-                                " ██ ",
-                                "   █ ",
-                                "   █ "
+                                "  ▀  ",
+                                " ▌█  ",
+                                "  █  ",
+                                " ▌█▌ "
                         }),
                         entry('j', new String[]{
                                 "   ▀ ",
