@@ -4,7 +4,7 @@
 
 A client-side utility mod that eases inputting text onto signs that forms larger letters! Just turn the toggle on in the sign editing UI, and type as normal! Each large character is made up of smaller, normal Unicode characters from the vanilla Minecraft font, allowing this mod to work on most servers.
 
-**Font resource packs may cause issues.**
+**Certain resource packs may cause issues.**
 
 <p align="center">
  <a href="https://modrinth.com/mod/bigsignwriter"><img src="https://img.shields.io/badge/Modrinth-00AF5C?style=for-the-badge&logo=modrinth&labelColor=16181C" alt="Modrinth downloads"></a>
@@ -21,28 +21,25 @@ A client-side utility mod that eases inputting text onto signs that forms larger
 
 A button is added to the sign editing GUI to switch between large letter typing and normal. This button's position can be changed in the config file. (`config/bigsignwriter/config.json`)
 
-The default fonts have large characters for all uppercase letters, all numbers, and a few additional symbols. Each character can be modified, and new fonts can be added in the 'fonts' folder. (`config/bigsignwriter/fonts/`)
+Most default fonts have large characters for all uppercase letters, all numbers, and a few additional symbols. Custom fonts can be added in the 'fonts' folder. (`config/bigsignwriter/fonts/`)
 
 <hr>
 <details>
 <summary>Configuration</summary>
 <br>
-The config and font files are loaded once at runtime, and are reloaded every time you hit the 'Reload' button in the sign editing screen (if you have that enabled), or when the config is updated through the in-game config screen.
+The config and font files are loaded once at runtime, and can be reloaded through the in-game config screen.
 
 <hr>
 
 ### `config/bigsignwriter/config.json`
-Contains coordinates for where to place this mod's buttons in the sign edit gui, offset from the center of the screen.
-
-Also contains `defaultCharacterSeparator`, which sets the default separator string to place between characters, and is a single space by default. May be overridden by fonts.
-
-These settings can be modified from the in-game mod config screen (requires [Mod Menu](https://modrinth.com/mod/modmenu) for the Fabric version).
+Contains the general mod configuration. Can be edited through the in-game config screen, accessible by default through the sign edit screen, or [Mod Menu](https://modrinth.com/mod/modmenu) on Fabric and NeoForge's mod list.
 
 <hr>
 
 ### `config/bigsignwriter/fonts/`
-Three fonts are bundled in by default: `default.json`, `retro.json` and `sharp.json`.
-These contain a `"name":""` field, an optional `"characterSeparator":""` field, which can override which character(s) to use in between letters, and a `"characters":{}` field containing every large character and the normal character they represent. You may add additional characters, as long as what you want replaced is a single, type-able character. You may also add new fonts as jsons inside `config/bigsignwriter/fonts/`.
+Folder where you can put custom fonts! You can create copies of the default fonts from the in-game config screen, which will go here.
+
+Custom fonts are .json files, which contain a `"name":""` field, an optional `"characterSeparator":""` field, which can override which character(s) to use in between letters, and a `"characters":{}` field containing every large character and the normal character they represent. You may add additional characters, as long as what you want replaced is a single, type-able character. There's also an optional `"credits":""` field for adding credits, and an optional `"parentFont":""` field for explicitly defining which font to inherit characters from (based on filename without ".json", or built-in id).
 
 When editing/creating large characters, it is important that each line is the exact same width to maintain alignment. Different fonts will have different widths for different characters, so it is a good idea to make these directly inside Minecraft, and then copy each line into the config file.
 
