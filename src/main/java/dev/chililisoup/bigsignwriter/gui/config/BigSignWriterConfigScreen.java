@@ -709,7 +709,7 @@ public class BigSignWriterConfigScreen extends Screen {
 
             private final ArrayList<Component> infoLines = new ArrayList<>();
             private @Nullable List<Component[]> wrappedFontPreview = null;
-            private boolean showInheritedCharacters = false;
+            private boolean showInheritedCharacters = true;
 
             private final Button zoomOutButton = Button.builder(Component.literal("\uD83D\uDD0D-"), button -> {
                 PREVIEW_LINE_HEIGHT = Math.max(PREVIEW_LINE_HEIGHT - 6, 12);
@@ -729,7 +729,7 @@ public class BigSignWriterConfigScreen extends Screen {
             }).tooltip(Tooltip.create(Component.translatable("bigsignwriter.config.fonts.createCopy.desc"))).build();
 
             private final TickBox inheritedCharactersToggle = new TickBox(
-                    false,
+                    true,
                     value -> {
                         this.showInheritedCharacters = value;
                         FontsTab.this.redoLayout();
@@ -795,16 +795,25 @@ public class BigSignWriterConfigScreen extends Screen {
                                 "bigsignwriter.font.info.parentFont",
                         parentFont.name()
                 ));
-                infoLines.add(
-                        fontInfo.hasExplicitParent() ?
-                                infoLine(
-                                        "bigsignwriter.font.info.characterCount.cumulative",
-                                        fontInfo.cumulativeCharacters().size(),
-                                        fontInfo.characters().size()
-                                ) :
-                                infoLine("bigsignwriter.font.info.characterCount", fontInfo.characters().size())
+                infoLines.add(fontInfo.hasExplicitParent() ?
+                        infoLine(
+                                "bigsignwriter.font.info.characterCount.cumulative",
+                                fontInfo.cumulativeCharacters().size(),
+                                fontInfo.characters().size()
+                        ) :
+                        infoLine("bigsignwriter.font.info.characterCount", fontInfo.characters().size())
                 );
-                if (fontInfo.isWorking()) infoLines.add(infoLine("bigsignwriter.font.info.width", fontInfo.widthInfo()));
+                if (fontInfo.isWorking()) {
+                    String cumulativeWidthInfo = fontInfo.cumulativeWidthInfo();
+                    infoLines.add(cumulativeWidthInfo == null ?
+                            infoLine("bigsignwriter.font.info.width", fontInfo.widthInfo()) :
+                            infoLine(
+                                    "bigsignwriter.font.info.width.cumulative",
+                                    cumulativeWidthInfo,
+                                    fontInfo.widthInfo()
+                            )
+                    );
+                }
 
                 Set<Character> charSet = this.showInheritedCharacters ?
                         fontInfo.cumulativeCharacters() :

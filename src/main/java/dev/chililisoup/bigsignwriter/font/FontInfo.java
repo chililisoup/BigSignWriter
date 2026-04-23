@@ -13,14 +13,12 @@ public class FontInfo {
     public final FontFile fontFile;
     public final String source;
     public final String id;
-    private @Nullable FontInfo parentFont = null;
-    private @Nullable TreeSet<Character> cumalitiveCharacters = null;
-    private boolean parentChecked = false;
     private boolean infoChecked = false;
     private @Nullable Component error = null;
-    private int minWidth;
-    private int maxWidth;
-    private float avgWidth;
+    private @Nullable FontInfo parentFont = null;
+    private @Nullable TreeSet<Character> cumulativeCharacters = null;
+    private String widthInfo = "0";
+    private @Nullable String cumulativeWidthInfo = null;
 
     FontInfo(FontFile fontFile, String source) {
         this.fontFile = fontFile;
@@ -57,48 +55,21 @@ public class FontInfo {
     }
 
     public Set<Character> cumulativeCharacters() {
-        if (this.cumalitiveCharacters != null) return this.cumalitiveCharacters;
+        if (this.cumulativeCharacters != null) return this.cumulativeCharacters;
         if (!this.hasExplicitParent()) return this.characters().keySet();
 
-        this.cumalitiveCharacters = new TreeSet<>(FontFile.COMPARATOR);
+        this.cumulativeCharacters = new TreeSet<>(FontFile.COMPARATOR);
         FontInfo nextFont = this;
         while (nextFont != null) {
-            this.cumalitiveCharacters.addAll(nextFont.characters().keySet());
+            this.cumulativeCharacters.addAll(nextFont.characters().keySet());
             nextFont = nextFont.parentFont();
         }
-        return this.cumalitiveCharacters;
+        return this.cumulativeCharacters;
     }
 
     public @Nullable FontInfo parentFont() {
-        if (this.parentChecked) return this.parentFont;
-        this.parentChecked = true;
-        if (this == BigSignWriter.DEFAULT_FONT) return null;
-
-        if (this.fontFile.parentFont == null) {
-            if (this.height() == 4) {
-                this.parentFont = BigSignWriter.DEFAULT_FONT;
-            } else return null;
-        } else for (FontInfo fontInfo : BigSignWriter.AVAILABLE_FONTS) {
-            if (this == fontInfo) continue;
-            if (fontInfo.id.equals(this.fontFile.parentFont)) {
-                this.parentFont = fontInfo;
-                break;
-            }
-        }
-
-        if (this.parentFont == null) return null;
-
-        if (this.parentFont.height() == this.height()) {
-            boolean explicit = !this.parentIsImplicit();
-            for (char chr : this.parentFont.characters().keySet()) {
-                if (!this.characters().containsKey(chr)
-                        && (explicit || !this.characters().containsKey(Character.toUpperCase(chr)))
-                ) return this.parentFont;
-            }
-        }
-
-        this.parentFont = null;
-        return null;
+        this.ensureInfoReady();
+        return this.parentFont;
     }
 
     public boolean parentIsImplicit() {
@@ -135,15 +106,13 @@ public class FontInfo {
     }
 
     public String widthInfo() {
-        if (this.isBroken()) return "UNFIXED";
-        return this.minWidth == this.maxWidth ?
-                String.valueOf(this.minWidth) :
-                String.format(
-                        "%d-%d ~%.2f",
-                        this.minWidth,
-                        this.maxWidth,
-                        this.avgWidth
-                );
+        this.ensureInfoReady();
+        return this.widthInfo;
+    }
+
+    public @Nullable String cumulativeWidthInfo() {
+        this.ensureInfoReady();
+        return this.cumulativeWidthInfo;
     }
 
     public @Nullable String getBuiltInName() {
@@ -153,52 +122,118 @@ public class FontInfo {
     }
 
     public @Nullable Component error() {
-        if (this.infoChecked) return this.error;
-        this.error = this.extractInfo(fontFile);
-        this.infoChecked = true;
+        this.ensureInfoReady();
         return this.error;
     }
 
-    private @Nullable Component extractInfo(FontFile fontFile) {
-        if (fontFile.height <= 0) return Component.translatable(
+    private void ensureInfoReady() {
+        if (!this.infoChecked) {
+            this.infoChecked = true;
+            this.error = this.extractInfo();
+        }
+    }
+
+    private @Nullable Component extractInfo() {
+        if (this.fontFile.height <= 0) return Component.translatable(
                 "bigsignwriter.font.error.invalidHeight",
                 fontFile.height
         );
-        if (fontFile.characters.isEmpty()) return null;
+
+        this.parentFont = this.findParent();
+        if (this.fontFile.characters.isEmpty()) {
+            if (!this.parentIsImplicit() && this.parentFont != null)
+                this.cumulativeWidthInfo = this.parentFont.widthInfo();
+            return null;
+        }
 
         Font font = Minecraft.getInstance().font;
-        ArrayList<Integer> allWidths = new ArrayList<>(fontFile.characters.size());
+        Set<Character> cumulativeCharacters = this.cumulativeCharacters();
+        ArrayList<Integer> ownWidths = new ArrayList<>(this.fontFile.characters.size());
+        ArrayList<Integer> cumulativeWidths = new ArrayList<>(cumulativeCharacters.size());
 
-        for (Map.Entry<Character, String[]> entry : fontFile.characters.entrySet()) {
-            char baseChar = entry.getKey();
-            String[] bigChar = entry.getValue();
+        for (char chr : cumulativeCharacters) {
+            String[] bigChar = this.fontFile.characters.get(chr);
+            if (bigChar == null && this.parentFont != null)
+                bigChar = BigSignWriter.getBigChar(chr, this.parentFont).orElse(null);
+            if (bigChar == null) continue;
 
-            if (bigChar.length != fontFile.height) return Component.translatable(
+            if (bigChar.length != this.fontFile.height) return Component.translatable(
                     "bigsignwriter.font.error.wrongLineCount",
-                    String.valueOf(baseChar),
+                    String.valueOf(chr),
                     bigChar.length,
-                    fontFile.height
+                    this.fontFile.height
             );
 
             int[] widths = new int[bigChar.length];
             int topWidth = font.width(bigChar[0]);
             widths[0] = topWidth;
-            allWidths.add(topWidth);
-            boolean unfixed = false;
-            for (int i = 1; i < bigChar.length; i++) {
-                widths[i] = font.width(bigChar[i]);
-                if (widths[i] != widths[0]) unfixed = true;
+
+            if (this.fontFile.characters.containsKey(chr)) {
+                boolean unfixed = false;
+                for (int i = 1; i < bigChar.length; i++) {
+                    widths[i] = font.width(bigChar[i]);
+                    if (widths[i] != widths[0]) unfixed = true;
+                }
+                if (unfixed) return Component.translatable(
+                        "bigsignwriter.font.error.unfixedWidth",
+                        String.valueOf(chr),
+                        Arrays.toString(widths)
+                );
+
+                ownWidths.add(topWidth);
             }
-            if (unfixed) return Component.translatable(
-                    "bigsignwriter.font.error.unfixedWidth",
-                    String.valueOf(baseChar),
-                    Arrays.toString(widths)
-            );
+
+            cumulativeWidths.add(topWidth);
         }
 
-        this.minWidth = Collections.min(allWidths);
-        this.maxWidth = Collections.max(allWidths);
-        this.avgWidth = (float) allWidths.stream().mapToInt(Integer::intValue).sum() / allWidths.size();
+        this.widthInfo = createWidthInfo(ownWidths);
+        if (!this.parentIsImplicit()) {
+            String cumulativeWidthInfo = createWidthInfo(cumulativeWidths);
+            if (!this.widthInfo.equals(cumulativeWidthInfo))
+                this.cumulativeWidthInfo = cumulativeWidthInfo;
+        }
+
+        return null;
+    }
+
+    private static String createWidthInfo(ArrayList<Integer> widths) {
+        int minWidth = Collections.min(widths);
+        int maxWidth = Collections.max(widths);
+        return minWidth == maxWidth ?
+                String.valueOf(minWidth) :
+                String.format(
+                        "%d-%d ~%.2f",
+                        minWidth,
+                        maxWidth,
+                        (float) widths.stream().mapToInt(Integer::intValue).sum() / widths.size()
+                );
+    }
+
+    private @Nullable FontInfo findParent() {
+        if (this == BigSignWriter.DEFAULT_FONT) return null;
+
+        FontInfo parentFont = null;
+        if (this.fontFile.parentFont == null) {
+            if (this.height() == 4) {
+                parentFont = BigSignWriter.DEFAULT_FONT;
+            } else return null;
+        } else for (FontInfo fontInfo : BigSignWriter.AVAILABLE_FONTS) {
+            if (this == fontInfo) continue;
+            if (fontInfo.id.equals(this.fontFile.parentFont)) {
+                parentFont = fontInfo;
+                break;
+            }
+        }
+
+        if (parentFont == null) return null;
+        if (parentFont.height() != this.height()) return null;
+
+        boolean explicit = !this.parentIsImplicit();
+        for (char chr : parentFont.characters().keySet()) {
+            if (!this.characters().containsKey(chr)
+                    && (explicit || !this.characters().containsKey(Character.toUpperCase(chr)))
+            ) return parentFont;
+        }
 
         return null;
     }
