@@ -775,7 +775,7 @@ public class BigSignWriterConfigScreen extends Screen {
                 this.zoomInButton.visible = this.zoomOutButton.visible;
                 this.copyButton.visible = this.zoomOutButton.visible
                         && selected.fontInfo.isBuiltIn();
-                this.inheritedCharactersToggle.visible = selected != null
+                this.inheritedCharactersToggle.visible = this.zoomOutButton.visible
                         && selected.fontInfo.hasExplicitParent();
                 if (selected == null) {
                     this.height = this.maxHeight;
