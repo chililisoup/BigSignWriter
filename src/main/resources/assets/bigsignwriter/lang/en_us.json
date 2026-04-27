@@ -33,6 +33,8 @@
   "bigsignwriter.config.fontSelectorCoversDoneButton.desc": "Disables the \"Done\" button when the font selector is open.",
   "bigsignwriter.config.showConfigButton": "Show Config Button",
   "bigsignwriter.config.showConfigButton.desc": "Whether to show the config button next to the font selector",
+  "bigsignwriter.config.displayFontHeights": "Display Font Heights",
+  "bigsignwriter.config.displayFontHeights.desc": "Displays the height of fonts in the font selector",
   "bigsignwriter.config.characterSeparatorOverride": "Character Separator Override",
   "bigsignwriter.config.characterSeparatorOverride.desc": "Overrides the separator string to place between characters. Only active when enabled. Does not save between sessions.",
   "bigsignwriter.config.characterSeparatorOverrideEnabled": "Enable Character Separator Override",

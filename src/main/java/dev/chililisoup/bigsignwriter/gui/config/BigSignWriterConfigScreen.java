@@ -417,6 +417,14 @@ public class BigSignWriterConfigScreen extends Screen {
                     Component.translatable("bigsignwriter.config.showConfigButton.desc")
             ));
             rowHelper.addChild(new OptionElement<>(
+                    workingConfig.displayFontHeights,
+                    defaults.displayFontHeights,
+                    value -> workingConfig.displayFontHeights = value,
+                    OptionController.BooleanController::new,
+                    Component.translatable("bigsignwriter.config.displayFontHeights"),
+                    Component.translatable("bigsignwriter.config.displayFontHeights.desc")
+            ));
+            rowHelper.addChild(new OptionElement<>(
                     workingConfig.characterSeparatorOverrideEnabled,
                     defaults.characterSeparatorOverrideEnabled,
                     value -> workingConfig.characterSeparatorOverrideEnabled = value,

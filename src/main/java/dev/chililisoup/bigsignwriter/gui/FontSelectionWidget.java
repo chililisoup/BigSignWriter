@@ -1,6 +1,7 @@
 package dev.chililisoup.bigsignwriter.gui;
 
 import dev.chililisoup.bigsignwriter.BigSignWriter;
+import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.font.FontInfo;
 import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
 import net.minecraft.client.Minecraft;
@@ -256,6 +257,16 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
                 //guiGraphics.flush();
             }
 
+            if (this.fontInfo != null && BigSignWriterConfig.MAIN_CONFIG.displayFontHeights) {
+                guiGraphics.text(
+                        Minecraft.getInstance().font,
+                        String.valueOf(this.fontInfo.height()),
+                        left + width + 2,
+                        top + 4,
+                        0xFFAAAAAA
+                );
+            }
+
             if (this.fontPreview.length == 0)
                 GraphicsHelper.drawScrollingString(
                         guiGraphics,
@@ -268,7 +279,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
                 );
             else GraphicsHelper.drawScrollingFontPreview(
                     guiGraphics,
-                    fontPreview,
+                    this.fontPreview,
                     left + 5,
                     top + 2,
                     width - 10,
