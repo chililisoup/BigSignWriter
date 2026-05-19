@@ -22,6 +22,9 @@ public class BuiltInFonts {
                 entry("queats_pro", new QueatsProFont()),
                 entry("queats_pro_monospace", new QueatsProMonospaceFont()),
                 entry("queats_lazy_sunday", new QueatsLazySundayFont()),
+                entry("queatlets", new QueatletsFont()),
+                entry("queatlets_monospace", new QueatletsMonospaceFont()),
+                entry("queatlets_old_style", new QueatletsOldStyleFont()),
                 entry("minecraft_striped", new MinecraftStripedFont()),
                 entry("minecraft_small", new MinecraftSmallFont()),
                 //?}

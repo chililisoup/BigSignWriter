@@ -15,6 +15,7 @@ public class QueatsProFont extends AbstractFontSupplier {
     @Override
     public FontFile get() {
         return new FontFile("Queats Pro", "adhillisepic")
+
                 .characters(
                         entry('A', new String[]{
                                 " 🬵█🬱 ",
@@ -74,7 +75,7 @@ public class QueatsProFont extends AbstractFontSupplier {
                                 "  ▊█▊",
                                 "   █ ",
                                 "▄ █ ",
-                                "🬊▊▌▊🬆 "
+                                "🬊▊█🬆 "
                         }),
                         entry('K', new String[]{
                                 "█ 🬵█",
@@ -83,21 +84,21 @@ public class QueatsProFont extends AbstractFontSupplier {
                                 "█ 🬊█"
                         }),
                         entry('L', new String[]{
-                                "█   ",
-                                "█   ",
-                                "█   ",
+                                "█   ",
+                                "█   ",
+                                "█   ",
                                 "██▌"
                         }),
                         entry('M', new String[]{
                                 "▊🬱  🬵▊",
                                 "█▊🬻█",
-                                "█𜺪𜴏█",
+                                "█𜺩𜴏█",
                                 "█  █"
                         }),
                         entry('N', new String[]{
-                                "▊🬺𜺡 █",
+                                "▊🬺𜺢 █",
                                 "█▊🬺█",
-                                "█𜺪🬬█",
+                                "█𜺩🬬█",
                                 "█  🬊▊"
                         }),
                         entry('O', new String[]{
@@ -126,8 +127,8 @@ public class QueatsProFont extends AbstractFontSupplier {
                         }),
                         entry('S', new String[]{
                                 "🬵▊█▊🬱",
-                                "🬬▊▄𜺡 ",
-                                " 𜺪▀▊🬺",
+                                "█▄🬭 ",
+                                " 🬂▀█",
                                 "🬊▊█▊🬆"
                         }),
                         entry('T', new String[]{
@@ -156,19 +157,19 @@ public class QueatsProFont extends AbstractFontSupplier {
                         }),
                         entry('X', new String[]{
                                 "▊🬱  🬵▊",
-                                "𜺪🬬▊🬻🬝𜺪",
-                                "𜺡🬻▊🬬🬺𜺡",
+                                "𜺩🬬▊🬻🬝𜺩",
+                                "𜺢🬻▊🬬🬺𜺢",
                                 "▊🬆  🬊▊"
                         }),
                         entry('Y', new String[]{
                                 "▊🬱  🬵▊",
-                                "𜺪🬬▊🬻🬝𜺪",
+                                "𜺩🬬▊🬻🬝𜺩",
                                 "  █  ",
                                 "  █  "
                         }),
                         entry('Z', new String[]{
                                 "██▊🬝",
-                                "  🬻▊🬝 ",
+                                "  🬻▊🬝 ",
                                 " 🬻▊🬝  ",
                                 "🬻▊██"
                         }),
@@ -194,7 +195,7 @@ public class QueatsProFont extends AbstractFontSupplier {
                                 "    █",
                                 "🬵▊▊🬱█",
                                 "█  █",
-                                "🬊▊▊🬬█"
+                                "🬊▊▊🬝█"
                         }),
                         entry('e', new String[]{
                                 "      ",
@@ -211,7 +212,7 @@ public class QueatsProFont extends AbstractFontSupplier {
                         entry('g', new String[]{
                                 "      ",
                                 "🬻▌🬄🬌█",
-                                "🬊▌🬓🬹█",
+                                "🬊▌🬹🬓█",
                                 "🬃🬓▖▄▊🬆"
                         }),
                         entry('h', new String[]{
@@ -234,9 +235,9 @@ public class QueatsProFont extends AbstractFontSupplier {
                         }),
                         entry('k', new String[]{
                                 "█    ",
-                                "█𜺡🬻▊🬆",
+                                "█𜺢🬻▊🬆",
                                 "█▊🬴  ",
-                                "█𜺪🬬▊🬱"
+                                "█𜺩🬬▊🬱"
                         }),
                         entry('l', new String[]{
                                 "█ ",
@@ -265,13 +266,13 @@ public class QueatsProFont extends AbstractFontSupplier {
                         entry('p', new String[]{
                                 "      ",
                                 "█🬍🬄▌🬺",
-                                "█🬹🬓▌🬆",
+                                "█🬓🬹▌🬆",
                                 "█    "
                         }),
                         entry('q', new String[]{
                                 "      ",
                                 "🬻▌🬄🬌█",
-                                "🬊▌🬓🬹█",
+                                "🬊▌🬹🬓█",
                                 "    █"
                         }),
                         entry('r', new String[]{
@@ -284,7 +285,7 @@ public class QueatsProFont extends AbstractFontSupplier {
                                 "      ",
                                 "🬵▊▀🬌 ",
                                 "🬊🬎🬎🬄▊🬱",
-                                "🬊▌🬹🬓▊🬆"
+                                "🬊▌🬓🬹▊🬆"
                         }),
                         entry('t', new String[]{
                                 " ▄ ",
@@ -330,8 +331,8 @@ public class QueatsProFont extends AbstractFontSupplier {
                         }),
                         entry('0', new String[]{
                                 "🬵▊▌▊🬱",
-                                "█ █",
-                                "█ █",
+                                "𜷴▌ │▌",
+                                "𜷴▌ │▌",
                                 "🬊▊▌▊🬆"
                         }),
                         entry('1', new String[]{
@@ -341,52 +342,52 @@ public class QueatsProFont extends AbstractFontSupplier {
                                 "▌█▌"
                         }),
                         entry('2', new String[]{
-                                "🬵▊█▊🬱",
-                                "   🬸▊🬝",
-                                " 𜺡🬻▊🬆 ",
-                                "🬻▊██"
+                                "🬵▊█🬱",
+                                "  🬸𜷴🬝",
+                                " 🬵▊🬆 ",
+                                "🬻██"
                         }),
                         entry('3', new String[]{
-                                "🬵▊█▊🬱",
-                                "  ▄▊🬝",
-                                "  ▀▊🬺",
-                                "🬊▊█▊🬆"
+                                "🬵▊█🬱",
+                                " 🬭🬭▊🬝",
+                                " 🬂🬂▊🬺",
+                                "🬊▊█🬆"
                         }),
                         entry('4', new String[]{
-                                " 🬵▊█ ",
-                                "🬻▊🬆█ ",
-                                "▌██▊",
-                                "   █ "
+                                "  🬵█ ",
+                                "🬵𜷴🬆█ ",
+                                "𜷴🬺🬹█🬹",
+                                "   █ "
                         }),
                         entry('5', new String[]{
-                                "███",
-                                "█▄𜺡 ",
-                                "▀▀▊🬺",
-                                "🬊▊█▊🬆"
+                                "██▌",
+                                "▌🬲🬭𜺣 ",
+                                "🬀🬀🬂🬀▊🬺",
+                                "🬊█▊🬆"
                         }),
                         entry('6', new String[]{
-                                "🬵▊█▊🬱",
-                                "█▄🬭 ",
-                                "█▀▊🬺",
-                                "🬊▊█▊🬆"
+                                " 🬵▌🬆 ",
+                                "🬷▌🬮𜺢 ",
+                                "▌𜷴🬂🬨▌",
+                                "🬊█▊🬆"
                         }),
                         entry('7', new String[]{
-                                "███",
-                                "   🬻▊🬝",
-                                "  🬻▊🬝 ",
-                                " 🬻▊🬝  "
+                                "██▌",
+                                "  🬻𜷴🬕",
+                                " 🬻𜷴🬕 ",
+                                "│𜷴🬕  "
                         }),
                         entry('8', new String[]{
-                                "🬵▊█▊🬱",
-                                "🬬▊▄▊🬝",
-                                "🬻▊▀▊🬺",
-                                "🬊▊█▊🬆"
+                                "🬵▊▌▊🬱",
+                                "🬬🬲🬭𜷴🬝",
+                                "🬻🬕🬂𜷴🬺",
+                                "🬊▊▌▊🬆"
                         }),
                         entry('9', new String[]{
-                                "🬵▊█▊🬱",
-                                "🬬▊▄█",
-                                " 🬂▀█",
-                                "🬊▊█▊🬆"
+                                "🬵▊█🬱",
+                                "🬬🬲🬭𜷴▌",
+                                " 𜺩🬡▌🬕",
+                                " 🬵▌🬆 "
                         }),
                         entry(' ', new String[]{
                                 "  ",
@@ -419,10 +420,10 @@ public class QueatsProFont extends AbstractFontSupplier {
                                 " 🬄𜷴▊"
                         }),
                         entry('|', new String[]{
-                                " █ ",
-                                " █ ",
-                                " █ ",
-                                " █ "
+                                "█",
+                                "█",
+                                "█",
+                                "█"
                         }),
                         entry('}', new String[]{
                                 "▊𜷴🬓 ",
@@ -467,15 +468,15 @@ public class QueatsProFont extends AbstractFontSupplier {
                                 "      "
                         }),
                         entry('*', new String[]{
-                                "   ",
                                 "🬩▌🬚",
                                 "🬍▌🬌",
+                                "   ",
                                 "   "
                         }),
                         entry('$', new String[]{
                                 "🬵🬓▌🬹🬱",
                                 "🬬𜷴▌▂ ",
-                                " 𜺨▌🬨🬺",
+                                " 🬀▌🬨🬺",
                                 "🬊🬄▌🬎🬆"
                         }),
                         entry('\\', new String[]{
@@ -509,51 +510,51 @@ public class QueatsProFont extends AbstractFontSupplier {
                                 "█"
                         }),
                         entry(';', new String[]{
-                                "   ",
+                                "   ",
                                 " █",
-                                "   ",
+                                "   ",
                                 "🬵▊🬝"
                         }),
                         entry('<', new String[]{
-                                "     ",
-                                " 𜺡🬻▊🬆",
+                                "     ",
+                                " 𜺢🬻▊🬆",
                                 "🬫▊🬴  ",
-                                " 𜺪🬬▊🬱"
+                                " 𜺩🬬▊🬱"
                         }),
                         entry('>', new String[]{
-                                "     ",
-                                "🬊▊🬺𜺡 ",
+                                "     ",
+                                "🬊▊🬺𜺢 ",
                                 "  🬸▊🬛",
-                                "🬵▊🬝𜺪 "
+                                "🬵▊🬝𜺩 "
                         }),
                         entry('(', new String[]{
-                                "🬵▊▌",
+                                "🬵█",
                                 "█ ",
                                 "█ ",
-                                "🬊▊▌"
+                                "🬊█"
                         }),
                         entry(')', new String[]{
-                                "▌▊🬱",
+                                "█🬱",
                                 " █",
                                 " █",
-                                "▌▊🬆"
+                                "█🬆"
                         }),
                         entry('"', new String[]{
-                                "██",
-                                "🬊▊🬊▊",
-                                "    ",
-                                "    "
+                                "▌𜷴 ▌𜷴",
+                                "🬊🬀 🬊🬀",
+                                "     ",
+                                "     "
                         }),
                         entry('\'', new String[]{
-                                "█",
-                                "🬊▊",
-                                "  ",
-                                "  "
+                                "▌𜷴",
+                                "🬊🬀",
+                                "  ",
+                                "  "
                         }),
                         entry('~', new String[]{
                                 "      ",
-                                "🬵🬓🬱𜺡 🬭",
-                                "🬂 𜺪🬊🬄🬆",
+                                "🬵🬓🬱𜺢 🬭",
+                                "🬂 𜺩🬊🬄🬆",
                                 "      "
                         }),
                         entry('`', new String[]{
@@ -563,9 +564,9 @@ public class QueatsProFont extends AbstractFontSupplier {
                                 "  "
                         }),
                         entry(',', new String[]{
-                                "   ",
-                                "   ",
-                                "   ",
+                                "   ",
+                                "   ",
+                                "   ",
                                 "🬵▊🬝"
                         }),
                         entry('.', new String[]{
@@ -595,7 +596,7 @@ public class QueatsProFont extends AbstractFontSupplier {
                         entry('&', new String[]{
                                 "🬵▊▌▊🬱 ",
                                 "🬬▊🬱▊🬆 ",
-                                "🬻▊𜺪🬬▊🬆",
+                                "🬻▊𜺩🬬▊🬆",
                                 "🬊▊▊🬝🬊▊"
                         })
                 );
