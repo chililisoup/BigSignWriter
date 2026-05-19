@@ -80,8 +80,10 @@ public final class BigSignWriter {
     }
 
     public static void selectFont(@Nullable FontInfo fontInfo) {
-        SELECTED_FONT = (fontInfo != null && AVAILABLE_FONTS.contains(fontInfo)) ?
-                fontInfo : null;
+        SELECTED_FONT = (fontInfo != null
+                && AVAILABLE_FONTS.contains(fontInfo)
+                && fontInfo.isVisible()
+        ) ? fontInfo : null;
 
         CHARACTER_SEPARATOR = SELECTED_FONT != null ?
                 SELECTED_FONT.characterSeparator() :
