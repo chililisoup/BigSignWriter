@@ -1,5 +1,5 @@
 /*
- * Queats Lazy Sunday (c) 2026 by adhill
+ * Queatlets Monospace (c) 2026 by adhill
  * Licensed under CC BY-NC 4.0.
  * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
  */

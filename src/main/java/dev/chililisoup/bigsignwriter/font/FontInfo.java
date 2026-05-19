@@ -16,9 +16,11 @@ public class FontInfo {
     private boolean infoChecked = false;
     private @Nullable Component error = null;
     private @Nullable FontInfo parentFont = null;
+    private @Nullable FontInfo rootAncestorFont = null;
     private @Nullable TreeSet<Character> cumulativeCharacters = null;
     private String widthInfo = "0";
     private @Nullable String cumulativeWidthInfo = null;
+    private @Nullable List<FontInfo> children = null;
 
     FontInfo(FontFile fontFile, String source) {
         this.fontFile = fontFile;
@@ -70,6 +72,11 @@ public class FontInfo {
     public @Nullable FontInfo parentFont() {
         this.ensureInfoReady();
         return this.parentFont;
+    }
+
+    public @Nullable FontInfo rootAncestorFont() {
+        this.ensureInfoReady();
+        return this.rootAncestorFont;
     }
 
     public boolean parentIsImplicit() {
@@ -133,6 +140,20 @@ public class FontInfo {
         }
     }
 
+    public List<FontInfo> children() {
+        if (this.children != null) return this.children;
+
+        this.children = BigSignWriter.AVAILABLE_FONTS.stream()
+                .filter(font -> font.rootAncestorFont() == this)
+                .toList();
+
+        return this.children;
+    }
+
+    public List<FontInfo> visibleChildren() {
+        return this.children().stream().filter(FontInfo::isVisible).toList();
+    }
+
     private @Nullable Component extractInfo() {
         if (this.fontFile.height <= 0) return Component.translatable(
                 "bigsignwriter.font.error.invalidHeight",
@@ -140,6 +161,7 @@ public class FontInfo {
         );
 
         this.parentFont = this.findParent();
+        this.rootAncestorFont = this.findRootAncestor();
         if (this.fontFile.characters.isEmpty()) {
             if (!this.parentIsImplicit() && this.parentFont != null)
                 this.cumulativeWidthInfo = this.parentFont.widthInfo();
@@ -236,6 +258,13 @@ public class FontInfo {
         }
 
         return null;
+    }
+
+    private @Nullable FontInfo findRootAncestor() {
+        if (this.parentIsImplicit()) return null;
+        return this.parentFont != null && this.parentFont.hasExplicitParent() ?
+                this.parentFont.findRootAncestor() :
+                this.parentFont;
     }
 
     public final Component[] getPreview(String text, String characterSeparator) {

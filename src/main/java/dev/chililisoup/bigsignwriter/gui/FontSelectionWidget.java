@@ -5,6 +5,7 @@ import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.font.FontInfo;
 import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.network.chat.CommonComponents;
@@ -12,7 +13,13 @@ import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.function.Consumer;
+
+//? if > 1.21.6 {
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.MutableComponent;
+//?}
 
 //? if >= 1.21.9 {
 import com.mojang.blaze3d.platform.cursor.CursorType;
@@ -60,16 +67,27 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
 
     public void updateEntries() {
         this.replaceEntries(BigSignWriter.AVAILABLE_FONTS.stream()
-                .filter(FontInfo::isVisible).map(Entry::new).toList()
+                .filter(FontInfo::isVisible)
+                //? if > 1.21.6 {
+                .sorted((a, b) -> {
+                    if (a.rootAncestorFont() == b) return 1;
+                    if (b.rootAncestorFont() == a) return -1;
+                    return 0;
+                })
+                //?}
+                .map(Entry::new).toList()
         );
         this.addEntryToTop(new Entry(null));
-        super.setSelected(this
-                .children()
-                .stream()
-                .filter(entry -> entry.fontInfo == BigSignWriter.SELECTED_FONT)
-                .findFirst()
-                .orElse(null)
-        );
+        super.setSelected(null);
+
+        List<Entry> children = this.children();
+        children.forEach(entry -> {
+            if (entry.fontInfo == BigSignWriter.SELECTED_FONT)
+                super.setSelected(entry);
+            //? if > 1.21.6
+            entry.update(children);
+        });
+
         this.setHeight(Math.min(this.maxHeight, this.contentHeight()));
         this.setScrollAmount(0.0);
     }
@@ -210,17 +228,25 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
     }
     *///?}
 
-    public static class Entry extends ObjectSelectionList.Entry<FontSelectionWidget.Entry> {
-        final @Nullable FontInfo fontInfo;
-        final Component[] fontPreview;
-        final Component name;
+    public class Entry extends ObjectSelectionList.Entry<FontSelectionWidget.Entry> {
+        private final @Nullable FontInfo fontInfo;
+        private final Component[] fontPreview;
+        private final Component name;
+
+        //? if > 1.21.6 {
+        private @Nullable Entry root = null;
+        private boolean collapsed = true;
+        private final List<FontInfo> children;
+        //?}
 
         public Entry(final @Nullable FontInfo fontInfo) {
             this.fontInfo = fontInfo;
-            this.fontPreview = fontInfo == null ? new Component[0] : fontInfo.getPreview();
+            this.fontPreview = fontInfo != null ? fontInfo.getPreview() : new Component[0];
             this.name = fontInfo != null ?
                     Component.literal(fontInfo.name()) :
                     Component.translatable("bigsignwriter.font.none");
+            //? if > 1.21.6
+            this.children = fontInfo != null ? fontInfo.visibleChildren() : List.of();
         }
 
         @Override
@@ -228,29 +254,101 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
             return Component.translatable("narrator.select", this.name);
         }
 
+        //? if > 1.21.6 {
+        @Override
+        public int getHeight() {
+            return this.isHidden() ? 0 : super.getHeight();
+        }
+
+        @Override
+        public boolean isMouseOver(double mouseX, double mouseY) {
+            if (super.isMouseOver(mouseX, mouseY)) return true;
+            return this.collapseButtonHovered((int) mouseX, (int) mouseY);
+        }
+
+        @Override
+        public boolean mouseClicked(@NotNull MouseButtonEvent event, boolean doubleClick) {
+            int mouseX = (int) event.x();
+            int mouseY = (int) event.y();
+            if (this.collapseButtonHovered(mouseX, mouseY)) {
+                this.collapsed = !this.collapsed;
+                FontSelectionWidget.this.refreshScrollAmount();
+                return false;
+            }
+            return super.mouseClicked(event, doubleClick);
+        }
+
+        private boolean collapseButtonHovered(int mouseX, int mouseY) {
+            if (this.children.isEmpty()) return false;
+
+            int left = this.getContentX();
+            int top = this.getContentY();
+            return mouseX >= left - 12 && mouseX < left - 3
+                    && mouseY >= top + 4 && mouseY < top + 13;
+        }
+
+        private void update(List<Entry> others) {
+            if (!this.children.isEmpty()) {
+                for (FontInfo child : this.children) {
+                    if (child == BigSignWriter.SELECTED_FONT) {
+                        this.collapsed = false;
+                        break;
+                    }
+                }
+
+                return;
+            }
+
+            if (this.fontInfo == null) return;
+            FontInfo rootAncestor = this.fontInfo.rootAncestorFont();
+            if (rootAncestor == null) return;
+            if (!rootAncestor.isVisible()) return;
+
+            for (Entry entry : others) {
+                if (entry.fontInfo == rootAncestor) {
+                    this.root = entry;
+                    return;
+                }
+            }
+        }
+
+        private boolean hasRoot() {
+            return this.root != null;
+        }
+
+        private boolean isHidden() {
+            return this.hasRoot() && this.root.collapsed;
+        }
+        //?}
+
         @Override
         //? if <= 1.21.6 {
-        /*public void render(GuiGraphicsExtractor guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovered, float partialTick) {
+        /*public void render(GuiGraphicsExtractor guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean anyHovered, float partialTick) {
         *///?} else {
         //? if >= 26.1 {
         public void extractContent(
         //?} else
         //public void renderContent(
-                @NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick
+                @NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean anyHovered, float partialTick
         ) {
         //?}
             //? if <= 1.21.6 {
             /*width -= 4;
             *///?} else {
+            if (this.isHidden()) return;
+
             int left = this.getContentX();
             int top = this.getContentY();
             int width = this.getContentWidth();
             int height = this.getContentHeight();
             //?}
+
+            boolean mainHovered = anyHovered && this.getRectangle().containsPoint(mouseX, mouseY);
+            Font font = FontSelectionWidget.this.minecraft.font;
             
-            if (hovered) {
+            if (mainHovered) {
                 guiGraphics.fill(left, top, left + width, top + height, 0x40FFFFFF);
-                guiGraphics.setTooltipForNextFrame(Minecraft.getInstance().font, this.name, mouseX, mouseY);
+                guiGraphics.setTooltipForNextFrame(font, this.name, mouseX, mouseY);
                 //? if >= 1.21.9 {
                 guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
                 //?} elif <= 1.21.1
@@ -259,13 +357,33 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
 
             if (this.fontInfo != null && BigSignWriterConfig.MAIN_CONFIG.displayFontHeights) {
                 guiGraphics.text(
-                        Minecraft.getInstance().font,
+                        font,
                         String.valueOf(this.fontInfo.height()),
                         left + width + 2,
                         top + 4,
                         0xFFAAAAAA
                 );
             }
+
+            //? if > 1.21.6 {
+            if (!this.children.isEmpty()) {
+                boolean expandHovered = anyHovered && !mainHovered;
+                MutableComponent text = Component.literal(this.collapsed ? "+" : "-");
+                guiGraphics.text(
+                        font,
+                        expandHovered ? text.withStyle(ChatFormatting.UNDERLINE) : text,
+                        left - 10,
+                        top + 4,
+                        -1
+                );
+
+                //? if >= 1.21.9
+                if (expandHovered) guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
+            } else if (this.hasRoot()) {
+                guiGraphics.horizontalLine(left - 8, left - 4, top + 7, -1);
+                guiGraphics.verticalLine(left - 8, top - 7, top + 7, -1);
+            }
+            //?}
 
             if (this.fontPreview.length == 0)
                 GraphicsHelper.drawScrollingString(

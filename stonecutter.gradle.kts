@@ -39,6 +39,8 @@ stonecutter parameters {
             replace("guiGraphics.drawString(", "guiGraphics.text(")
             replace("guiGraphics.drawWordWrap(", "guiGraphics.textWithWordWrap(")
             replace("guiGraphics.renderOutline(", "guiGraphics.outline(")
+            replace("guiGraphics.hLine(", "guiGraphics.horizontalLine(")
+            replace("guiGraphics.vLine(", "guiGraphics.verticalLine(")
 
             replace("renderContents", "extractContents")
             replace("renderWidget", "extractWidgetRenderState")
