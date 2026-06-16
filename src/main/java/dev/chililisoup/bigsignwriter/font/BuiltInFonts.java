@@ -26,6 +26,7 @@ public class BuiltInFonts {
                 entry("queatlets", new QueatletsFont()),
                 entry("queatlets_monospace", new QueatletsMonospaceFont()),
                 entry("queatlets_old_style", new QueatletsOldStyleFont()),
+                entry("queatlets_old_style_monospace", new QueatletsOldStyleMonospaceFont()),
                 entry("minecraft_striped", new MinecraftStripedFont()),
                 entry("minecraft_small", new MinecraftSmallFont()),
                 //?}

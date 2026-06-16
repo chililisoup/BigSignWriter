@@ -15,54 +15,53 @@ public class QueatletsFont extends AbstractFontSupplier {
     @Override
     public FontFile get() {
         return new FontFile("Queatlets", "adhillisepic")
-                .parentFont("queats_pro")
                 .characters(
                         entry('A', new String[]{
-                                " ▟▀▙ ",
-                                "▟▊▄▊▙",
-                                "█  █",
+                                " ▟𜴍𜴍𜶫▖ ",
+                                "▟𜷴▂▂▊▙",
+                                "▌𜷴🮂🮂▊▌",
                                 "      "
                         }),
                         entry('B', new String[]{
-                                "█▀▊𜷞",
-                                "█▀▊𜷂",
-                                "██▊𜴗",
+                                "█𜴍🮅▌𜷞",
+                                "█𜴳🯦▌𜷂",
+                                "█𜵈▆▌𜴗",
                                 "      "
                         }),
                         entry('C', new String[]{
-                                "𜷡▊▀▊𜷞",
-                                "█  𜺢▂",
-                                "𜴦▊█▊𜴗",
+                                "𜷡▊🮅𜴍▌𜷞",
+                                "█    ",
+                                "𜴦▊𜵈▆▌𜴗",
                                 "      "
                         }),
                         entry('D', new String[]{
-                                "█▀▊𜷞",
-                                "█  █",
-                                "██▊𜴗",
+                                "█🮅𜴍▌𜷞",
+                                "█  ▌▌",
+                                "█𜵈▆▌𜴗",
                                 "      "
                         }),
                         entry('E', new String[]{
-                                "█▀▀",
-                                "█▀▀",
-                                "███",
+                                "█🮅🮅🮅𜴍",
+                                "█🯦𜴳𜴳𜴳",
+                                "█▆▆▆𜵈",
                                 "      "
                         }),
                         entry('F', new String[]{
-                                "█▀▀",
-                                "█▀▀",
+                                "█🮅🮅🮅𜴍",
+                                "█🯦𜴳𜴳𜴳",
                                 "█    ",
                                 "      "
                         }),
                         entry('G', new String[]{
-                                "𜷡▊▀▊𜷞",
-                                "█  ▄",
-                                "𜴦▊▊𜵰█",
+                                "𜷡▌🮅𜴍▊𜷞",
+                                "▌▌  ▄",
+                                "𜴦▌𜵈𜵭█",
                                 "    ▀"
                         }),
                         entry('H', new String[]{
-                                "█  █",
-                                "█▀█",
-                                "█  █",
+                                "█  ▌▌",
+                                "█𜴳🯦▌▌",
+                                "█  ▌▌",
                                 "      "
                         }),
                         entry('I', new String[]{
@@ -72,26 +71,26 @@ public class QueatletsFont extends AbstractFontSupplier {
                                 "    "
                         }),
                         entry('J', new String[]{
-                                " 🮅█🮅",
-                                "▂ █ ",
-                                "𜴦▊▊𜴗 ",
-                                "     "
+                                " 𜴍🮅█🮅",
+                                "𜺣▂ █ ",
+                                "𜴦𜷴▆▊𜴗 ",
+                                "      "
                         }),
                         entry('K', new String[]{
                                 "█𜺣𜷡▌𜴗",
-                                "█𜷴▊𜴶  ",
+                                "█▌𜷂  ",
                                 "█𜺨𜴦▌𜷞",
                                 "      "
                         }),
                         entry('L', new String[]{
-                                "█  ",
-                                "█  ",
-                                "██",
-                                "    "
+                                "█   ",
+                                "█   ",
+                                "█▆▆𜵈",
+                                "     "
                         }),
                         entry('M', new String[]{
                                 "▊𜶿  𜷓▊",
-                                "█▊▟█",
+                                "█▊𜷥█",
                                 "█𜺩𜴏█",
                                 "      "
                         }),
@@ -102,56 +101,56 @@ public class QueatletsFont extends AbstractFontSupplier {
                                 "      "
                         }),
                         entry('O', new String[]{
-                                "𜷡▊▀▊𜷞",
-                                "█  █",
-                                "𜴦▊█▊𜴗",
+                                "𜷡▊𜴍🮅▌𜷞",
+                                "█  ▌▌",
+                                "𜴦▊▆𜵈▌𜴗",
                                 "      "
                         }),
                         entry('P', new String[]{
-                                "█▀▊𜷞",
-                                "█▄▊𜴗",
+                                "█🮅𜴍▌𜷞",
+                                "█𜵈▆▌𜴗",
                                 "█    ",
                                 "      "
                         }),
                         entry('Q', new String[]{
-                                "𜷡▊▀▊𜷞",
-                                "█ 𜶻▊𜵰",
-                                "𜴦▊▊𜴗▊𜷞",
+                                "𜷡▊🮅𜴍▌𜷞",
+                                "█ 𜺢▌▌",
+                                "𜴦▊𜵈𜵰▌𜷞",
                                 "      "
                         }),
                         entry('R', new String[]{
-                                "█▀▊𜷞",
-                                "█▄▊𜴗",
+                                "█🮅𜴍▌𜷞",
+                                "█𜵈▆▌𜴗",
                                 "█ 𜴅▊𜷞",
                                 "      "
                         }),
                         entry('S', new String[]{
-                                "𜷡▛▀𜴍𜴫",
-                                "𜴅▘▀▜𜷞",
-                                "𜴦▊█▊𜴗",
+                                "𜷡▊𜴍🮅▌𜷞",
+                                "▘𜴍𜴍𜴳🯦▆𜷞",
+                                "𜴦▊𜵈▆▌𜴗",
                                 "      "
                         }),
                         entry('T', new String[]{
-                                "▀█▀",
-                                "  █  ",
-                                "  █  ",
+                                "🮅𜴍█🮅🮅",
+                                "  █  ",
+                                "  █  ",
                                 "      "
                         }),
                         entry('U', new String[]{
-                                "█  █",
-                                "█  █",
-                                "𜴦▊█▊𜴗",
+                                "█  ▌▌",
+                                "█  ▌▌",
+                                "𜴦▊▆𜵈▌𜴗",
                                 "      "
                         }),
                         entry('V', new String[]{
-                                "▜▊  ▊▛",
-                                " ▜▊▟▛ ",
-                                "  𜶫𜵰  ",
+                                "▜▙ ▖▊▛",
+                                " ▜𜷤▊▛ ",
+                                "  𜶫𜵰  ",
                                 "      "
                         }),
                         entry('W', new String[]{
                                 "𜷴▊ ▌ ▊𜷴",
-                                "▜▙▊▙▌▘",
+                                "▜▙▊▙𜷴▛",
                                 " 𜶫▊𜶫𜵰 ",
                                 "      "
                         }),
@@ -162,15 +161,15 @@ public class QueatletsFont extends AbstractFontSupplier {
                                 "      "
                         }),
                         entry('Y', new String[]{
-                                "𜶫▊  ▊𜵰",
+                                "𜴍𜷴▙ ▟▊𜴍",
                                 " 𜴢▊▌𜴏 ",
                                 "  █  ",
                                 "      "
                         }),
                         entry('Z', new String[]{
-                                "▀𜷚▊▊𜵰",
-                                " 𜷓▊▌𜴏 ",
-                                "𜷥▊██",
+                                "𜴍🮅𜶫█𜵰",
+                                " 𜷓█𜴏 ",
+                                "𜷥█𜷤▆𜵈",
                                 "      "
                         }),
                         entry('a', new String[]{
@@ -211,7 +210,7 @@ public class QueatletsFont extends AbstractFontSupplier {
                         }),
                         entry('g', new String[]{
                                 "      ",
-                                "𜷡𜵰𜴍𜶫𜷟𜺩",
+                                "𜷡𜷴🮅𜶫𜷟𜺩",
                                 "𜷖🮅🮅𜴍𜴂 ",
                                 "𜶫𜷝𜷝𜷝▊🯦"
                         }),
@@ -231,7 +230,7 @@ public class QueatletsFont extends AbstractFontSupplier {
                                 "  ▀",
                                 "  █",
                                 "  █",
-                                "𜶨▖▌𜴗"
+                                "▄▊𜴗"
                         }),
                         entry('k', new String[]{
                                 "█    ",
@@ -247,8 +246,8 @@ public class QueatletsFont extends AbstractFontSupplier {
                         }),
                         entry('m', new String[]{
                                 "      ",
-                                "█𜴵𜷞𜴵𜵈",
-                                "█ ▌ 𜷴",
+                                "█🯦𜷤𜵯𜷞",
+                                "█ ▌ ▌",
                                 "      "
                         }),
                         entry('n', new String[]{
@@ -301,7 +300,7 @@ public class QueatletsFont extends AbstractFontSupplier {
                         }),
                         entry('v', new String[]{
                                 "      ",
-                                "▜▊  ▊▛",
+                                "𜶫▊▖ ▟▛",
                                 " 𜴢▊𜷥𜴏 ",
                                 "      "
                         }),
@@ -319,9 +318,9 @@ public class QueatletsFont extends AbstractFontSupplier {
                         }),
                         entry('y', new String[]{
                                 "      ",
-                                "▜▊  ▊▛",
+                                "𜶫▊▖ ▟▛",
                                 " 𜴢▊𜷥𜴏 ",
-                                "▄▊𜴏  "
+                                "▄𜷴𜴏  "
                         }),
                         entry('z', new String[]{
                                 "      ",
@@ -336,10 +335,10 @@ public class QueatletsFont extends AbstractFontSupplier {
                                 "     "
                         }),
                         entry('1', new String[]{
-                                "𜴯█ ",
-                                " █ ",
-                                "▆█▆",
-                                "    "
+                                "𜴯▌𜷴 ",
+                                " ▊▊ ",
+                                "▆𜷴▌▆",
+                                "    "
                         }),
                         entry('2', new String[]{
                                 "𜴯🮅𜶫𜷴𜷞",
@@ -354,9 +353,9 @@ public class QueatletsFont extends AbstractFontSupplier {
                                 "     "
                         }),
                         entry('4', new String[]{
-                                " 𜷋𜷥𜷴 ",
-                                "𜷥𜷛▌▙▖",
-                                "  █ ",
+                                "  𜺣𜷡𜷴 ",
+                                "𜷡𜶲𜷕▊𜺢",
+                                "🮂🮂▊▌𜺩",
                                 "     "
                         }),
                         entry('5', new String[]{

@@ -17,83 +17,17 @@ public class QueatsLazySundayFont extends AbstractFontSupplier {
         return new FontFile("Queats Lazy Sunday", "adhillisepic")
                 .parentFont("queats_pro_monospace")
                 .characters(
-                        entry('A', new String[]{
-                                " 🬵█🬱 ",
-                                "🬻▊▀▊🬺",
-                                "█▄█",
-                                "█  █"
-                        }),
-                        entry('B', new String[]{
-                                "██▊🬱",
-                                "█▄▊🬝",
-                                "█▀▊🬺",
-                                "██▊🬆"
-                        }),
-                        entry('D', new String[]{
-                                "██▊🬱",
-                                "█  █",
-                                "█  █",
-                                "██▊🬆"
-                        }),
-                        entry('E', new String[]{
-                                "███",
-                                "█▄▄",
-                                "█▀▀",
-                                "███"
-                        }),
-                        entry('F', new String[]{
-                                "███",
-                                "█▄▄",
-                                "█▀▀",
-                                "█    "
-                        }),
-                        entry('G', new String[]{
-                                "🬵▊█▊🬱",
-                                "█  ▀",
-                                "█ 🬄🬬▌",
-                                "🬊▊█▊🬆"
-                        }),
-                        entry('H', new String[]{
-                                "█  █",
-                                "█▄█",
-                                "█▀█",
-                                "█  █"
-                        }),
-                        entry('I', new String[]{
-                                "███",
-                                "  █  ",
-                                "  █  ",
-                                "███"
-                        }),
                         entry('J', new String[]{
                                 " ██▊",
                                 "   █ ",
                                 "▄ █ ",
                                 "🬊▊█🬆 "
                         }),
-                        entry('L', new String[]{
-                                "█    ",
-                                "█    ",
-                                "█    ",
-                                "███"
-                        }),
-                        entry('N', new String[]{
-                                "▊🬺𜺢 █",
-                                "█▊🬺█",
-                                "█𜺩🬬█",
-                                "█  🬊▊"
-                        }),
                         entry('Q', new String[]{
                                 "🬵▊█▊🬱",
                                 "█  █",
-                                "█ 🬺▊🬝",
-                                "🬊▊▊🬆▊🬱"
-                        }),
-                        entry('R', new String[]{
-                                "██▊🬱",
-                                "█▄█",
-                                "█🬬▊🬴 ",
-                                "█ 🬊█"
+                                "█ 🬺█",
+                                "🬊▊▊🬝▊🬱"
                         }),
                         entry('S', new String[]{
                                 "🬵▊█▊🬺",
@@ -101,29 +35,11 @@ public class QueatsLazySundayFont extends AbstractFontSupplier {
                                 " 🬂▀█",
                                 "🬬▊█▊🬆"
                         }),
-                        entry('T', new String[]{
-                                "███",
-                                "  █  ",
-                                "  █  ",
-                                "  █  "
-                        }),
-                        entry('U', new String[]{
-                                "█  █",
-                                "█  █",
-                                "█  █",
-                                "🬊▊█▊🬆"
-                        }),
                         entry('W', new String[]{
                                 "█  █",
                                 "█  █",
                                 "█🬓𜷴🬓█",
                                 "🬊▊🬄🬀🬄▊🬆"
-                        }),
-                        entry('Y', new String[]{
-                                "▊🬱  🬵▊",
-                                "𜺩🬬▊🬻🬝𜺩",
-                                "  █  ",
-                                "  █  "
                         }),
                         entry('a', new String[]{
                                 "      ",
@@ -190,12 +106,6 @@ public class QueatsLazySundayFont extends AbstractFontSupplier {
                                 "█🬻▊▊🬱",
                                 "█  █",
                                 "█  █"
-                        }),
-                        entry('q', new String[]{
-                                "      ",
-                                "🬻▌🬄🬌█",
-                                "🬊▌🬹🬓█",
-                                "    █"
                         }),
                         entry('r', new String[]{
                                 "      ",

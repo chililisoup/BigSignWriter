@@ -17,58 +17,16 @@ public class QueatletsMonospaceFont extends AbstractFontSupplier {
         return new FontFile("Queatlets Monospace", "adhillisepic")
                 .parentFont("queatlets")
                 .characters(
-                        entry('A', new String[]{
-                                " ▟▀▙ ",
-                                "▟▊▄▊▙",
-                                "█  █",
-                                "      "
-                        }),
-                        entry('C', new String[]{
-                                "𜷡▊▀▊𜷞",
-                                "█  𜺢▂",
-                                "𜴦▊█▊𜴗",
-                                "      "
-                        }),
-                        entry('E', new String[]{
-                                "█▀▀",
-                                "█▀▀",
-                                "███",
-                                "      "
-                        }),
-                        entry('F', new String[]{
-                                "█▀▀",
-                                "█▀▀",
-                                "█    ",
-                                "      "
-                        }),
                         entry('I', new String[]{
                                 " 🮅█🮅 ",
                                 "  █  ",
                                 " ▆█▆ ",
                                 "      "
                         }),
-                        entry('J', new String[]{
-                                "  🮅█🮅",
-                                "▂𜺢 █ ",
-                                "𜴦𜷴█𜴗 ",
-                                "      "
-                        }),
                         entry('L', new String[]{
-                                " █   ",
-                                " █   ",
-                                " ██▌",
-                                "      "
-                        }),
-                        entry('S', new String[]{
-                                "𜷡▛▀𜴍𜴫",
-                                "𜴅▘▀▜𜷞",
-                                "𜴦▊█▊𜴗",
-                                "      "
-                        }),
-                        entry('T', new String[]{
-                                "▀█▀",
-                                "  █  ",
-                                "  █  ",
+                                "█    ",
+                                "█    ",
+                                "█▆▆▆𜵈",
                                 "      "
                         }),
                         entry('a', new String[]{
@@ -103,7 +61,7 @@ public class QueatletsMonospaceFont extends AbstractFontSupplier {
                         }),
                         entry('j', new String[]{
                                 "   ▀ ",
-                                "  🮅█ ",
+                                " 🮅🮅█ ",
                                 "   █ ",
                                 "𜶨▄▊𜴗 "
                         }),
@@ -132,9 +90,9 @@ public class QueatletsMonospaceFont extends AbstractFontSupplier {
                                 "      "
                         }),
                         entry('1', new String[]{
-                                "  𜴯█ ",
-                                "   █ ",
-                                "  ▆█▆",
+                                "  𜴯▌𜷴 ",
+                                "   ▊▊ ",
+                                "  ▆𜷴▌▆",
                                 "      "
                         }),
                         entry('2', new String[]{
@@ -150,9 +108,9 @@ public class QueatletsMonospaceFont extends AbstractFontSupplier {
                                 "      "
                         }),
                         entry('4', new String[]{
-                                "  𜷋𜷥𜷴 ",
-                                " 𜷥𜷛▌▙▖",
-                                "   █ ",
+                                "   𜺣𜷡𜷴 ",
+                                " 𜷡𜶲𜷕▊𜺢",
+                                " 🮂🮂▊▌𜺩",
                                 "      "
                         }),
                         entry('5', new String[]{

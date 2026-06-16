@@ -116,8 +116,8 @@ public class QueatsProFont extends AbstractFontSupplier {
                         entry('Q', new String[]{
                                 "🬵▊█▊🬱",
                                 "█  █",
-                                "█ 🬱▊🬝",
-                                "🬊▊▊🬆▊🬱"
+                                "█ 🬱█",
+                                "🬊▊▊🬝▊🬱"
                         }),
                         entry('R', new String[]{
                                 "██▊🬱",
