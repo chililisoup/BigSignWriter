@@ -409,6 +409,14 @@ public class BigSignWriterConfigScreen extends Screen {
                     Component.translatable("bigsignwriter.config.fontSelectorCoversDoneButton.desc")
             ));
             rowHelper.addChild(new OptionElement<>(
+                    workingConfig.fontSelectorOpensScrolledUp,
+                    defaults.fontSelectorOpensScrolledUp,
+                    value -> workingConfig.fontSelectorOpensScrolledUp = value,
+                    OptionController.BooleanController::new,
+                    Component.translatable("bigsignwriter.config.fontSelectorOpensScrolledUp"),
+                    Component.translatable("bigsignwriter.config.fontSelectorOpensScrolledUp.desc")
+            ));
+            rowHelper.addChild(new OptionElement<>(
                     workingConfig.showConfigButton,
                     defaults.showConfigButton,
                     value -> workingConfig.showConfigButton = value,

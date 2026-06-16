@@ -54,7 +54,8 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
         this.open = open;
         if (this.onOpenChanged != null)
             this.onOpenChanged.accept(this);
-        this.setScrollAmount(0.0);
+        if (BigSignWriterConfig.MAIN_CONFIG.fontSelectorOpensScrolledUp)
+            this.setScrollAmount(0.0);
     }
 
     public boolean isOpen() {

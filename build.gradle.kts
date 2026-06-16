@@ -153,6 +153,7 @@ modstitch.onEnable {
     )
 
     tasks.register<Copy>("buildAndCollect") {
+        description = "Builds the mod, then copies the jar into the root libs folder"
         group = "build"
 
         finalJarTasks.forEach { jar ->
@@ -179,6 +180,8 @@ tasks {
     }
 
     register<Delete>("filterArtifacts") {
+        description = "Deletes meta files irrelevant to the target platform"
+
         if (modstitch.isLoom)
             delete(layout.buildDirectory.dir("resources/main/META-INF"))
         else if (modstitch.isModDevGradleRegular)
@@ -188,6 +191,7 @@ tasks {
     }
 
     register<Delete>("buildCollectAndClean") {
+        description = "Builds the mod, then moves the jar into the root libs folder"
         group = "build"
 
         delete(layout.buildDirectory.dir("libs"))
