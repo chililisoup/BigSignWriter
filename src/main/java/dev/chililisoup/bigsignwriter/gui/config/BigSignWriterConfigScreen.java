@@ -829,6 +829,7 @@ public class BigSignWriterConfigScreen extends Screen {
                                     fontInfo.widthInfo()
                             )
                     );
+                    infoLines.add(infoLine("bigsignwriter.font.info.height", fontInfo.height()));
                 }
 
                 Set<Character> charSet = this.showInheritedCharacters ?
