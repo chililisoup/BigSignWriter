@@ -1,5 +1,6 @@
 package dev.chililisoup.bigsignwriter.gui.config;
 
+import com.google.common.collect.ImmutableList;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.font.FontInfo;
 import dev.chililisoup.bigsignwriter.gui.*;
@@ -76,7 +77,7 @@ public class BigSignWriterConfigScreen extends Screen {
             MAIN_CONFIG.copyFrom(this.workingConfig);
             saveConfig();
         }
-        this.minecraft.setScreen(this.parent);
+        this.minecraft.gui.setScreen(this.parent);
     }
 
     @Override
@@ -86,9 +87,7 @@ public class BigSignWriterConfigScreen extends Screen {
                 this.layout.getHeaderHeight(),
                 this.columnWidth(),
                 this.tabManager,
-                List.of(new ConfigTab[]{
-                        new OptionsTab(), new FontsTab()
-                })
+                ImmutableList.of(new OptionsTab(), new FontsTab())
         );
         this.tabNavigationBar.selectTab(0, false);
         this.addRenderableWidget(this.tabNavigationBar);
@@ -226,7 +225,10 @@ public class BigSignWriterConfigScreen extends Screen {
         if (this.tabNavigationBar == null) return;
 
         int columnWidth = this.columnWidth();
-        this.tabNavigationBar.updateWidth(columnWidth);
+        //? if >= 26.2 {
+        this.tabNavigationBar.arrangeElements(columnWidth);
+        //?} else
+        //this.tabNavigationBar.updateWidth(columnWidth);
         int tabHeight = this.tabNavigationBar.getRectangle().height();
         this.tabManager.setTabArea(new ScreenRectangle(
                 MARGIN * 2,
@@ -324,6 +326,13 @@ public class BigSignWriterConfigScreen extends Screen {
 
             this.sidePanel.arrangeOthers();
         }
+
+        //? if >= 26.2 {
+        @Override
+        public @NotNull Layout getLayout() {
+            return this.layout;
+        }
+        //?}
 
         private static void doScrollableLayout(ScreenRectangle screenRectangle, ScrollableLayout layout) {
             layout.arrangeElements();

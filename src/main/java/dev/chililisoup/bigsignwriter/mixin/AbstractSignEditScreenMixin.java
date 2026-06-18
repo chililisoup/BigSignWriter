@@ -344,7 +344,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                     Component.literal("☰"),
                     button -> {
                         this.bigSignWriter$ignoreNextRemoval = true;
-                        this.minecraft.setScreen(new BigSignWriterConfigScreen(this));
+                        this.minecraft.gui.setScreen(new BigSignWriterConfigScreen(this));
                         this.bigSignWriter$ignoreNextRemoval = false;
                     }
             );

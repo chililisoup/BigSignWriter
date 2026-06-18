@@ -6,7 +6,7 @@ plugins {
     id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT" apply false
 }
 
-stonecutter active "26.1-fabric"
+stonecutter active "26.2-fabric"
 
 stonecutter parameters {
     replacements {
@@ -46,6 +46,10 @@ stonecutter parameters {
             replace("renderWidget", "extractWidgetRenderState")
             replace("renderMenuBackground", "extractMenuBackground")
             replace("renderMenuBackgroundTexture", "extractMenuBackgroundTexture")
+        }
+
+        string(current.parsed >= "26.2") {
+            replace("minecraft.setScreen", "minecraft.gui.setScreen")
         }
     }
 }
