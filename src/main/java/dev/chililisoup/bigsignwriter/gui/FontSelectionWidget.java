@@ -69,13 +69,6 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
     public void updateEntries() {
         this.replaceEntries(BigSignWriter.AVAILABLE_FONTS.stream()
                 .filter(FontInfo::isVisible)
-                //? if > 1.21.6 {
-                .sorted((a, b) -> {
-                    if (a.rootAncestorFont() == b) return 1;
-                    if (b.rootAncestorFont() == a) return -1;
-                    return 0;
-                })
-                //?}
                 .map(Entry::new).toList()
         );
         this.addEntryToTop(new Entry(null));

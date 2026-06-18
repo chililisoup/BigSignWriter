@@ -13,10 +13,11 @@ public class FontInfo {
     public final FontFile fontFile;
     public final String source;
     public final String id;
-    private boolean infoChecked = false;
-    private @Nullable Component error = null;
+    private boolean relationsChecked = false;
     private @Nullable FontInfo parentFont = null;
     private @Nullable FontInfo rootAncestorFont = null;
+    private boolean infoChecked = false;
+    private @Nullable Component error = null;
     private @Nullable TreeSet<Character> cumulativeCharacters = null;
     private String widthInfo = "0";
     private @Nullable String cumulativeWidthInfo = null;
@@ -60,7 +61,7 @@ public class FontInfo {
         if (this.cumulativeCharacters != null) return this.cumulativeCharacters;
         if (!this.hasExplicitParent()) return this.characters().keySet();
 
-        this.cumulativeCharacters = new TreeSet<>(FontFile.COMPARATOR);
+        this.cumulativeCharacters = new TreeSet<>(FontFile::compareChars);
         FontInfo nextFont = this;
         while (nextFont != null) {
             this.cumulativeCharacters.addAll(nextFont.characters().keySet());
@@ -70,12 +71,12 @@ public class FontInfo {
     }
 
     public @Nullable FontInfo parentFont() {
-        this.ensureInfoReady();
+        this.checkRelations();
         return this.parentFont;
     }
 
     public @Nullable FontInfo rootAncestorFont() {
-        this.ensureInfoReady();
+        this.checkRelations();
         return this.rootAncestorFont;
     }
 
@@ -85,6 +86,14 @@ public class FontInfo {
 
     public boolean hasExplicitParent() {
         return !this.parentIsImplicit() && this.parentFont() != null;
+    }
+
+    private void checkRelations() {
+        if (this.relationsChecked) return;
+        this.relationsChecked = true;
+
+        this.parentFont = this.findParent();
+        this.rootAncestorFont = this.findRootAncestor();
     }
 
     public boolean isBroken() {
@@ -160,8 +169,7 @@ public class FontInfo {
                 fontFile.height
         );
 
-        this.parentFont = this.findParent();
-        this.rootAncestorFont = this.findRootAncestor();
+        this.checkRelations();
         if (this.fontFile.characters.isEmpty()) {
             if (!this.parentIsImplicit() && this.parentFont != null)
                 this.cumulativeWidthInfo = this.parentFont.widthInfo();

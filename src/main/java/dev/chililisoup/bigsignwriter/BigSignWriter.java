@@ -133,7 +133,7 @@ public final class BigSignWriter {
             }).toList());
         }
 
-        AVAILABLE_FONTS.sort((a, b) -> a.name().compareToIgnoreCase(b.name()));
+        AVAILABLE_FONTS.sort(BigSignWriter::compareFonts);
         reselectFont(selectedFontId);
         LOGGER.info(LOGGER_PREFIX + "Fonts loaded!");
     }
@@ -284,5 +284,23 @@ public final class BigSignWriter {
             LOGGER.error(LOGGER_PREFIX + "Error copying built-in fonts", e);
             return List.of();
         }
+    }
+
+    public static int compareFonts(FontInfo a, FontInfo b) {
+        if (a == b) return 0;
+
+        FontInfo aRoot = a.rootAncestorFont();
+        if (b == aRoot || b == DEFAULT_FONT) return 1;
+        FontInfo bRoot = b.rootAncestorFont();
+        if (a == bRoot || a == DEFAULT_FONT) return -1;
+
+        if (aRoot == DEFAULT_FONT) return -1;
+        if (bRoot == DEFAULT_FONT) return 1;
+
+        if (aRoot == bRoot) return a.name().compareToIgnoreCase(b.name());
+
+        return (aRoot != null ? aRoot : a).name().compareToIgnoreCase(
+                (bRoot != null ? bRoot : b).name()
+        );
     }
 }

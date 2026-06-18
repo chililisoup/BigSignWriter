@@ -3,13 +3,10 @@ package dev.chililisoup.bigsignwriter.font;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class FontFile {
-    public static final Comparator<Character> COMPARATOR = FontFile::compare;
-
     public String name;
     public @Nullable String credits = null;
     public int height = 4;
@@ -41,7 +38,7 @@ public class FontFile {
 
     @SafeVarargs
     public final FontFile characters(Map.Entry<Character, String[]>... entries) {
-        this.characters = new TreeMap<>(COMPARATOR);
+        this.characters = new TreeMap<>(FontFile::compareChars);
         this.characters.putAll(Map.ofEntries(entries));
         return this;
     }
@@ -50,21 +47,21 @@ public class FontFile {
         return new FontInfo(this, source);
     }
 
-    private static int compare(char a, char b) {
+    public static int compareChars(char a, char b) {
         if (a == b) return 0;
-        boolean aOrdered = isOrdered(a);
-        boolean bOrdered = isOrdered(b);
+        boolean aOrdered = charHasSetOrder(a);
+        boolean bOrdered = charHasSetOrder(b);
         if (aOrdered != bOrdered) return aOrdered ? -1 : 1;
-        return aOrdered ? orderOf(a) - orderOf(b) : a - b;
+        return aOrdered ? getSetCharOrder(a) - getSetCharOrder(b) : a - b;
     }
 
-    private static boolean isOrdered(char chr) {
+    private static boolean charHasSetOrder(char chr) {
         if (chr >= 97) return chr <= 122; // a-z
         if (chr >= 65) return chr <= 90; // A-Z
         return chr >= 48 && chr <= 57; // 0-9
     }
 
-    private static int orderOf(char chr) {
+    private static int getSetCharOrder(char chr) {
         if (chr >= 97) return chr - 71; // a-z -> 26-51
         return chr - (chr >= 65 ? 65 : -4); // A-Z -> 0-25, 0-9 -> 52-61
     }
