@@ -19,6 +19,7 @@ public class BuiltInFonts {
                 entry("smooth_small", new SmoothSmallFont()),
                 entry("happy_ghast", new HappyGhastFont()),
                 entry("endermite", new EndermiteFont()),
+                entry("chillager", new ChillagerFont()),
                 entry("plains", new PlainsFont()),
                 entry("queats_pro", new QueatsProFont()),
                 entry("queats_pro_monospace", new QueatsProMonospaceFont()),
