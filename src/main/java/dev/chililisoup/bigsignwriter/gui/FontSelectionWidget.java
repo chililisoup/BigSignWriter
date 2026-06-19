@@ -29,6 +29,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 
 public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget.Entry> {
     private final int maxHeight;
+    private final int lineCount;
     private final Runnable onSelect;
     private @Nullable Consumer<FontSelectionWidget> onOpenChanged;
     private boolean open = false;
@@ -40,10 +41,12 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
             int x,
             int y,
             int entryHeight,
+            int lineCount,
             Runnable onSelect
     ) {
         super(minecraft, width, height, y, entryHeight);
         this.maxHeight = height;
+        this.lineCount = lineCount;
         this.onSelect = onSelect;
         this.setX(x);
         this.updateEntries();
@@ -68,7 +71,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
 
     public void updateEntries() {
         this.replaceEntries(BigSignWriter.AVAILABLE_FONTS.stream()
-                .filter(FontInfo::isVisible)
+                .filter(font -> font.isVisible() && font.height() <= this.lineCount)
                 .map(Entry::new).toList()
         );
         this.addEntryToTop(new Entry(null));

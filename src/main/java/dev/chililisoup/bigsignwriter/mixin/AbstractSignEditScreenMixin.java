@@ -286,6 +286,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 x - 100,
                 y,
                 20,
+                this.messages.length,
                 () -> {
                     if (this.signField == null) return;
                     this.signField.setSelectionPos(this.signField.getCursorPos());
