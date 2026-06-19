@@ -48,6 +48,10 @@ public final class BigSignWriter {
         return SELECTED_FONT != null;
     }
 
+    public static int getHeight() {
+        return SELECTED_FONT != null ? SELECTED_FONT.height() : 4;
+    }
+
     private static Optional<String[]> getBigChar(char chr, @Nullable FontInfo fontInfo, @Nullable String[] fallback) {
         if (fontInfo == null)
             return Optional.ofNullable(fallback);
