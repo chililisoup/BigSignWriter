@@ -18,7 +18,7 @@ public class HappyGhastFont extends AbstractFontSupplier {
                 .characters(
                         entry(' ', new String[]{
                                 "   ",
-                                "   ",
+                                "   "
                         }),
                         entry('A', new String[]{
                                 "𜷥◚𜶚",

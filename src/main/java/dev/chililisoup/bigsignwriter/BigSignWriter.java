@@ -49,7 +49,7 @@ public final class BigSignWriter {
     }
 
     public static int getHeight() {
-        return SELECTED_FONT != null ? SELECTED_FONT.height() : 4;
+        return SELECTED_FONT != null ? SELECTED_FONT.height() : 1;
     }
 
     private static Optional<String[]> getBigChar(char chr, @Nullable FontInfo fontInfo, @Nullable String[] fallback) {

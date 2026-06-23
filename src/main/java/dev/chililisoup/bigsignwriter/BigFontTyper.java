@@ -7,7 +7,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -22,7 +21,7 @@ public final class BigFontTyper {
     private final Consumer<Integer> lineSetter;
     private final String[] messages;
     private final Consumer<String> messageSetter;
-    private final @NotNull TextFieldHelper signField;
+    private final TextFieldHelper signField;
 
     public BigFontTyper(
             SignBlockEntity sign,
@@ -31,7 +30,7 @@ public final class BigFontTyper {
             Consumer<Integer> lineSetter,
             String[] messages,
             Consumer<String> messageSetter,
-            @NotNull TextFieldHelper signField
+            TextFieldHelper signField
     ) {
         this.sign = sign;
         this.font = font;
