@@ -70,7 +70,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
     }
 
     public void updateEntries() {
-        this.replaceEntries(BigSignWriter.AVAILABLE_FONTS.stream()
+        this.replaceEntries(BigSignWriter.availableFonts().stream()
                 .filter(font -> font.isVisible() && font.height() <= this.lineCount)
                 .map(Entry::new).toList()
         );
@@ -79,7 +79,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
 
         List<Entry> children = this.children();
         children.forEach(entry -> {
-            if (entry.fontInfo == BigSignWriter.SELECTED_FONT)
+            if (entry.fontInfo == BigSignWriter.selectedFont())
                 super.setSelected(entry);
             //? if > 1.21.6
             entry.update(children);
@@ -287,7 +287,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
         private void update(List<Entry> others) {
             if (!this.children.isEmpty()) {
                 for (FontInfo child : this.children) {
-                    if (child == BigSignWriter.SELECTED_FONT) {
+                    if (child == BigSignWriter.selectedFont()) {
                         this.collapsed = false;
                         break;
                     }

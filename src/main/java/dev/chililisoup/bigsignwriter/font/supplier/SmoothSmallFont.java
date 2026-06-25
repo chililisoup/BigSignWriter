@@ -3,15 +3,10 @@ package dev.chililisoup.bigsignwriter.font.supplier;
 
 import dev.chililisoup.bigsignwriter.font.FontFile;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import static java.util.Map.entry;
 
-public class SmoothSmallFont extends AbstractFontSupplier {
-    @Override
-    public FontFile get() {
+public final class SmoothSmallFont {
+    public static FontFile get() {
         return new FontFile("Smooth Small", "chililisoup, Opticality")
                 .height(2)
                 .characters(
@@ -396,18 +391,6 @@ public class SmoothSmallFont extends AbstractFontSupplier {
                                 "  "
                         })
                 );
-    }
-
-    @Override
-    public Map<Character, Set<PatchCharacter>> patches() {
-        return new HashMap<>(Map.ofEntries(
-                entry('D', Set.of(
-                        PatchCharacter.of(
-                                "|▔\uD833\uDC36",
-                                "|▁\uD833\uDC3A"
-                        )
-                ))
-        ));
     }
 }
 //?}

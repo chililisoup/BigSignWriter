@@ -5,9 +5,8 @@ import dev.chililisoup.bigsignwriter.font.FontFile;
 
 import static java.util.Map.entry;
 
-public class MinecraftStripedFont extends AbstractFontSupplier {
-    @Override
-    public FontFile get() {
+public final class MinecraftStripedFont {
+    public static FontFile get() {
         return new FontFile("Minecraft Striped", "Mojang, chililisoup")
                 .characters(
                         entry(' ', new String[]{

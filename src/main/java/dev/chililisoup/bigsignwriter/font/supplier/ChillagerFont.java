@@ -5,9 +5,8 @@ import dev.chililisoup.bigsignwriter.font.FontFile;
 
 import static java.util.Map.entry;
 
-public class ChillagerFont extends AbstractFontSupplier {
-    @Override
-    public FontFile get() {
+public final class ChillagerFont {
+    public static FontFile get() {
         return new FontFile("Chillager", "chililisoup")
                 .characterSeparator("")
                 .characters(

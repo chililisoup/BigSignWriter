@@ -2,15 +2,10 @@ package dev.chililisoup.bigsignwriter.font.supplier;
 
 import dev.chililisoup.bigsignwriter.font.FontFile;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import static java.util.Map.entry;
 
-public class SharpFont extends AbstractFontSupplier {
-    @Override
-    public FontFile get() {
+public final class SharpFont {
+    public static FontFile get() {
         return new FontFile("Sharp", "Hugleton, DebornMC")
                 .characters(
                         entry(' ', new String[]{
@@ -338,22 +333,5 @@ public class SharpFont extends AbstractFontSupplier {
                                 "█"
                         })
                 );
-    }
-
-    @Override
-    public Map<Character, Set<PatchCharacter>> patches() {
-        HashMap<Character, Set<PatchCharacter>> baseMap = new HashMap<>(Map.ofEntries(
-                entry('$', Set.of(
-                        PatchCharacter.of(
-                                "◢▉ ▎ ▉◣",
-                                "◥▉ ▎ ▀",
-                                "▄ ▎ ▉◣",
-                                "◥▉ ▎ ▉◤"
-                        )
-                ))
-        ));
-
-        this.appendRecolourfulContainersGuiFix(baseMap);
-        return baseMap;
     }
 }

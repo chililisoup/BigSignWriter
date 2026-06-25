@@ -11,9 +11,8 @@ import dev.chililisoup.bigsignwriter.font.FontFile;
 
 import static java.util.Map.entry;
 
-public class QueatsLazySundayFont extends AbstractFontSupplier {
-    @Override
-    public FontFile get() {
+public final class QueatsLazySundayFont {
+    public static FontFile get() {
         return new FontFile("Queats Lazy Sunday", "adhillisepic")
                 .parentFont("queats_pro_monospace")
                 .characters(

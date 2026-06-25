@@ -3,15 +3,10 @@ package dev.chililisoup.bigsignwriter.font.supplier;
 
 import dev.chililisoup.bigsignwriter.font.FontFile;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import static java.util.Map.entry;
 
-public class MinecraftSmallFont extends AbstractFontSupplier {
-    @Override
-    public FontFile get() {
+public final class MinecraftSmallFont {
+    public static FontFile get() {
         return new FontFile("Minecraft Small", "Mojang, chililisoup")
                 .height(2)
                 .characterSeparator("")
@@ -397,27 +392,6 @@ public class MinecraftSmallFont extends AbstractFontSupplier {
                                 "  "
                         })
                 );
-    }
-
-    @Override
-    public Map<Character, Set<PatchCharacter>> patches() {
-        HashMap<Character, Set<PatchCharacter>> baseMap = new HashMap<>(Map.ofEntries(
-                entry('m', Set.of(
-                        PatchCharacter.of(
-                                "▂ܼܼܼ𜺠ܼܼ",
-                                "𜴍᤺𜺨᤺𜴍"
-                        )
-                )),
-                entry('n', Set.of(
-                        PatchCharacter.of(
-                                "▂𜺠𜺠ܼܼ",
-                                "𜴍\uD836\uDE9D \uD836\uDE9D𜴍"
-                        )
-                ))
-        ));
-
-        this.appendMediumVerticalBarAnnihilator(baseMap);
-        return baseMap;
     }
 }
 //?}

@@ -41,8 +41,6 @@ import net.minecraft.client.input.CharacterEvent;
 import org.joml.Vector2f;
 //?}
 
-import java.util.*;
-
 import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.*;
 
 @Mixin(value = AbstractSignEditScreen.class, priority = 999)
@@ -215,7 +213,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             int cursorX = cursorPosition - this.font.width(topLine) / 2;
             int cursorY = (this.line - 2) * lineHeight;
 
-            guiGraphics.fill(cursorX, cursorY - 1, cursorX + 1, cursorY + lineHeight * BigSignWriter.getHeight(), opaqueColor);
+            guiGraphics.fill(cursorX, cursorY - 1, cursorX + 1, cursorY + lineHeight * BigSignWriter.height(), opaqueColor);
         }
 
         ci.cancel();

@@ -4,9 +4,8 @@ import dev.chililisoup.bigsignwriter.font.FontFile;
 
 import static java.util.Map.entry;
 
-public class OutlinedShortFont extends AbstractFontSupplier {
-    @Override
-    public FontFile get() {
+public final class OutlinedShortFont {
+    public static FontFile get() {
         return new FontFile("Outlined Short", "chililisoup")
                 .height(3)
                 .characterSeparator(" ")

@@ -2,14 +2,10 @@ package dev.chililisoup.bigsignwriter.font.supplier;
 
 import dev.chililisoup.bigsignwriter.font.FontFile;
 
-import java.util.Map;
-import java.util.Set;
-
 import static java.util.Map.entry;
 
-public class ThinFont extends AbstractFontSupplier {
-    @Override
-    public FontFile get() {
+public final class ThinFont {
+    public static FontFile get() {
         return new FontFile("Thin", "chililisoup")
                 .height(3)
                 .characterSeparator(" ")
@@ -150,18 +146,5 @@ public class ThinFont extends AbstractFontSupplier {
                                 "·╹--·"
                         })
                 );
-    }
-
-    @Override
-    public Map<Character, Set<PatchCharacter>> patches() {
-        return Map.ofEntries(
-                entry('K', Set.of(
-                        PatchCharacter.of(
-                                "╻  ᷺.·",
-                                "┃-< ",
-                                "╹  \uD804\uDC81˙·"
-                        )
-                ))
-        );
     }
 }

@@ -3,15 +3,10 @@ package dev.chililisoup.bigsignwriter.font.supplier;
 
 import dev.chililisoup.bigsignwriter.font.FontFile;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import static java.util.Map.entry;
 
-public class HappyGhastFont extends AbstractFontSupplier {
-    @Override
-    public FontFile get() {
+public final class HappyGhastFont {
+    public static FontFile get() {
         return new FontFile("Happy Ghast", "chililisoup")
                 .height(2)
                 .characterSeparator("")
@@ -397,13 +392,6 @@ public class HappyGhastFont extends AbstractFontSupplier {
                                 "   "
                         })
                 );
-    }
-
-    @Override
-    public Map<Character, Set<PatchCharacter>> patches() {
-        HashMap<Character, Set<PatchCharacter>> baseMap = new HashMap<>();
-        this.appendMediumVerticalBarAnnihilator(baseMap);
-        return baseMap;
     }
 }
 //?}

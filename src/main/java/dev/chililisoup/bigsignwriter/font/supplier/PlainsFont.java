@@ -6,9 +6,8 @@ import dev.chililisoup.bigsignwriter.font.FontFile;
 import static java.util.Map.entry;
 
 @SuppressWarnings("UnnecessaryUnicodeEscape")
-public class PlainsFont extends AbstractFontSupplier {
-    @Override
-    public FontFile get() {
+public final class PlainsFont {
+    public static FontFile get() {
         return new FontFile("Plains", "chililisoup")
                 .height(3)
                 .characters(

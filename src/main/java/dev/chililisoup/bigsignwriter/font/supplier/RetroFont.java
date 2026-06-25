@@ -4,9 +4,8 @@ import dev.chililisoup.bigsignwriter.font.FontFile;
 
 import static java.util.Map.entry;
 
-public class RetroFont extends AbstractFontSupplier {
-    @Override
-    public FontFile get() {
+public final class RetroFont {
+    public static FontFile get() {
         return new FontFile("Retro", "DebornMC")
                 .characterSeparator("   ")
                 .characters(

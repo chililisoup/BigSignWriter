@@ -11,9 +11,8 @@ import dev.chililisoup.bigsignwriter.font.FontFile;
 
 import static java.util.Map.entry;
 
-public class QueatletsOldStyleMonospaceFont extends AbstractFontSupplier {
-    @Override
-    public FontFile get() {
+public final class QueatletsOldStyleMonospaceFont {
+    public static FontFile get() {
         return new FontFile("Queatlets Old Style Monospace", "adhillisepic")
                 .parentFont("queatlets_monospace")
                 .characters(

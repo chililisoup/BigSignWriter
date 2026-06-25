@@ -2,21 +2,16 @@ package dev.chililisoup.bigsignwriter.font.supplier;
 
 import dev.chililisoup.bigsignwriter.font.FontFile;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import static java.util.Map.entry;
 
-public class SmallFont extends AbstractFontSupplier {
+public final class SmallFont {
     private static final String VERT_3PX =
             //? if >= 1.21.4 {
             "𜷴";
             //?} else
             //"❙";
-    
-    @Override
-    public FontFile get() {
+
+    public static FontFile get() {
         return new FontFile("Small", "chililisoup")
                 .height(2)
                 .characterSeparator("")
@@ -418,45 +413,4 @@ public class SmallFont extends AbstractFontSupplier {
                         })
                 );
     }
-
-    //? if >= 1.21.4 {
-    @Override
-    public Map<Character, Set<PatchCharacter>> patches() {
-        HashMap<Character, Set<PatchCharacter>> baseMap = new HashMap<>(Map.ofEntries(
-                entry('F', Set.of(
-                        PatchCharacter.of(
-                                "🬴🬒",
-                                "▍  "
-                        )
-                )),
-                entry('J', Set.of(
-                        PatchCharacter.of(
-                                "  ▍",
-                                "🬢🬘"
-                        )
-                )),
-                entry('L', Set.of(
-                        PatchCharacter.of(
-                                "▍  ",
-                                "🬲🬭"
-                        )
-                )),
-                entry('P', Set.of(
-                        PatchCharacter.of(
-                                "🬴🬗",
-                                "▍  "
-                        )
-                )),
-                entry('4', Set.of(
-                        PatchCharacter.of(
-                                "🬳🬷",
-                                "  ▍"
-                        )
-                ))
-        ));
-
-        this.appendMediumVerticalBarAnnihilator(baseMap);
-        return baseMap;
-    }
-    //?}
 }

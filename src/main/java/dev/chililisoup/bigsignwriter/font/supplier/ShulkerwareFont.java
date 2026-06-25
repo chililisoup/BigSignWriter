@@ -11,9 +11,8 @@ import dev.chililisoup.bigsignwriter.font.FontFile;
 
 import static java.util.Map.entry;
 
-public class ShulkerwareFont extends AbstractFontSupplier {
-    @Override
-    public FontFile get() {
+public final class ShulkerwareFont {
+    public static FontFile get() {
         return new FontFile("SHULKERWARE", "adhillisepic")
                 .characterSeparator("   ")
                 .characters(

@@ -66,9 +66,11 @@ public class BigSignWriterConfigScreen extends Screen {
         this.parent = parent;
         this.tabManager.setTabArea(ScreenRectangle.empty());
 
-        List<FontInfo> workingFonts = BigSignWriter.AVAILABLE_FONTS.stream().filter(FontInfo::isWorking).toList();
-        this.title = workingFonts.get(Mth.floor(Math.random() * workingFonts.size()))
-                .getPreview("Big Sign Writer");
+        List<FontInfo> workingFonts = BigSignWriter.availableFonts().stream().filter(FontInfo::isWorking).toList();
+        this.title = workingFonts.isEmpty() ?
+                new Component[]{ Component.empty() } :
+                workingFonts.get(Mth.floor(Math.random() * workingFonts.size()))
+                        .getPreview("Big Sign Writer");
     }
 
     @Override
@@ -97,7 +99,7 @@ public class BigSignWriterConfigScreen extends Screen {
                 Util.getPlatform().openPath(BigSignWriter.getFontsDir())
         ).width(120).build(), 0, 0);
         footerButtons.addChild(Button.builder(Component.translatable("bigsignwriter.config.reloadFonts"), button -> {
-            BigSignWriter.reloadFonts();
+            BigSignWriter.forceReload();
             this.reload();
         }).width(120).build(), 0, 1);
         footerButtons.addChild(Button.builder(CommonComponents.GUI_DONE, button ->
@@ -539,7 +541,7 @@ public class BigSignWriterConfigScreen extends Screen {
         protected Layout buildContent() {
             GridLayout content = new GridLayout().spacing(4);
             GridLayout.RowHelper rowHelper = content.createRowHelper(1);
-            BigSignWriter.AVAILABLE_FONTS.forEach(
+            BigSignWriter.availableFonts().forEach(
                     fontFile -> rowHelper.addChild(new FontElement(fontFile))
             );
             return content;
@@ -748,7 +750,7 @@ public class BigSignWriterConfigScreen extends Screen {
 
             private final Button copyButton = Button.builder(Component.translatable("bigsignwriter.config.fonts.createCopy"), button -> {
                 if (FontsTab.this.selected != null) {
-                    BigSignWriter.saveFontToFile(FontsTab.this.selected.fontInfo);
+                    BigSignWriter.copyFontToFile(FontsTab.this.selected.fontInfo);
                     BigSignWriterConfigScreen.this.reload();
                 }
             }).tooltip(Tooltip.create(Component.translatable("bigsignwriter.config.fonts.createCopy.desc"))).build();

@@ -32,7 +32,7 @@ public class FontFile {
     }
 
     public FontFile parentFont(String parentFont) {
-        this.parentFont = parentFont;
+        this.parentFont = "builtin/" + parentFont;
         return this;
     }
 
@@ -43,8 +43,17 @@ public class FontFile {
         return this;
     }
 
-    public final FontInfo createInfo(String source) {
-        return new FontInfo(this, source);
+    public FontFile copyWithUnsafeCharacters() {
+        FontFile copy = new FontFile();
+
+        copy.name = this.name;
+        copy.credits = this.credits;
+        copy.height = height;
+        copy.characterSeparator = this.characterSeparator;
+        copy.parentFont = this.parentFont;
+        copy.characters = this.characters;
+
+        return copy;
     }
 
     public static int compareChars(char a, char b) {

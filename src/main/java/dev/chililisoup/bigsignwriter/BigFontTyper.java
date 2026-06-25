@@ -100,11 +100,11 @@ public final class BigFontTyper {
     }
 
     public int getEndLine() {
-        return Math.min(BigSignWriter.getHeight() + this.getLine(), this.lineCount());
+        return Math.min(BigSignWriter.height() + this.getLine(), this.lineCount());
     }
 
     private int getEffectiveBottomLine() {
-        return Math.max(this.lineCount() - BigSignWriter.getHeight(), 0);
+        return Math.max(this.lineCount() - BigSignWriter.height(), 0);
     }
 
     private int getCursorPos() {
@@ -125,7 +125,7 @@ public final class BigFontTyper {
                 return splitMap;
         }
 
-        String characterSeparator = BigSignWriter.CHARACTER_SEPARATOR;
+        String characterSeparator = BigSignWriter.characterSeparator();
         HashSet<Integer> widths = new HashSet<>();
         Stream<String> messageStream = Arrays.stream(
                 Arrays.copyOfRange(this.messages, startLine, endLine)
@@ -301,7 +301,7 @@ public final class BigFontTyper {
             int charLine = i - startLine;
             if (charLine >= split.length || charLine >= bigChar.length || bigChar[charLine] == null) continue;
 
-            String separator = this.messages[i].isEmpty() ? "" : BigSignWriter.CHARACTER_SEPARATOR;
+            String separator = this.messages[i].isEmpty() ? "" : BigSignWriter.characterSeparator();
             String addition = atEnd ? separator + bigChar[charLine] : bigChar[charLine] + separator;
             String message = this.messages[i].substring(0, split[charLine]) + addition + this.messages[i].substring(split[charLine]);
 
@@ -329,9 +329,9 @@ public final class BigFontTyper {
         } else if (keyEvent.isDown() || keyEvent.isConfirmation()) {
             if (keyEvent.isDown()) this.setLine(this.getLine() + 1);
             else {
-                if (this.getLine() == 0 && BigSignWriter.getHeight() * 2 > this.messages.length)
+                if (this.getLine() == 0 && BigSignWriter.height() * 2 > this.messages.length)
                     this.setLine(this.getEffectiveBottomLine());
-                else this.setLine(this.getLine() + BigSignWriter.getHeight());
+                else this.setLine(this.getLine() + BigSignWriter.height());
             }
             if (this.getLine() > this.getEffectiveBottomLine())
                 this.setLine(0);

@@ -2,15 +2,10 @@ package dev.chililisoup.bigsignwriter.font.supplier;
 
 import dev.chililisoup.bigsignwriter.font.FontFile;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import static java.util.Map.entry;
 
-public class DefaultFont extends AbstractFontSupplier {
-    @Override
-    public FontFile get() {
+public final class DefaultFont {
+    public static FontFile get() {
         return new FontFile("Default", "chililisoup")
                 .characters(
                         entry(' ', new String[]{
@@ -584,38 +579,5 @@ public class DefaultFont extends AbstractFontSupplier {
                                 "▜▙▟▜▙"
                         })
         );
-    }
-
-    @Override
-    public Map<Character, Set<PatchCharacter>> patches() {
-        HashMap<Character, Set<PatchCharacter>> baseMap = new HashMap<>(Map.ofEntries(
-                entry('2', Set.of(
-                        PatchCharacter.of(
-                                "▗▆█▆▖",
-                                "▔🬏▄▌🬉",
-                                "🬓▌▀🬁 ",
-                                "█▋▋█"
-                        )
-                )),
-                entry('$', Set.of(
-                        PatchCharacter.of(
-                                "▗▆ ▎ ▆▖",
-                                "🬉▌ ▎ 🬏▔",
-                                "▁🬁 ▎ ▌🬓",
-                                "▝🮅 ▎ 🮅▘"
-                        )
-                )),
-                entry('5', Set.of(
-                        PatchCharacter.of(
-                                "█▋▋█",
-                                "▉▉▄🬏 ",
-                                "'▘▘▀▌🬓",
-                                "▝🮅█🮅▘"
-                        )
-                ))
-        ));
-
-        this.appendRecolourfulContainersGuiFix(baseMap);
-        return baseMap;
     }
 }

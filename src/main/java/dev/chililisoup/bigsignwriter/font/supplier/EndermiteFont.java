@@ -6,9 +6,8 @@ import dev.chililisoup.bigsignwriter.font.FontFile;
 import static java.util.Map.entry;
 
 @SuppressWarnings("UnnecessaryUnicodeEscape")
-public class EndermiteFont extends AbstractFontSupplier {
-    @Override
-    public FontFile get() {
+public final class EndermiteFont {
+    public static FontFile get() {
         return new FontFile("Endermite", "Opticality")
                 .height(3)
                 .characters(

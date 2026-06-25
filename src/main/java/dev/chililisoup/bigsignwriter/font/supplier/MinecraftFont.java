@@ -4,9 +4,8 @@ import dev.chililisoup.bigsignwriter.font.FontFile;
 
 import static java.util.Map.entry;
 
-public class MinecraftFont extends AbstractFontSupplier {
-    @Override
-    public FontFile get() {
+public final class MinecraftFont {
+    public static FontFile get() {
         return new FontFile("Minecraft", "Mojang, chililisoup")
                 .characterSeparator(" ")
                 .characters(
