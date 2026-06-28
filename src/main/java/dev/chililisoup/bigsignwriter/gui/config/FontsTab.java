@@ -153,7 +153,7 @@ public class FontsTab extends ConfigTab<FontsTab.FontsSidePanel> {
                 //? if >= 1.21.11 {
         protected void extractContents(
                 //?} else
-                //protected void extractWidgetRenderState(
+        //protected void extractWidgetRenderState(
                 @NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick
         ) {
             int left = this.getX();
@@ -189,11 +189,17 @@ public class FontsTab extends ConfigTab<FontsTab.FontsSidePanel> {
                         bottom - 2,
                         0x40FFFFFF
                 );
+                //? if <= 1.21.6
+                //guiGraphics.disableScissor();
                 guiGraphics.setTooltipForNextFrame(Minecraft.getInstance().font, this.name, mouseX, mouseY);
+
                 //? if >= 1.21.9 {
                 guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
                 //?} elif <= 1.21.1
                 //guiGraphics.flush();
+
+                //? if <= 1.21.6
+                //FontsTab.this.enableScissor(guiGraphics);
             }
 
             if (this.fontInfo.error() != null) {

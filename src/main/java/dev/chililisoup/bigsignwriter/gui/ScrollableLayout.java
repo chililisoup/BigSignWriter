@@ -111,9 +111,13 @@ public class ScrollableLayout implements Layout {
             return 10.0;
         }
 
+        public void enableScissor(GuiGraphicsExtractor guiGraphics) {
+            guiGraphics.enableScissor(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height);
+        }
+
         @Override
         protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
-            guiGraphics.enableScissor(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height);
+            this.enableScissor(guiGraphics);
 
             for (AbstractWidget abstractWidget : this.children)
                 abstractWidget.render(guiGraphics, mouseX, mouseY, partialTick);

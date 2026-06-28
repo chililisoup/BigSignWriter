@@ -15,6 +15,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
+//? if <= 1.21.6 {
+/*import net.minecraft.client.gui.GuiGraphicsExtractor;
+*///?}
+
 public abstract class ConfigTab<T extends ConfigTab.SidePanel> implements Tab {
     protected final BigSignWriterConfigScreen screen;
     private final Component title;
@@ -55,6 +59,21 @@ public abstract class ConfigTab<T extends ConfigTab.SidePanel> implements Tab {
     protected final Layout getContent() {
         return this.layout.content;
     }
+
+    //? if <= 1.21.6 {
+    /*protected final void enableScissor(GuiGraphicsExtractor guiGraphics) {
+        //? if 1.21.6 {
+        /^ScrollableLayout.Container container = this.layout.container;
+        guiGraphics.enableScissor(
+                container.getX(),
+                container.getY(),
+                container.getX() + container.getWidth(),
+                container.getY() + container.getHeight()
+        );
+        ^///?} else
+        this.layout.container.enableScissor(guiGraphics);
+    }
+    *///?}
 
     //? if >= 1.21.6 {
     @Override
