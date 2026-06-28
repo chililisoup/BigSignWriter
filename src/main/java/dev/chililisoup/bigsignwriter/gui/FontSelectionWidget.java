@@ -390,6 +390,10 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
             }
             //?}
 
+            //? if < 1.21.6 {
+            /*guiGraphics.pose().pushMatrix();
+            guiGraphics.pose().translate(0, 0, 1);
+            *///?}
             if (this.fontPreview.length == 0)
                 GraphicsHelper.drawScrollingString(
                         guiGraphics,
@@ -408,6 +412,8 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
                     width - 10,
                     height - 4
             );
+            //? if < 1.21.6
+            //guiGraphics.pose().popMatrix();
         }
     }
 }
