@@ -29,6 +29,7 @@ public abstract class BigSignWriterConfig {
         public boolean fontSelectorCoversDoneButton = true;
         public boolean fontSelectorOpensScrolledUp = true;
         public boolean showConfigButton = true;
+        public boolean showSymbolsButton = true;
         public boolean displayFontHeights = true;
         public HashSet<String> hiddenFonts = new HashSet<>();
 

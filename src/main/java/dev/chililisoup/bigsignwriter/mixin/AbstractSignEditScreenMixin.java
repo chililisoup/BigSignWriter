@@ -138,6 +138,19 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             configButton.setTooltip(Tooltip.create(Component.translatable("bigsignwriter.config")));
             this.addRenderableWidget(configButton);
         }
+
+        if (MAIN_CONFIG.showSymbolsButton) {
+            ClickableButtonWidget symbolsButton = new ClickableButtonWidget(
+                    x + 104,
+                    y + 3,
+                    14,
+                    14,
+                    Component.literal("❤"),
+                    button -> {}
+            );
+            symbolsButton.setTooltip(Tooltip.create(Component.translatable("bigsignwriter.symbols")));
+            this.addRenderableWidget(symbolsButton);
+        }
     }
 
     @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)

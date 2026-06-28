@@ -16,6 +16,7 @@ stonecutter parameters {
             replace("pushPose", "pushMatrix")
             replace("popPose", "popMatrix")
             replace("guiGraphics.renderTooltip(", "guiGraphics.setTooltipForNextFrame(")
+            replace("dev.chililisoup.bigsignwriter.gui.ScrollableLayout", "net.minecraft.client.gui.components.ScrollableLayout")
         }
 
         string(current.parsed > "1.21.6") {

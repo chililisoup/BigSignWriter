@@ -70,4 +70,28 @@ public class OptionElement<T> extends AbstractLayoutElement {
             return RESET_SPRITE;
         }
     }
+
+    public static class BooleanOption extends OptionElement<Boolean> {
+        BooleanOption(
+                boolean value,
+                boolean defaultValue,
+                Consumer<Boolean> onChange,
+                Component name,
+                Component description
+        ) {
+            super(value, defaultValue, onChange, OptionController.BooleanController::new, name, description);
+        }
+    }
+
+    public static class StringOption extends OptionElement<String> {
+        StringOption(
+                String value,
+                String defaultValue,
+                Consumer<String> onChange,
+                Component name,
+                Component description
+        ) {
+            super(value, defaultValue, onChange, OptionController.StringController::new, name, description);
+        }
+    }
 }
