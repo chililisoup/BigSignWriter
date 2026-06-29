@@ -9,15 +9,13 @@ val mod = `mod-common`.mod.get()
 val deps = mod.deps
 
 stonecutter {
-    constants {
-        match(name.split("-")[1], "fabric", "neoforge")
-    }
+    constants["fabric"] = true
+    constants["neoforge"] = true
 }
 
 modstitch {
     minecraftVersion = deps.minecraft
     javaVersion = deps.javaVersion
-    parchment { deps.parchment { mappingsVersion = it } }
 
     metadata {
         modId = mod.id
@@ -71,6 +69,9 @@ modstitch {
 dependencies {
     deps.fabricApi { modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:${it}") }
     deps.modMenu { modstitchModImplementation("com.terraformersmc:modmenu:${it}") }
+
+    compileOnly("net.neoforged.fancymodloader:loader:${deps.neoForgeLoader}")
+    deps.neoForge { compileOnly("net.neoforged:neoforge:$it") }
 }
 
 java {
@@ -88,15 +89,23 @@ modstitch.onEnable {
 
 tasks {
     named("jar") {
-        dependsOn("filterArtifacts")
+        dependsOn("convertClassTweaker")
     }
 
-    register<Delete>("filterArtifacts") {
-        description = "Deletes meta files irrelevant to the target platform"
+    register<Copy>("convertClassTweaker") {
+        description = "Copies the class tweaker and converts it to an access transformer"
+        group = "build"
 
-        if (modstitch.isLoom)
-            delete(layout.buildDirectory.file("resources/main/META-INF/neoforge.mods.toml"))
-        else
-            delete(layout.buildDirectory.file("resources/main/fabric.mod.json"))
+        from(layout.buildDirectory.file("resources/main/${mod.id}.ct"))
+        into(layout.buildDirectory.dir("resources/main/META-INF"))
+        rename("${mod.id}\\.ct", "accesstransformer.cfg")
+        filter { line -> line
+            .replace("classTweaker v1 official", "")
+            .replace(Regex("accessible \\w+"), "public")
+            .replace(Regex("(?<=public [\\w./]+)\\/"), ".")
+            .replace(" (", "(")
+        }
+
+        dependsOn("processResources")
     }
 }

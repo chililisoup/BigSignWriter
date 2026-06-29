@@ -1,5 +1,5 @@
 //? if neoforge {
-/*package dev.chililisoup.bigsignwriter.loaders.neoforge;
+package dev.chililisoup.bigsignwriter.loaders.neoforge;
 
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.gui.config.BigSignWriterConfigScreen;
@@ -16,8 +16,8 @@ import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.resources.VanillaClientListeners;
 //?} else {
-/^import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
-^///?}
+/*import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+*///?}
 
 @Mod(BigSignWriter.MOD_ID)
 public class NeoforgeEntrypoint {
@@ -45,8 +45,8 @@ public class NeoforgeEntrypoint {
         event.addListener(bigFontManager, BigSignWriter.getBigFontManager());
         event.addDependency(VanillaClientListeners.FONTS, bigFontManager);
         //?} else {
-        /^event.registerReloadListener(BigSignWriter.getBigFontManager());
-        ^///?}
+        /*event.registerReloadListener(BigSignWriter.getBigFontManager());
+        *///?}
     }
 }
-*///?}
+//?}

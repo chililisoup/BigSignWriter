@@ -23,6 +23,12 @@ side = "CLIENT"
 [[dependencies.${mod_id}]]
 modId = "minecraft"
 type = "required"
-versionRange = "${minecraft_range}"
+versionRange = "${minecraft_range_neoforge}"
 ordering = "NONE"
 side = "CLIENT"
+
+[[mixins]]
+config = "${mod_id}.mixins.json"
+
+[[accessTransformers]]
+file = "META-INF/accesstransformer.cfg"
