@@ -46,20 +46,6 @@ modstitch {
         }
     }
 
-    // ModDevGradle (NeoForge, Forge, Forgelike)
-    moddevgradle {
-        deps.neoForge { neoForgeVersion = it }
-
-        configureNeoForge {
-            runs {
-                register("testClient") {
-                    client()
-                    gameDirectory = layout.projectDirectory.dir("../../run")
-                }
-            }
-        }
-    }
-
     mixin {
         addMixinsToModManifest = true
         configs.register(mod.id)

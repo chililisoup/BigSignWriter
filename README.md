@@ -1,4 +1,4 @@
-<p align="center"><img width="128" alt="Big Sign Writer Logo" src="https://github.com/user-attachments/assets/3e093f83-022e-42f4-96b5-39fac32d204c"></p>
+<p align="center"><img width="128" alt="Big Sign Writer Logo" src="src/main/resources/assets/bigsignwriter/icon.png"></p>
 
 <h1 align="center">Big Sign Writer</h1>
 

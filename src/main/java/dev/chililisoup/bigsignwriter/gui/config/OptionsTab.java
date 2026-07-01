@@ -74,6 +74,13 @@ public class OptionsTab extends ConfigTab<OptionsTab.OptionsSidePanel> {
                 Component.translatable("bigsignwriter.config.fontSelectorOpensScrolledUp.desc")
         ));
         rowHelper.addChild(new OptionElement.BooleanOption(
+                workingConfig.displayFontHeights,
+                defaults.displayFontHeights,
+                value -> workingConfig.displayFontHeights = value,
+                Component.translatable("bigsignwriter.config.displayFontHeights"),
+                Component.translatable("bigsignwriter.config.displayFontHeights.desc")
+        ));
+        rowHelper.addChild(new OptionElement.BooleanOption(
                 workingConfig.showConfigButton,
                 defaults.showConfigButton,
                 value -> workingConfig.showConfigButton = value,
@@ -88,11 +95,11 @@ public class OptionsTab extends ConfigTab<OptionsTab.OptionsSidePanel> {
                 Component.translatable("bigsignwriter.config.showSymbolsButton.desc")
         ));
         rowHelper.addChild(new OptionElement.BooleanOption(
-                workingConfig.displayFontHeights,
-                defaults.displayFontHeights,
-                value -> workingConfig.displayFontHeights = value,
-                Component.translatable("bigsignwriter.config.displayFontHeights"),
-                Component.translatable("bigsignwriter.config.displayFontHeights.desc")
+                workingConfig.largeSymbolPreviews,
+                defaults.largeSymbolPreviews,
+                value -> workingConfig.largeSymbolPreviews = value,
+                Component.translatable("bigsignwriter.config.largeSymbolPreviews"),
+                Component.translatable("bigsignwriter.config.largeSymbolPreviews.desc")
         ));
         rowHelper.addChild(new OptionElement.BooleanOption(
                 workingConfig.characterSeparatorOverrideEnabled,
@@ -164,7 +171,7 @@ public class OptionsTab extends ConfigTab<OptionsTab.OptionsSidePanel> {
                         this.getY() + 10
                 );
 
-                guiGraphics.fill(this.getX(), this.getY() + 15, this.getRight(), this.getY() + 16, 0xFFFFFFFF);
+                guiGraphics.horizontalLine(this.getX(), this.getRight() - 1, this.getY() + 15, -1);
 
                 guiGraphics.textWithWordWrap(
                         OptionsTab.this.screen.font,

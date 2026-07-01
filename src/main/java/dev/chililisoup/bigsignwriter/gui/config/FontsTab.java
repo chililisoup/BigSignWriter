@@ -403,7 +403,7 @@ public class FontsTab extends ConfigTab<FontsTab.FontsSidePanel> {
                     this.getY() + 10
             );
 
-            guiGraphics.fill(this.getX(), this.getY() + 15, this.getRight(), this.getY() + 16, 0xFFFFFFFF);
+            guiGraphics.horizontalLine(this.getX(), this.getRight() - 1, this.getY() + 15, -1);
 
             for (int i = 0; i < this.infoLines.size(); i++) GraphicsHelper.drawScrollingString(
                     guiGraphics,
@@ -416,7 +416,7 @@ public class FontsTab extends ConfigTab<FontsTab.FontsSidePanel> {
             );
 
             int afterInfoLines = this.afterInfoLines();
-            guiGraphics.fill(this.getX(), afterInfoLines, this.getRight(), afterInfoLines + 1, 0xFFFFFFFF);
+            guiGraphics.horizontalLine(this.getX(), this.getRight() - 1, afterInfoLines, -1);
 
             Component error = fontInfo.error();
             if (error != null) {

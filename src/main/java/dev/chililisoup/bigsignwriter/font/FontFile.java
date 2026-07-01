@@ -13,6 +13,7 @@ public class FontFile {
     public @Nullable String characterSeparator = null;
     public @Nullable String parentFont = null;
     public Map<Character, String[]> characters;
+    public @Nullable Map<String, String[]> symbols = null;
 
     public FontFile() {}
 
@@ -43,6 +44,12 @@ public class FontFile {
         return this;
     }
 
+    @SafeVarargs
+    public final FontFile symbols(Map.Entry<String, String[]>... entries) {
+        this.symbols = Map.ofEntries(entries);
+        return this;
+    }
+
     public FontFile copyWithUnsafeCharacters() {
         FontFile copy = new FontFile();
 
@@ -52,6 +59,7 @@ public class FontFile {
         copy.characterSeparator = this.characterSeparator;
         copy.parentFont = this.parentFont;
         copy.characters = this.characters;
+        copy.symbols = this.symbols;
 
         return copy;
     }

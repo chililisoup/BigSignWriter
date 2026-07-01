@@ -106,7 +106,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
     }
 
     @Override
-    public void setSelected(FontSelectionWidget.Entry entry) {
+    public void setSelected(Entry entry) {
         this.setOpen(false);
         this.playDownSound(this.minecraft.getSoundManager());
         if (this.getSelected() == entry) return;
@@ -225,7 +225,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
     }
     *///?}
 
-    public class Entry extends ObjectSelectionList.Entry<FontSelectionWidget.Entry> {
+    public class Entry extends ObjectSelectionList.Entry<Entry> {
         private final @Nullable FontInfo fontInfo;
         private final Component[] fontPreview;
         private final Component name;
@@ -236,7 +236,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
         private final List<FontInfo> children;
         //?}
 
-        public Entry(final @Nullable FontInfo fontInfo) {
+        public Entry(@Nullable FontInfo fontInfo) {
             this.fontInfo = fontInfo;
             this.fontPreview = fontInfo != null ? fontInfo.getPreview() : new Component[0];
             this.name = fontInfo != null ?

@@ -2,10 +2,7 @@ package dev.chililisoup.bigsignwriter;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dev.chililisoup.bigsignwriter.font.BuiltInFonts;
-import dev.chililisoup.bigsignwriter.font.FontFile;
-import dev.chililisoup.bigsignwriter.font.FontInfo;
-import dev.chililisoup.bigsignwriter.font.FontInfoExtractor;
+import dev.chililisoup.bigsignwriter.font.*;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,10 +37,15 @@ public final class BigFontManager implements
     public static final String DEFAULT_FONT_SOURCE = "builtin/default";
 
     private final ArrayList<FontInfo> availableFonts = new ArrayList<>();
+    private final ArrayList<SymbolGroup> availableSymbolGroups = new ArrayList<>();
     private @Nullable FontInfo selectedFont = null;
 
     public List<FontInfo> availableFonts() {
         return this.availableFonts;
+    }
+
+    public List<SymbolGroup> availableSymbolGroups() {
+        return this.availableSymbolGroups;
     }
 
     public @Nullable FontInfo selectedFont() {
@@ -108,6 +110,7 @@ public final class BigFontManager implements
         String selectedFontSource = this.selectedFont != null ? this.selectedFont.source : null;
 
         this.availableFonts.clear();
+        this.availableSymbolGroups.clear();
         this.selectedFont = null;
 
         Stream<Map.Entry<String, FontFile>> combinedStream;
@@ -133,6 +136,7 @@ public final class BigFontManager implements
     private void apply(Preparation preparation) {
         this.availableFonts.addAll(FontInfoExtractor.extractAll(preparation.preparedFonts));
         this.availableFonts.sort(BigFontManager::compareFonts);
+        this.availableSymbolGroups.addAll(SymbolGroup.availableGroups());
         this.reselectFont(preparation.selectedFontSource);
         BigSignWriter.LOGGER.info(BigSignWriter.LOGGER_PREFIX + "Fonts loaded!");
     }

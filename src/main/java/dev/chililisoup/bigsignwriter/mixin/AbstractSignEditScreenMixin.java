@@ -8,6 +8,7 @@ import dev.chililisoup.bigsignwriter.BigFontTyper;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.gui.ClickableButtonWidget;
 import dev.chililisoup.bigsignwriter.gui.FontSelectionWidget;
+import dev.chililisoup.bigsignwriter.gui.SymbolPickerWidget;
 import dev.chililisoup.bigsignwriter.gui.config.BigSignWriterConfigScreen;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -114,7 +115,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
         fontSelector.setOnOpenChanged(instance -> {
             fontSelectorToggleButton.setMessage(bigSignWriter$getDropdownLabel(instance.isOpen()));
-            if (this.bigSignWriter$doneButton != null) this.bigSignWriter$doneButton.active =
+            if (this.bigSignWriter$doneButton != null) this.bigSignWriter$doneButton.visible =
                     !MAIN_CONFIG.fontSelectorCoversDoneButton || !instance.isOpen();
         });
 
@@ -140,16 +141,35 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         }
 
         if (MAIN_CONFIG.showSymbolsButton) {
+            SymbolPickerWidget symbolPicker = new SymbolPickerWidget(
+                    this.minecraft,
+                    x - 100,
+                    y,
+                    200,
+                    Math.min(200, this.height - y - 5)
+            );
+            symbolPicker.visible = false;
+
+            symbolPicker.setOnVisibilityToggle(visible -> {
+                if (fontSelector.isOpen()) fontSelector.setOpen(false);
+                fontSelector.visible = !visible;
+                fontSelectorToggleButton.visible = !visible;
+                if (this.bigSignWriter$doneButton != null) this.bigSignWriter$doneButton.visible =
+                        !MAIN_CONFIG.fontSelectorCoversDoneButton || !visible;
+            });
+
             ClickableButtonWidget symbolsButton = new ClickableButtonWidget(
                     x + 104,
                     y + 3,
                     14,
                     14,
                     Component.literal("❤"),
-                    button -> {}
+                    button -> symbolPicker.toggleVisibility()
             );
             symbolsButton.setTooltip(Tooltip.create(Component.translatable("bigsignwriter.symbols")));
+
             this.addRenderableWidget(symbolsButton);
+            this.addRenderableWidget(symbolPicker);
         }
     }
 

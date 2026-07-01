@@ -27,9 +27,7 @@ import net.minecraft.util.Util;
 /*import net.minecraft.Util;
 *///?}
 
-//? if < 1.21.3 {
-/*import com.mojang.blaze3d.systems.RenderSystem;
-*///?} else {
+//? if >= 1.21.3 {
 import net.minecraft.client.renderer.RenderPipelines;
 //?}
 
@@ -152,24 +150,12 @@ public class BigSignWriterConfigScreen extends Screen {
 
         this.extractDivider(guiGraphics, leftTabX, tabY, tabWidth, contentHeight);
         this.extractDivider(guiGraphics, rightTabX, tabY, tabWidth, contentHeight);
-
-        //? if < 1.21.3
-        //RenderSystem.enableBlend();
-        guiGraphics.blit(
-                //? if >= 1.21.3
-                RenderPipelines.GUI_TEXTURED,
-                Screen.HEADER_SEPARATOR,
+        GraphicsHelper.drawHeaderSeparator(
+                guiGraphics,
                 rightTabX,
                 tabY - 2,
-                0.0F,
-                0.0F,
-                tabWidth,
-                2,
-                32,
-                2
+                tabWidth
         );
-        //? if < 1.21.3
-        //RenderSystem.disableBlend();
 
         //? if < 1.21.6 {
         /*for (Renderable renderable : this.renderables) renderable.render(guiGraphics, mouseX, mouseY, partialTick);
@@ -185,26 +171,12 @@ public class BigSignWriterConfigScreen extends Screen {
 
     private void extractDivider(GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height) {
         this.extractMenuBackground(guiGraphics, x, y, width, height - 2);
-
-        //? if < 1.21.3
-        //RenderSystem.enableBlend();
-
-        guiGraphics.blit(
-                //? if >= 1.21.3
-                RenderPipelines.GUI_TEXTURED,
-                Screen.FOOTER_SEPARATOR,
+        GraphicsHelper.drawFooterSeparator(
+                guiGraphics,
                 x,
                 y + height - 2,
-                0.0F,
-                0.0F,
-                width,
-                2,
-                32,
-                2
+                width
         );
-
-        //? if < 1.21.3
-        //RenderSystem.disableBlend();
     }
 
     @Override

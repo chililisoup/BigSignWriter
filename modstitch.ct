@@ -11,6 +11,7 @@ accessible class net/minecraft/client/gui/components/ScrollableLayout$Container
 accessible method net/minecraft/client/gui/components/ScrollableLayout$Container scrollbarReserve ()I
 accessible method net/minecraft/client/gui/components/AbstractWidget renderScrollingString (Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIIII)V
 accessible method net/minecraft/client/gui/components/AbstractSliderButton setValue (D)V
+extendable method net/minecraft/client/gui/components/AbstractSelectionList repositionEntries ()V
 accessible field net/minecraft/client/gui/components/EditBox value Ljava/lang/String;
 accessible field net/minecraft/client/gui/screens/Screen renderables Ljava/util/List;
 accessible field net/minecraft/client/gui/screens/Screen minecraft Lnet/minecraft/client/Minecraft;

@@ -60,6 +60,10 @@ public class FontInfo implements FamilyCharacterProvider {
         return this.cumulativeCharacters;
     }
 
+    public @Nullable Map<String, String[]> symbols() {
+        return this.fontFile.symbols;
+    }
+
     @Override
     public @Nullable FontInfo parentFont() {
         return this.parentFont;

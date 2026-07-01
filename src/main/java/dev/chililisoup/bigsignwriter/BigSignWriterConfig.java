@@ -28,9 +28,10 @@ public abstract class BigSignWriterConfig {
         public double buttonsAlignmentY = 0.25;
         public boolean fontSelectorCoversDoneButton = true;
         public boolean fontSelectorOpensScrolledUp = true;
+        public boolean displayFontHeights = true;
         public boolean showConfigButton = true;
         public boolean showSymbolsButton = true;
-        public boolean displayFontHeights = true;
+        public boolean largeSymbolPreviews = false;
         public HashSet<String> hiddenFonts = new HashSet<>();
 
         public PersistentConfig copyFrom(PersistentConfig other) {

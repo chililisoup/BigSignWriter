@@ -5,7 +5,9 @@ import dev.chililisoup.bigsignwriter.font.FontInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
@@ -23,6 +25,12 @@ import net.minecraft.util.Util;
 import net.minecraft.client.gui.components.AbstractWidget;
 //?}
 *///?}
+
+//? if < 1.21.3 {
+/*import com.mojang.blaze3d.systems.RenderSystem;
+*///?} else {
+import net.minecraft.client.renderer.RenderPipelines;
+//?}
 
 public final class GraphicsHelper {
     public static void drawScrollingString(GuiGraphicsExtractor guiGraphics, Component text, int centerX, int left, int right, int top, int bottom) {
@@ -88,6 +96,10 @@ public final class GraphicsHelper {
 
     public static void drawScrollingString(GuiGraphicsExtractor guiGraphics, Component text, int left, int right, int top, int bottom) {
         drawScrollingString(guiGraphics, text, (left + right) / 2, left, right, top, bottom);
+    }
+
+    public static void drawScrollingString(GuiGraphicsExtractor guiGraphics, Component text, int left, int right, int y) {
+        drawScrollingString(guiGraphics, text, left, left, right, y, y + 8);
     }
 
     public static void drawScrollingFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, int x, int y, int width, int height) {
@@ -203,5 +215,46 @@ public final class GraphicsHelper {
             previewLines.add(fontInfo.getPreview(runningString.toString(), characterSeparator));
 
         return previewLines;
+    }
+
+    public static float getScaledWidth(Font font, String[] lines, int lineHeight) {
+        if (lines.length == 0) return 0;
+
+        float scale = (lineHeight / 9F) / (float) lines.length;
+        return font.width(lines[0]) * scale;
+    }
+
+    private static void drawSeparator(GuiGraphicsExtractor guiGraphics, int x, int y, int width, Identifier texture) {
+        //? if < 1.21.3
+        //RenderSystem.enableBlend();
+
+        guiGraphics.blit(
+                //? if >= 1.21.3
+                RenderPipelines.GUI_TEXTURED,
+                texture,
+                x,
+                y,
+                0.0F,
+                0.0F,
+                width,
+                2,
+                32,
+                2
+        );
+
+        //? if < 1.21.3
+        //RenderSystem.disableBlend();
+    }
+
+    public static void drawHeaderSeparator(GuiGraphicsExtractor guiGraphics, int x, int y, int width) {
+        drawSeparator(guiGraphics, x, y, width, Minecraft.getInstance().level == null ?
+                Screen.HEADER_SEPARATOR : Screen.INWORLD_HEADER_SEPARATOR
+        );
+    }
+
+    public static void drawFooterSeparator(GuiGraphicsExtractor guiGraphics, int x, int y, int width) {
+        drawSeparator(guiGraphics, x, y, width, Minecraft.getInstance().level == null ?
+                Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR
+        );
     }
 }

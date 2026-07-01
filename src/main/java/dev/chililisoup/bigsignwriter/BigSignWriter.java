@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import dev.chililisoup.bigsignwriter.font.FamilyCharacterProvider;
 import dev.chililisoup.bigsignwriter.font.FontFile;
 import dev.chililisoup.bigsignwriter.font.FontInfo;
+import dev.chililisoup.bigsignwriter.font.SymbolGroup;
 import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,6 +48,10 @@ public final class BigSignWriter {
 
     public static List<FontInfo> availableFonts() {
         return BIG_FONT_MANAGER.availableFonts();
+    }
+
+    public static List<SymbolGroup> availableSymbolGroups() {
+        return BIG_FONT_MANAGER.availableSymbolGroups();
     }
 
     public static @Nullable FontInfo selectedFont() {
