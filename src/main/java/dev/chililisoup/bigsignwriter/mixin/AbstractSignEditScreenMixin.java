@@ -55,6 +55,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
     @Unique private @Nullable Button bigSignWriter$doneButton;
     @Unique private @Nullable BigFontTyper bigSignWriter$fontTyper;
+    @Unique private boolean bigSignWriter$inSymbolPicker = false;
     @Unique private boolean bigSignWriter$ignoreNextRemoval = false;
 
     @Shadow /*? if >= 1.21.2 {*/ protected /*?} else {*/ /*private *//*?}*/ @Final SignBlockEntity sign;
@@ -62,6 +63,10 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     @Shadow private void setMessage(String message) {}
     @Shadow private int line;
     @Shadow private @Nullable TextFieldHelper signField;
+
+    @Unique private int bigSignWriter$cursorHeight() {
+        return this.bigSignWriter$inSymbolPicker ? 1 : BigSignWriter.height();
+    }
 
     @WrapOperation(
             method = "init",
@@ -83,6 +88,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         this.bigSignWriter$fontTyper = new BigFontTyper(
                 this.sign,
                 this.font,
+                this::bigSignWriter$cursorHeight,
                 () -> this.line,
                 i -> this.line = i,
                 this.messages,
@@ -146,11 +152,15 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                     x - 100,
                     y,
                     200,
-                    Math.min(200, this.height - y - 5)
+                    Math.min(200, this.height - y - 5),
+                    this.bigSignWriter$fontTyper::typeLines
             );
             symbolPicker.visible = false;
 
             symbolPicker.setOnVisibilityToggle(visible -> {
+                this.bigSignWriter$inSymbolPicker = visible;
+                if (!visible) this.bigSignWriter$fontTyper.clampLine();
+
                 if (fontSelector.isOpen()) fontSelector.setOpen(false);
                 fontSelector.visible = !visible;
                 fontSelectorToggleButton.visible = !visible;
@@ -233,7 +243,8 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         int opaqueColor = 0xFF000000 | color;
 
         if (cursorPos <= 0 || atEnd) {
-            for (int i = this.line; i < this.bigSignWriter$fontTyper.getEndLine(); i++) {
+            int endLine = this.bigSignWriter$fontTyper.getEndLine(this.bigSignWriter$cursorHeight());
+            for (int i = this.line; i < endLine; i++) {
                 String message = this.messages[i] == null ? "" : this.messages[i];
                 int cursorX = this.font.width(message) / 2;
                 if (cursorPos <= 0 && !atEnd) cursorX *= -1;
@@ -246,7 +257,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             int cursorX = cursorPosition - this.font.width(topLine) / 2;
             int cursorY = (this.line - 2) * lineHeight;
 
-            guiGraphics.fill(cursorX, cursorY - 1, cursorX + 1, cursorY + lineHeight * BigSignWriter.height(), opaqueColor);
+            guiGraphics.fill(cursorX, cursorY - 1, cursorX + 1, cursorY + lineHeight * this.bigSignWriter$cursorHeight(), opaqueColor);
         }
 
         ci.cancel();

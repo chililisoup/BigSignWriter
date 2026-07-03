@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 public final class BigFontTyper {
     private final SignBlockEntity sign;
     private final Font font;
+    private final Supplier<Integer> cursorHeightGetter;
     private final Supplier<Integer> lineGetter;
     private final Consumer<Integer> lineSetter;
     private final String[] messages;
@@ -26,6 +27,7 @@ public final class BigFontTyper {
     public BigFontTyper(
             SignBlockEntity sign,
             Font font,
+            Supplier<Integer> cursorHeightGetter,
             Supplier<Integer> lineGetter,
             Consumer<Integer> lineSetter,
             String[] messages,
@@ -34,11 +36,20 @@ public final class BigFontTyper {
     ) {
         this.sign = sign;
         this.font = font;
+        this.cursorHeightGetter = cursorHeightGetter;
         this.lineGetter = lineGetter;
         this.lineSetter = lineSetter;
         this.messages = messages;
         this.messageSetter = messageSetter;
         this.signField = signField;
+    }
+
+    private int getClampedLine() {
+        return Math.clamp(this.lineCount() - BigSignWriter.height(), 0, this.getLine());
+    }
+
+    public void clampLine() {
+        this.setLine(this.getClampedLine());
     }
 
     public void onFontSelected() {
@@ -47,7 +58,7 @@ public final class BigFontTyper {
 
         int cursorPos = this.getCursorPos();
         int width = this.font.width(this.getMessage().substring(0, cursorPos));
-        this.setLine(Math.min(this.getLine(), this.getEffectiveBottomLine()));
+        this.clampLine();
 
         TreeMap<Integer, Integer[]> splitIndices = this.getSplitIndices(true);
         if (splitIndices.containsKey(width)) this.signField.setCursorPos(splitIndices.get(width)[0], false);
@@ -66,6 +77,10 @@ public final class BigFontTyper {
             else if (higherSplit != null) this.signField.setCursorPos(higherSplit.getValue()[0], false);
             else this.signField.setCursorToEnd();
         }
+    }
+
+    private int cursorHeight() {
+        return this.cursorHeightGetter.get();
     }
 
     private int lineCount() {
@@ -99,23 +114,49 @@ public final class BigFontTyper {
         this.signField.setCursorToEnd();
     }
 
+    public int getEndLine(int height) {
+        return Math.min(height + this.getLine(), this.lineCount());
+    }
+
     public int getEndLine() {
-        return Math.min(BigSignWriter.height() + this.getLine(), this.lineCount());
+        return this.getEndLine(BigSignWriter.height());
     }
 
     private int getEffectiveBottomLine() {
-        return Math.max(this.lineCount() - BigSignWriter.height(), 0);
+        return Math.max(this.lineCount() - this.cursorHeight(), 0);
     }
 
     private int getCursorPos() {
         return Math.min(this.signField.getCursorPos(), this.getMessage().length());
     }
 
-    private TreeMap<Integer, Integer[]> getSplitIndices(boolean afterSeparator) {
+    @SuppressWarnings("UnnecessaryUnicodeEscape")
+    private static String getGapFiller(int width) {
+        return width <= 0 ? "" : switch (width) {
+            case 1 -> "\u073C";
+            case 2 -> "\u073C\u073C";
+            case 3 -> "\u073C\u073C\u073C";
+            case 6 -> " \u073C";
+            case 7 -> " \u073C\u073C";
+            case 11 -> "  \u073C";
+            default -> {
+                String filler = "";
+                while (width % 5 != 0) {
+                    filler += " ";
+                    width -= 4;
+                }
+                while (width > 0) {
+                    filler += " ";
+                    width -= 5;
+                }
+                yield filler;
+            }
+        };
+    }
+
+    private TreeMap<Integer, Integer[]> getSplitIndices(boolean afterSeparator, int startLine, int endLine) {
         int firstWidth = this.font.width(this.getMessage());
         if (firstWidth == 0) return new TreeMap<>();
-        int startLine = this.getLine();
-        int endLine = this.getEndLine();
 
         TreeMap<Integer, Integer[]> splitMap = new TreeMap<>();
         splitMap.put(0, IntStream.of(new int[endLine - startLine]).boxed().toArray(Integer[]::new));
@@ -194,6 +235,11 @@ public final class BigFontTyper {
         return splitMap;
     }
 
+
+    private TreeMap<Integer, Integer[]> getSplitIndices(boolean afterSeparator) {
+        return this.getSplitIndices(afterSeparator, this.getLine(), this.getEndLine());
+    }
+
     private void deleteBigChar(KeyEvent keyEvent) {
         if (keyEvent.hasControlDown()) {
             this.clearSign();
@@ -260,12 +306,12 @@ public final class BigFontTyper {
         else this.signField.setCursorToStart();
     }
 
-    public void charTyped(char chr) {
-        String[] bigChar = BigSignWriter.getBigChar(chr).orElse(new String[]{});
+    public void typeLines(String[] bigChar) {
         if (bigChar.length == 0) return;
 
-        int startLine = this.getLine();
-        int endLine = this.getEndLine();
+        int currentLine = this.getLine();
+        int startLine = this.getClampedLine();
+        int endLine = Math.min(BigSignWriter.height() + startLine, this.lineCount());
         int endLength = this.getMessage().length();
         int cursorPos = this.getCursorPos();
 
@@ -278,7 +324,7 @@ public final class BigFontTyper {
                     Arrays.copyOfRange(this.messages, startLine, endLine)
             ).map(String::length).toArray(Integer[]::new);
         } else {
-            TreeMap<Integer, Integer[]> splitIndices = this.getSplitIndices(true);
+            TreeMap<Integer, Integer[]> splitIndices = this.getSplitIndices(true, startLine, endLine);
             if (splitIndices.isEmpty()) {
                 split = Arrays.stream(
                         Arrays.copyOfRange(this.messages, startLine, endLine)
@@ -294,29 +340,53 @@ public final class BigFontTyper {
             }
         }
 
+        int maxWidth = 0;
+        for (int i = startLine; i < endLine; i++) {
+            int splitLine = i - startLine;
+
+            String message = splitLine >= split.length ?
+                    this.messages[i] :
+                    this.messages[i].substring(0, split[splitLine]);
+
+            int width = this.font.width(message);
+            if (width > maxWidth) maxWidth = width;
+        }
+
+        String bigCharFiller = getGapFiller(this.font.width(bigChar[0]));
         boolean atEnd = split[0] == endLength;
         int newCursorPos = -1;
-
         for (int i = startLine; i < endLine; i++) {
-            int charLine = i - startLine;
-            if (charLine >= split.length || charLine >= bigChar.length || bigChar[charLine] == null) continue;
+            int splitLine = i - startLine;
+            if (splitLine >= split.length) continue;
 
+            int charLine = i - currentLine;
+            String charText = charLine >= 0 && charLine < bigChar.length && bigChar[charLine] != null ?
+                    bigChar[charLine] :
+                    bigCharFiller;
+
+            String prefix = this.messages[i].substring(0, split[splitLine]);
+            String filler = getGapFiller(maxWidth - this.font.width(prefix));
             String separator = this.messages[i].isEmpty() ? "" : BigSignWriter.characterSeparator();
-            String addition = atEnd ? separator + bigChar[charLine] : bigChar[charLine] + separator;
-            String message = this.messages[i].substring(0, split[charLine]) + addition + this.messages[i].substring(split[charLine]);
+            String addition = atEnd ? separator + charText : charText + separator;
+            String suffix = this.messages[i].substring(split[splitLine]);
+            String message = prefix + filler + addition + suffix;
 
             if (this.font.width(message) > this.sign.getMaxTextLineWidth())
                 continue;
 
             this.setLine(i);
             this.setMessage(message);
-            if (charLine == 0) newCursorPos = cursorPos + addition.length();
+            if (splitLine == 0) newCursorPos = cursorPos + filler.length() + addition.length();
         }
 
-        this.setLine(startLine);
+        this.setLine(currentLine);
         if (newCursorPos >= 0)
             this.signField.setCursorPos(newCursorPos, false);
         else this.signField.setCursorPos(cursorPos, false);
+    }
+
+    public void charTyped(char chr) {
+        this.typeLines(BigSignWriter.getBigChar(chr).orElse(new String[]{}));
     }
 
     public boolean keyPressed(KeyEvent keyEvent) {
@@ -329,9 +399,9 @@ public final class BigFontTyper {
         } else if (keyEvent.isDown() || keyEvent.isConfirmation()) {
             if (keyEvent.isDown()) this.setLine(this.getLine() + 1);
             else {
-                if (this.getLine() == 0 && BigSignWriter.height() * 2 > this.messages.length)
+                if (this.getLine() == 0 && this.cursorHeight() * 2 > this.messages.length)
                     this.setLine(this.getEffectiveBottomLine());
-                else this.setLine(this.getLine() + BigSignWriter.height());
+                else this.setLine(this.getLine() + this.cursorHeight());
             }
             if (this.getLine() > this.getEffectiveBottomLine())
                 this.setLine(0);

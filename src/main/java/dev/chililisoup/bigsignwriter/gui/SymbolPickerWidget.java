@@ -33,7 +33,7 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
     private final SymbolGridWidget symbolGrid;
     private @Nullable Consumer<Boolean> onVisibilityToggle;
 
-    public SymbolPickerWidget(Minecraft minecraft, int x, int y, int width, int height) {
+    public SymbolPickerWidget(Minecraft minecraft, int x, int y, int width, int height, Consumer<String[]> symbolConsumer) {
         super(x, y, width, height, Component.translatable("bigsignwriter.symbols"));
         this.minecraft = minecraft;
         this.symbolTextWidth = Minecraft.getInstance().font.width(this.message);
@@ -48,7 +48,7 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
                 y + 28,
                 BigSignWriterConfig.MAIN_CONFIG.largeSymbolPreviews ? 42 : 28,
                 BigSignWriterConfig.MAIN_CONFIG.largeSymbolPreviews ? 30 : 18,
-                this::pasteSymbol
+                symbolConsumer
         );
         this.symbolGrid.visible = false;
     }
@@ -68,10 +68,6 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
         this.groupList.visible = group == null;
         this.symbolGrid.visible = group != null;
         if (group != null) this.symbolGrid.updateEntries(group);
-    }
-
-    public void pasteSymbol(String[] symbol) {
-
     }
 
     @Override
