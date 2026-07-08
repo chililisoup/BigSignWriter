@@ -311,8 +311,11 @@ public final class BigFontTyper {
 
         int currentLine = this.getLine();
         int startLine = this.getClampedLine();
-        int endLine = Math.min(BigSignWriter.height() + startLine, this.lineCount());
-        int endLength = this.getMessage().length();
+        int endLine = Math.min(
+                Math.max(BigSignWriter.height(), bigChar.length) + startLine,
+                this.lineCount()
+        );
+        int endLength = this.messages[startLine].length();
         int cursorPos = this.getCursorPos();
 
         Integer[] split;
@@ -376,7 +379,7 @@ public final class BigFontTyper {
 
             this.setLine(i);
             this.setMessage(message);
-            if (splitLine == 0) newCursorPos = cursorPos + filler.length() + addition.length();
+            if (charLine == 0) newCursorPos = cursorPos + filler.length() + addition.length();
         }
 
         this.setLine(currentLine);
