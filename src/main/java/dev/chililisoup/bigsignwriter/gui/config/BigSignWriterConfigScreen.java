@@ -271,6 +271,21 @@ public class BigSignWriterConfigScreen extends Screen {
             );
         }
 
+        //? if <= 1.21.6 {
+        /*protected final void enableScissor(GuiGraphicsExtractor guiGraphics) {
+            //? if 1.21.6 {
+            /^ScrollableLayout.Container container = this.layout.container;
+            guiGraphics.enableScissor(
+                    container.getX(),
+                    container.getY(),
+                    container.getX() + container.getWidth(),
+                    container.getY() + container.getHeight()
+            );
+            ^///?} else
+            this.layout.container.enableScissor(guiGraphics);
+        }
+        *///?}
+
         protected abstract Layout buildContent();
 
         protected abstract T buildSidePanel();
@@ -684,11 +699,18 @@ public class BigSignWriterConfigScreen extends Screen {
                             bottom - 2,
                             0x40FFFFFF
                     );
+
+                    //? if <= 1.21.6
+                    //guiGraphics.disableScissor();
                     guiGraphics.setTooltipForNextFrame(Minecraft.getInstance().font, this.name, mouseX, mouseY);
+
                     //? if >= 1.21.9 {
                     guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
                     //?} elif <= 1.21.1
                     //guiGraphics.flush();
+
+                    //? if <= 1.21.6
+                    //FontsTab.this.enableScissor(guiGraphics);
                 }
 
                 if (this.fontInfo.error() != null) {

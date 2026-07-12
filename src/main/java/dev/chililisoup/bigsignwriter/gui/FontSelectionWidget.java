@@ -320,7 +320,7 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
 
         @Override
         //? if <= 1.21.6 {
-        /*public void render(GuiGraphicsExtractor guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean anyHovered, float partialTick) {
+        /*public void render(GuiGraphicsExtractor guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean mainHovered, float partialTick) {
         *///?} else {
         //? if >= 26.1 {
         public void extractContent(
@@ -340,16 +340,24 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
             int height = this.getContentHeight();
             //?}
 
+            //? if > 1.21.6
             boolean mainHovered = anyHovered && this.getRectangle().containsPoint(mouseX, mouseY);
             Font font = FontSelectionWidget.this.minecraft.font;
             
             if (mainHovered) {
                 guiGraphics.fill(left, top, left + width, top + height, 0x40FFFFFF);
+
+                //? if <= 1.21.6
+                //guiGraphics.disableScissor();
                 guiGraphics.setTooltipForNextFrame(font, this.name, mouseX, mouseY);
+
                 //? if >= 1.21.9 {
                 guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
                 //?} elif <= 1.21.1
                 //guiGraphics.flush();
+
+                //? if <= 1.21.6
+                //FontSelectionWidget.this.enableScissor(guiGraphics);
             }
 
             if (this.fontInfo != null && BigSignWriterConfig.MAIN_CONFIG.displayFontHeights) {
@@ -382,6 +390,10 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
             }
             //?}
 
+            //? if < 1.21.6 {
+            /*guiGraphics.pose().pushMatrix();
+            guiGraphics.pose().translate(0, 0, 1);
+            *///?}
             if (this.fontPreview.length == 0)
                 GraphicsHelper.drawScrollingString(
                         guiGraphics,
@@ -400,6 +412,8 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
                     width - 10,
                     height - 4
             );
+            //? if < 1.21.6
+            //guiGraphics.pose().popMatrix();
         }
     }
 }

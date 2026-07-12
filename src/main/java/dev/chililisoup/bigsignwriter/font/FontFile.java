@@ -7,12 +7,12 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class FontFile {
-    public String name;
+    public String name = "Font";
     public @Nullable String credits = null;
     public int height = 4;
     public @Nullable String characterSeparator = null;
     public @Nullable String parentFont = null;
-    public Map<Character, String[]> characters;
+    public Map<Character, String[]> characters = Map.of();
 
     public FontFile() {}
 
