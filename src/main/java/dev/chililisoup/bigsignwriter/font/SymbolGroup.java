@@ -2,25 +2,32 @@ package dev.chililisoup.bigsignwriter.font;
 
 import com.mojang.datafixers.util.Either;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
+import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public record SymbolGroup(String name, Either<Map<String, String[]>, FontInfo> symbolSource) {
     public static @Nullable SymbolGroup of(String name, @Nullable Map<String, String[]> symbols) {
-        return symbols != null ? new SymbolGroup(name, Either.left(symbols)) : null;
+        return (symbols != null && !symbols.isEmpty()) ?
+                new SymbolGroup(name, Either.left(symbols)) : null;
     }
 
     public static @Nullable SymbolGroup of(FontInfo font) {
-        return font.symbols() != null ? new SymbolGroup(font.name(), Either.right(font)) : null;
+        return font.hasSymbols() ? new SymbolGroup(font.name(), Either.right(font)) : null;
+    }
+
+    public static @Nullable SymbolGroup ofMerged(String name, List<SymbolGroup> groups) {
+        return of(name, merged(groups));
     }
 
     public Map<String, String[]> symbols() {
-        return Optional.ofNullable(this.symbolSource.map(
+        return this.symbolSource.map(
                 l -> l,
                 FontInfo::symbols
-        )).orElse(Map.of());
+        );
     }
 
     public @Nullable String[] get(String id) {
@@ -31,17 +38,18 @@ public record SymbolGroup(String name, Either<Map<String, String[]>, FontInfo> s
         return this.symbols().entrySet();
     }
 
-    public static List<SymbolGroup> availableGroups() {
-        ArrayList<SymbolGroup> groups = new ArrayList<>();
-
-        List<SymbolGroup> baseGroups = baseGroups();
-        groups.add(of("All", merged(baseGroups)));
-        groups.addAll(baseGroups);
-
-        return groups;
+    public boolean isVisible(BigSignWriterConfig.PersistentConfig config) {
+        return this.symbolSource.map(
+                l -> true,
+                font -> font.isVisible(config)
+        );
     }
 
-    private static List<SymbolGroup> baseGroups() {
+    public boolean isVisible() {
+        return this.isVisible(BigSignWriterConfig.MAIN_CONFIG);
+    }
+
+    public static List<SymbolGroup> availableGroups() {
         return BigSignWriter.availableFonts().stream()
                 .map(SymbolGroup::of)
                 .filter(Objects::nonNull)
@@ -50,14 +58,21 @@ public record SymbolGroup(String name, Either<Map<String, String[]>, FontInfo> s
 
     private static Map<String, String[]> merged(List<SymbolGroup> groups) {
         TreeMap<String, String[]> merged = new TreeMap<>();
-        groups.forEach(group -> merged.putAll(group.expandIds()));
+        groups.forEach(group -> merged.putAll(group.expandIds(SymbolGroup::filterFromInclude)));
         return merged;
     }
 
-    private Map<String, String[]> expandIds() {
+    private static boolean filterFromInclude(String key) {
+        char[] chars = key.toCharArray();
+        if (chars.length != 1) return true;
+        return !BigSignWriterConfig.MAIN_CONFIG.characterShownInSymbols(chars[0]);
+    }
+
+    private Map<String, String[]> expandIds(Function<String, Boolean> filter) {
         return this.symbolSource.map(
                 l -> l,
                 font -> this.entrySet().stream()
+                        .filter(entry -> filter.apply(entry.getKey()))
                         .map(entry -> Map.entry(
                                 font.source + ":" + entry.getKey(),
                                 entry.getValue()

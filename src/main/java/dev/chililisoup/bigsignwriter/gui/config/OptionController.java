@@ -67,8 +67,8 @@ public interface OptionController<T> {
     }
 
     record StringController(LabeledEditBox editBox) implements OptionController<String> {
-        public StringController(OptionElement<String> option) {
-            this(new LabeledEditBox(option.value, 20, option::setValue, option.name));
+        public StringController(OptionElement<String> option, int width) {
+            this(new LabeledEditBox(option.value, width, option::setValue, option.name));
         }
 
         @Override

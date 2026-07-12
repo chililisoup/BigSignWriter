@@ -2,6 +2,7 @@ package dev.chililisoup.bigsignwriter.font;
 
 import dev.chililisoup.bigsignwriter.BigFontManager;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
+import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
@@ -41,9 +42,9 @@ public final class FontInfoExtractor {
         final String source;
 
         @Nullable FontInfoExtraction parentFont = null;
-        @Nullable FontInfoExtraction rootAncestorFont = null;
+        private @Nullable FontInfoExtraction rootAncestorFont = null;
         @Nullable Component error = null;
-        @Nullable TreeSet<Character> cumulativeCharacters = null;
+        private @Nullable TreeSet<Character> cumulativeCharacters = null;
         String widthInfo = "0";
         @Nullable String cumulativeWidthInfo = null;
 
@@ -95,6 +96,15 @@ public final class FontInfoExtractor {
             return this.parentFont;
         }
 
+        public @Nullable FontInfo parentFontInfo() {
+            FontInfoExtraction parentFont = this.parentFont();
+            return parentFont != null ? parentFont.get() : null;
+        }
+
+        public @Nullable FontInfo rootAncestorFont() {
+            return this.rootAncestorFont != null ? this.rootAncestorFont.get() : null;
+        }
+
         private @Nullable FontInfoExtraction findRootAncestor() {
             if (this.parentIsImplicit()) return null;
             return this.parentFont != null && this.parentFont.hasExplicitParent() ?
@@ -102,7 +112,7 @@ public final class FontInfoExtractor {
                     this.parentFont;
         }
 
-        private Set<Character> cumulativeCharacters() {
+        public Set<Character> cumulativeCharacters() {
             if (this.cumulativeCharacters != null) return this.cumulativeCharacters;
             if (!this.hasExplicitParent()) return this.characters().keySet();
 
@@ -113,6 +123,20 @@ public final class FontInfoExtractor {
                 nextFont = nextFont.parentFont();
             }
             return this.cumulativeCharacters;
+        }
+
+        public Map<String, String[]> symbols() {
+            Map<Character, String[]> characters = this.characters();
+            HashMap<String, String[]> symbols = new HashMap<>();
+
+            for (char chr : BigSignWriterConfig.MAIN_CONFIG.charactersShownInSymbols.toCharArray()) {
+                if (characters.containsKey(chr))
+                    symbols.put(String.valueOf(chr), characters.get(chr));
+            }
+
+            if (this.fontFile.symbols != null) symbols.putAll(this.fontFile.symbols);
+
+            return symbols.isEmpty() ? Map.of() : symbols;
         }
 
         private String widthInfo() {

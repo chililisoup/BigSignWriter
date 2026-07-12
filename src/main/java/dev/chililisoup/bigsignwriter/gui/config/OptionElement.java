@@ -87,11 +87,29 @@ public class OptionElement<T> extends AbstractLayoutElement {
         StringOption(
                 String value,
                 String defaultValue,
+                int width,
                 Consumer<String> onChange,
                 Component name,
                 Component description
         ) {
-            super(value, defaultValue, onChange, OptionController.StringController::new, name, description);
+            super(
+                    value,
+                    defaultValue,
+                    onChange,
+                    option -> new OptionController.StringController(option, width),
+                    name,
+                    description
+            );
+        }
+
+        StringOption(
+                String value,
+                String defaultValue,
+                Consumer<String> onChange,
+                Component name,
+                Component description
+        ) {
+            this(value, defaultValue, 20, onChange, name, description);
         }
     }
 }

@@ -15,6 +15,7 @@ public class FontInfo implements FamilyCharacterProvider {
     private final @Nullable FontInfo rootAncestorFont;
     private final @Nullable Component error;
     private final Set<Character> cumulativeCharacters;
+    private final Map<String, String[]> symbols;
     private final String widthInfo;
     private final @Nullable String cumulativeWidthInfo;
     private List<FontInfo> children;
@@ -22,13 +23,11 @@ public class FontInfo implements FamilyCharacterProvider {
     FontInfo(FontInfoExtractor.FontInfoExtraction extraction) {
         this.fontFile = extraction.fontFile;
         this.source = extraction.source;
-        this.parentFont = extraction.parentFont != null ?
-                extraction.parentFont.get() : null;
-        this.rootAncestorFont = extraction.rootAncestorFont != null ?
-                extraction.rootAncestorFont.get() : null;
+        this.parentFont = extraction.parentFontInfo();
+        this.rootAncestorFont = extraction.rootAncestorFont();
         this.error = extraction.error;
-        this.cumulativeCharacters = extraction.cumulativeCharacters != null ?
-                extraction.cumulativeCharacters : this.characters().keySet();
+        this.cumulativeCharacters = extraction.cumulativeCharacters();
+        this.symbols = extraction.symbols();
         this.widthInfo = extraction.widthInfo;
         this.cumulativeWidthInfo = extraction.cumulativeWidthInfo;
     }
@@ -60,8 +59,8 @@ public class FontInfo implements FamilyCharacterProvider {
         return this.cumulativeCharacters;
     }
 
-    public @Nullable Map<String, String[]> symbols() {
-        return this.fontFile.symbols;
+    public Map<String, String[]> symbols() {
+        return this.symbols;
     }
 
     @Override
@@ -80,6 +79,14 @@ public class FontInfo implements FamilyCharacterProvider {
 
     public boolean hasExplicitParent() {
         return !this.parentIsImplicit() && this.parentFont() != null;
+    }
+
+    public boolean hasCharacters() {
+        return !this.cumulativeCharacters.isEmpty();
+    }
+
+    public boolean hasSymbols() {
+        return !this.symbols.isEmpty();
     }
 
     public boolean isBroken() {

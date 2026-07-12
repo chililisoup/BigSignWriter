@@ -226,27 +226,21 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         }
 
         String topLine = this.messages[this.line] == null ? "" : this.messages[this.line];
-        boolean atEnd = topLine.length() == cursorPos;
         int lineHeight = this.sign.getTextLineHeight();
+        int cursorHeight = this.bigSignWriter$cursorHeight();
+        int fullHeight = Math.min(BigSignWriter.height(), this.messages.length - this.line);
         int opaqueColor = 0xFF000000 | color;
 
-        if (cursorPos <= 0 || atEnd) {
-            int endLine = this.bigSignWriter$fontTyper.getEndLine(this.bigSignWriter$cursorHeight());
-            for (int i = this.line; i < endLine; i++) {
-                String message = this.messages[i] == null ? "" : this.messages[i];
-                int cursorX = this.font.width(message) / 2;
-                if (cursorPos <= 0 && !atEnd) cursorX *= -1;
-                int cursorY = (i - 2) * lineHeight;
+        int cursorPosition = this.font.width(topLine.substring(0, Math.min(cursorPos, topLine.length())));
+        int cursorX = cursorPosition - this.font.width(topLine) / 2;
+        int cursorY = (this.line - 2) * lineHeight;
 
-                guiGraphics.fill(cursorX, cursorY - 1, cursorX + 1, cursorY + lineHeight, opaqueColor);
-            }
-        } else {
-            int cursorPosition = this.font.width(topLine.substring(0, Math.min(cursorPos, topLine.length())));
-            int cursorX = cursorPosition - this.font.width(topLine) / 2;
-            int cursorY = (this.line - 2) * lineHeight;
+        int endY = cursorY + lineHeight * cursorHeight;
+        guiGraphics.fill(cursorX, cursorY - 1, cursorX + 1, endY, opaqueColor);
 
-            guiGraphics.fill(cursorX, cursorY - 1, cursorX + 1, cursorY + lineHeight * this.bigSignWriter$cursorHeight(), opaqueColor);
-        }
+        if (fullHeight > cursorHeight)
+            for (int y = endY + 2; y < cursorY + lineHeight * fullHeight; y += 4)
+                guiGraphics.fill(cursorX, y, cursorX + 1, y + 2, opaqueColor);
 
         ci.cancel();
     }

@@ -390,12 +390,6 @@ public final class HappyGhastFont {
                                 "𜴦 𜴦",
                                 "   "
                         })
-                )
-                .symbols(
-                        entry("K", new String[]{
-                                "▌ 𜵛",
-                                "▌🮂𜶓"
-                        })
                 );
     }
 }

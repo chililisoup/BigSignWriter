@@ -51,8 +51,13 @@ public class BigSignWriterConfigScreen extends Screen {
     @Override
     public void onClose() {
         if (!this.workingConfig.equals(MAIN_CONFIG)) {
+            boolean needsReload = !this.workingConfig.charactersShownInSymbols
+                    .equals(MAIN_CONFIG.charactersShownInSymbols);
+
             MAIN_CONFIG.copyFrom(this.workingConfig);
             saveConfig();
+
+            if (needsReload) BigSignWriter.forceReload();
         }
         this.minecraft.gui.setScreen(this.parent);
     }

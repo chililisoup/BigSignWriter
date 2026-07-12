@@ -32,6 +32,7 @@ public abstract class BigSignWriterConfig {
         public boolean showConfigButton = true;
         public boolean showSymbolsButton = true;
         public boolean largeSymbolPreviews = false;
+        public String charactersShownInSymbols = "£€";
         public HashSet<String> hiddenFonts = new HashSet<>();
 
         public PersistentConfig copyFrom(PersistentConfig other) {
@@ -45,6 +46,10 @@ public abstract class BigSignWriterConfig {
             this.hiddenFonts = new HashSet<>(other.hiddenFonts);
 
             return this;
+        }
+
+        public boolean characterShownInSymbols(char chr) {
+            return this.charactersShownInSymbols.indexOf(chr) >= 0;
         }
 
         @Override

@@ -11,6 +11,8 @@ import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -35,9 +37,16 @@ public class SymbolGroupListWidget extends ObjectSelectionList<SymbolGroupListWi
     }
 
     public void updateEntries() {
-        this.replaceEntries(BigSignWriter.availableSymbolGroups().stream()
-                .map(Entry::new).toList()
-        );
+        List<SymbolGroup> visibleGroups = BigSignWriter.availableSymbolGroups().stream()
+                .filter(SymbolGroup::isVisible)
+                .toList();
+        SymbolGroup merged = SymbolGroup.ofMerged(Component.translatable("bigsignwriter.symbols.all").getString(), visibleGroups);
+
+        ArrayList<SymbolGroup> groups = new ArrayList<>();
+        if (merged != null) groups.add(merged);
+        groups.addAll(visibleGroups);
+
+        this.replaceEntries(groups.stream().map(Entry::new).toList());
         super.setSelected(null);
 
         this.setHeight(Math.min(this.maxHeight, this.contentHeight()));

@@ -101,6 +101,14 @@ public class OptionsTab extends ConfigTab<OptionsTab.OptionsSidePanel> {
                 Component.translatable("bigsignwriter.config.largeSymbolPreviews"),
                 Component.translatable("bigsignwriter.config.largeSymbolPreviews.desc")
         ));
+        rowHelper.addChild(new OptionElement.StringOption(
+                workingConfig.charactersShownInSymbols,
+                defaults.charactersShownInSymbols,
+                40,
+                value -> workingConfig.charactersShownInSymbols = value,
+                Component.translatable("bigsignwriter.config.charactersShownInSymbols"),
+                Component.translatable("bigsignwriter.config.charactersShownInSymbols.desc")
+        ));
         rowHelper.addChild(new OptionElement.BooleanOption(
                 workingConfig.characterSeparatorOverrideEnabled,
                 defaults.characterSeparatorOverrideEnabled,
