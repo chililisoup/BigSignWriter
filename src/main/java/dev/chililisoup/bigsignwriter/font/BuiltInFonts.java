@@ -15,7 +15,6 @@ public class BuiltInFonts {
                 entry("retro", RetroFont::get),
                 entry("thin", ThinFont::get),
                 entry("small", SmallFont::get),
-                //? if >= 1.21.4 {
                 entry("smooth_small", SmoothSmallFont::get),
                 entry("happy_ghast", HappyGhastFont::get),
                 entry("endermite", EndermiteFont::get),
@@ -30,7 +29,6 @@ public class BuiltInFonts {
                 entry("queatlets_old_style_monospace", QueatletsOldStyleMonospaceFont::get),
                 entry("minecraft_striped", MinecraftStripedFont::get),
                 entry("minecraft_small", MinecraftSmallFont::get),
-                //?}
                 entry("minecraft", MinecraftFont::get),
                 entry("outlined", OutlinedFont::get),
                 entry("outlined_short", OutlinedShortFont::get),

@@ -9,7 +9,7 @@ import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -27,6 +27,7 @@ public abstract class SimpleContainerWidget extends AbstractWidget implements Co
     @Override
     protected void extractWidgetRenderState(@NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.children().forEach(child -> child
+                //~ if >= 26.1 'render' -> 'extractRenderState'
                 .extractRenderState(guiGraphics, mouseX, mouseY, partialTick)
         );
     }

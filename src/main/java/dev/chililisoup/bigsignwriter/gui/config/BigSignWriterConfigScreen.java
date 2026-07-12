@@ -11,25 +11,17 @@ import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.client.gui.layouts.*;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.*;
-
-//? if >= 1.21.11 {
-import net.minecraft.util.Util;
-//?} else {
-/*import net.minecraft.Util;
-*///?}
-
-//? if >= 1.21.3 {
-import net.minecraft.client.renderer.RenderPipelines;
-//?}
 
 public class BigSignWriterConfigScreen extends Screen {
     private static final Component SCREEN_TITLE = Component.translatable("bigsignwriter.config");
@@ -108,23 +100,16 @@ public class BigSignWriterConfigScreen extends Screen {
             this.tabNavigationBar.selectTab(selectedTab, false);
     }
 
+    //~ if >= 26.1 'render' -> 'extractRenderState' {
     @Override
-    //? if >= 26.1 {
     public void extractRenderState(
-    //?} else
-    //public void render(
             @NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick
     ) {
         if (this.tabNavigationBar == null) return;
 
-        //? if < 1.21.6 {
-        /*this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
-        *///?}
-
         int iconSize = 40;
         int iconX = this.width - MARGIN - iconSize;
         guiGraphics.blit(
-                //? if >= 1.21.3
                 RenderPipelines.GUI_TEXTURED,
                 BigSignWriter.ICON,
                 iconX,
@@ -157,17 +142,9 @@ public class BigSignWriterConfigScreen extends Screen {
                 tabWidth
         );
 
-        //? if < 1.21.6 {
-        /*for (Renderable renderable : this.renderables) renderable.render(guiGraphics, mouseX, mouseY, partialTick);
-        *///?} else {
-        //? if >= 26.1 {
-        super.extractRenderState(
-        //?} else
-        //super.render(
-                guiGraphics, mouseX, mouseY, partialTick
-        );
-        //?}
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
     }
+    //~}
 
     private void extractDivider(GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height) {
         this.extractMenuBackground(guiGraphics, x, y, width, height - 2);
@@ -184,10 +161,8 @@ public class BigSignWriterConfigScreen extends Screen {
         if (this.tabNavigationBar == null) return;
 
         int columnWidth = this.columnWidth();
-        //? if >= 26.2 {
+        //~ if >= 26.2 'updateWidth' -> 'arrangeElements'
         this.tabNavigationBar.arrangeElements(columnWidth);
-        //?} else
-        //this.tabNavigationBar.updateWidth(columnWidth);
         int tabHeight = this.tabNavigationBar.getRectangle().height();
         this.tabManager.setTabArea(new ScreenRectangle(
                 MARGIN * 2,

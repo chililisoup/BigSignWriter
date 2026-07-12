@@ -7,10 +7,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-//? if >= 1.21.11 {
-public abstract class IconButton extends Button.Plain {
-//?} else
-//public abstract class IconButton extends Button {
+public abstract class IconButton extends
+        //~ if >= 1.21.11 'Button' -> 'Button.Plain'
+        Button.Plain
+{
     public IconButton(OnPress onPress) {
         super(0, 0, 20, 20, Component.empty(), onPress, Button.DEFAULT_NARRATION);
     }
@@ -32,7 +32,6 @@ public abstract class IconButton extends Button.Plain {
         );
 
         guiGraphics.blitSprite(
-                //? if >= 1.21.3
                 RenderPipelines.GUI_TEXTURED,
                 this.getSprite(),
                 this.getX() + 2,

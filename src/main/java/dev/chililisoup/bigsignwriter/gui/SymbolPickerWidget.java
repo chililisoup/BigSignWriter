@@ -1,5 +1,6 @@
 package dev.chililisoup.bigsignwriter.gui;
 
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.font.SymbolGroup;
 import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
@@ -10,6 +11,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
@@ -18,11 +20,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Consumer;
-
-//? if >= 1.21.9 {
-import com.mojang.blaze3d.platform.cursor.CursorTypes;
-import net.minecraft.client.input.MouseButtonEvent;
-//?}
 
 public class SymbolPickerWidget extends SimpleContainerWidget {
     private static final Identifier INWORLD_MENU_LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
@@ -36,7 +33,7 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
     public SymbolPickerWidget(Minecraft minecraft, int x, int y, int width, int height, Consumer<String[]> symbolConsumer) {
         super(x, y, width, height, Component.translatable("bigsignwriter.symbols"));
         this.minecraft = minecraft;
-        this.symbolTextWidth = Minecraft.getInstance().font.width(this.message);
+        this.symbolTextWidth = Minecraft.getInstance().font.width(this.getMessage());
         this.groupList = new SymbolGroupListWidget(
                 minecraft, width, height - 28, x, y + 28, 14, this::openGroup
         );
@@ -86,17 +83,12 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
     }
 
     @Override
-    //? if <= 1.21.6 {
-    /*public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    *///?} else
     public boolean mouseClicked(@NotNull MouseButtonEvent mouseButtonEvent, boolean doubleClick) {
         if (!this.isActive()) return false;
 
-        //? if >= 1.21.9 {
         double mouseX = mouseButtonEvent.x();
         double mouseY = mouseButtonEvent.y();
         int button = mouseButtonEvent.button();
-        //?}
 
         if (button == 0) {
             if (this.symbolTextHovered((int) mouseX, (int) mouseY)) {
@@ -167,7 +159,7 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
         this.navigatorText(
                 guiGraphics,
                 font,
-                symbolTextHovered ? this.message.copy().withStyle(ChatFormatting.UNDERLINE) : this.message,
+                symbolTextHovered ? this.getMessage().copy().withStyle(ChatFormatting.UNDERLINE) : this.getMessage(),
                 24
         );
 
@@ -175,7 +167,6 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
                 Component.translatable("gui.back"), mouseX, mouseY
         );
 
-        //? if >= 1.21.9
         if (backHovered || symbolTextHovered) guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
 
         SymbolGroupListWidget.Entry selected = this.groupList.getSelected();
@@ -199,6 +190,4 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
     protected void updateWidgetNarration(@NotNull NarrationElementOutput output) {
 
     }
-
-
 }

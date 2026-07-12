@@ -18,6 +18,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
+import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.chat.Component;
@@ -33,10 +34,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-//? if >= 1.21.9 {
-import net.minecraft.client.input.CharacterEvent;
-//?}
 
 //? if >= 26.1 {
 import org.joml.Vector2f;
@@ -58,7 +55,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     @Unique private boolean bigSignWriter$inSymbolPicker = false;
     @Unique private boolean bigSignWriter$ignoreNextRemoval = false;
 
-    @Shadow /*? if >= 1.21.2 {*/ protected /*?} else {*/ /*private *//*?}*/ @Final SignBlockEntity sign;
+    @Shadow protected @Final SignBlockEntity sign;
     @Shadow private @Final String[] messages;
     @Shadow private void setMessage(String message) {}
     @Shadow private int line;
@@ -184,35 +181,26 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     }
 
     @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
-    //? if < 1.21.9 {
-    /*private void charTypedInject(char chr, int modifiers, CallbackInfoReturnable<Boolean> cir) {
-    *///?} else
-    private void charTypedInject(CharacterEvent characterEvent, CallbackInfoReturnable<Boolean> cir) {
-        if (!BigSignWriter.enabled() || this.bigSignWriter$fontTyper == null) return;
+    private void charTypedInject(CharacterEvent event, CallbackInfoReturnable<Boolean> cir) {
+        if (BigSignWriter.isVanillaTyping() || this.bigSignWriter$fontTyper == null) return;
         cir.setReturnValue(true);
 
-        //? if >= 1.21.9
-        char chr = Character.toChars(characterEvent.codepoint())[0];
+        char chr = Character.toChars(event.codepoint())[0];
         this.bigSignWriter$fontTyper.charTyped(chr);
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-    //? if < 1.21.9 {
-    /*private void keyPressedInject(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
-    *///?} else
-    private void keyPressedInject(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
-        if (!BigSignWriter.enabled() || this.bigSignWriter$fontTyper == null) return;
-        //? if < 1.21.9
-        //KeyEvent keyEvent = new KeyEvent(keyCode, scanCode, modifiers);
+    private void keyPressedInject(KeyEvent event, CallbackInfoReturnable<Boolean> cir) {
+        if (BigSignWriter.isVanillaTyping() || this.bigSignWriter$fontTyper == null) return;
 
-        if (this.bigSignWriter$fontTyper.keyPressed(keyEvent))
+        if (this.bigSignWriter$fontTyper.keyPressed(event))
             cir.setReturnValue(true);
     }
 
     //? if >= 26.1
     @SuppressWarnings("LocalMayUseName")
     @Inject(
-            method = /*? if >= 26.1 {*/ "extractSignText" /*?} else {*/ /*"renderSignText" *//*?}*/,
+            method = "extractSignText",
             at = @At(
                     value = "FIELD",
                     target = "Lnet/minecraft/client/gui/screens/inventory/AbstractSignEditScreen;messages:[Ljava/lang/String;",
@@ -230,7 +218,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             @Local(ordinal = 0) boolean showCursor,
             @Local(ordinal = 1) int cursorPos
     ) {
-        if (!BigSignWriter.enabled() || this.bigSignWriter$fontTyper == null) return;
+        if (BigSignWriter.isVanillaTyping() || this.bigSignWriter$fontTyper == null) return;
 
         if (!showCursor) {
             ci.cancel();
@@ -264,17 +252,15 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     }
 
     @WrapWithCondition(
-            method = /*? if >= 26.1 {*/ "extractSignText" /*?} else {*/ /*"renderSignText" *//*?}*/,
+            method = "extractSignText",
             at = @At(
                     value = "INVOKE",
                     //? if < 21.6
                     //ordinal = 1,
                     //? if >= 21.6 {
                     target = "Lnet/minecraft/client/gui/components/TextCursorUtils;extractAppendCursor(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIIZ)V"
-                    //?} elif >= 1.21.6 {
-                    /*target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V"
-                    *///?} else
-                    //target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I"
+                    //?} else
+                    //target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V"
             )
     )
     private boolean hideUnderscore(
@@ -282,12 +268,12 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             Font font,
             //? if < 21.6
             //String string,
-            int cursorX,
-            int cursorY,
+            int x,
+            int y,
             int color,
             boolean shadow
     ) {
-        return !BigSignWriter.enabled();
+        return BigSignWriter.isVanillaTyping();
     }
 
     @WrapWithCondition(

@@ -38,8 +38,8 @@ public final class BigSignWriter {
         BigSignWriterConfig.init();
     }
 
-    public static boolean enabled() {
-        return selectedFont() != null;
+    public static boolean isVanillaTyping() {
+        return selectedFont() == null;
     }
 
     public static void forceReload() {

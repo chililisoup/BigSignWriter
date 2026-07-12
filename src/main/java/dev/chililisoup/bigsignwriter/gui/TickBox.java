@@ -6,23 +6,18 @@ import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
-//? if >= 1.21.3 {
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.util.ARGB;
-//?}
-
-//? if >= 1.21.9 {
-import net.minecraft.client.input.InputWithModifiers;
 //? if < 1.21.11 {
 /*import com.mojang.blaze3d.platform.cursor.CursorTypes;
 *///?}
-//?}
 
 public class TickBox extends AbstractButton {
     private static final Identifier CHECKBOX_SELECTED_HIGHLIGHTED_SPRITE = Identifier.withDefaultNamespace("widget/checkbox_selected_highlighted");
@@ -40,10 +35,7 @@ public class TickBox extends AbstractButton {
     }
 
     @Override
-    public void onPress(
-            //? if >= 1.21.9
-            @NotNull InputWithModifiers input
-    ) {
+    public void onPress(@NotNull InputWithModifiers input) {
         this.value = !this.value;
         this.onChange.accept(this.value);
     }
@@ -61,10 +53,7 @@ public class TickBox extends AbstractButton {
 
         int boxSize = this.getHeight();
         guiGraphics.blitSprite(
-                //? if >= 1.21.3 {
                 RenderPipelines.GUI_TEXTURED, sprite, this.getX(), this.getY(), boxSize, boxSize, ARGB.white(this.alpha)
-                //?} else
-                //sprite, this.getX(), this.getY(), boxSize, boxSize
         );
 
         int labelX = this.getX() + boxSize + 2;
@@ -96,7 +85,7 @@ public class TickBox extends AbstractButton {
                 this.getBottom()
         );
 
-        //? if >= 1.21.9 < 1.21.11 {
+        //? if < 1.21.11 {
         /*if (this.isHovered()) {
             guiGraphics.requestCursor(this.isActive() ? CursorTypes.POINTING_HAND : CursorTypes.NOT_ALLOWED);
         }

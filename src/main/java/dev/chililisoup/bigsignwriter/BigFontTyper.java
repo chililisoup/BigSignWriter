@@ -54,7 +54,7 @@ public final class BigFontTyper {
 
     public void onFontSelected() {
         this.signField.setSelectionPos(this.signField.getCursorPos());
-        if (!BigSignWriter.enabled()) return;
+        if (BigSignWriter.isVanillaTyping()) return;
 
         int cursorPos = this.getCursorPos();
         int width = this.font.width(this.getMessage().substring(0, cursorPos));
@@ -306,6 +306,7 @@ public final class BigFontTyper {
         else this.signField.setCursorToStart();
     }
 
+    // TODO: Clean up, this is messy and feels bug-prone
     public void typeLines(String[] bigChar) {
         if (bigChar.length == 0) return;
 

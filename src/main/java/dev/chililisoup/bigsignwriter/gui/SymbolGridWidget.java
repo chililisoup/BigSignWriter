@@ -135,41 +135,21 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
         }
 
         @Override
-        //? if <= 1.21.6 {
-        /*public void render(GuiGraphicsExtractor guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovered, float partialTick) {
-        *///?} else {
-        //? if >= 26.1 {
+        //~ if >= 26.1 'renderContent' -> 'extractContent'
         public void extractContent(
-        //?} else
-        //public void renderContent(
                 @NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick
         ) {
-        //?}
-            //? if <= 1.21.6 {
-            /*width -= 4;
-            *///?} else {
             int left = this.getContentX();
             int top = this.getContentY();
             int width = this.getContentWidth();
             int height = this.getContentHeight();
-            //?}
 
             if (hovered) {
                 guiGraphics.fill(left, top, left + width, top + height, 0x40FFFFFF);
-
-                //? if <= 1.21.6
-                //guiGraphics.disableScissor();
                 guiGraphics.setTooltipForNextFrame(
                         SymbolGridWidget.this.minecraft.font, this.tooltip, Optional.empty(), mouseX, mouseY
                 );
-
-                //? if >= 1.21.9 {
                 guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
-                //?} elif <= 1.21.1
-                //guiGraphics.flush();
-
-                //? if <= 1.21.6
-                //FontSelectionWidget.this.enableScissor(guiGraphics);
             }
 
             if (this.shouldScrollPreview) {

@@ -1,31 +1,25 @@
 package dev.chililisoup.bigsignwriter.gui;
 
+import com.mojang.blaze3d.platform.cursor.CursorType;
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.font.FontInfo;
 import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Consumer;
-
-//? if > 1.21.6 {
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.MutableComponent;
-//?}
-
-//? if >= 1.21.9 {
-import com.mojang.blaze3d.platform.cursor.CursorType;
-import com.mojang.blaze3d.platform.cursor.CursorTypes;
-import net.minecraft.client.input.MouseButtonEvent;
-//?}
 
 public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget.Entry> {
     private final int maxHeight;
@@ -81,19 +75,12 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
         children.forEach(entry -> {
             if (entry.fontInfo == BigSignWriter.selectedFont())
                 super.setSelected(entry);
-            //? if > 1.21.6
             entry.update(children);
         });
 
         this.setHeight(Math.min(this.maxHeight, this.contentHeight()));
         this.setScrollAmount(0.0);
     }
-
-    //? if <= 1.21.3 {
-    /*private int contentHeight() {
-        return this.getItemCount() * this.itemHeight + 4;
-    }
-    *///?}
 
     @Override
     public int getHeight() {
@@ -116,17 +103,12 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
     }
 
     @Override
-    //? if >= 26.1 {
     public void extractWidgetRenderState(
-    //?} else
-    //public void extractWidgetRenderState(
             @NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick
     ) {
         if (!this.open) {
-            //? if >= 26.1 {
+            //~ if >= 26.1 'renderListBackground' -> 'extractListBackground'
             this.extractListBackground(guiGraphics);
-            //?} else
-            //this.renderListBackground(guiGraphics);
 
             if (mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getRight() && mouseY < this.getBottom()) {
                 guiGraphics.fill(
@@ -136,7 +118,6 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
                         this.getBottom(),
                         0x40FFFFFF
                 );
-                //? if >= 1.21.9
                 guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
             }
 
@@ -156,28 +137,17 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
             return;
         }
 
-        //? if >= 1.21.9
         if (this.isHovered()) guiGraphics.requestCursor(CursorType.DEFAULT);
 
-        //? if >= 26.1 {
         super.extractWidgetRenderState(
-        //?} else
-        //super.extractWidgetRenderState(
                 guiGraphics, mouseX, mouseY, partialTick
         );
     }
 
     @Override
-    //? if <= 1.21.6 {
-    /*public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    *///?} else
-    public boolean mouseClicked(@NotNull MouseButtonEvent mouseButtonEvent, boolean bl) {
-        //? if > 1.21.3 {
+    public boolean mouseClicked(@NotNull MouseButtonEvent event, boolean doubleClick) {
         if (!this.open) {
-        //?} else
-        //if (!this.open && this.isMouseOver(mouseX, mouseY)) {
-            //? if >= 1.21.9
-            int button = mouseButtonEvent.button();
+            int button = event.button();
             if (button == 0) {
                 this.setOpen(true);
                 this.playDownSound(this.minecraft.getSoundManager());
@@ -185,13 +155,9 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
             return true;
         }
 
-        //? if <= 1.21.6 {
-        /*return super.mouseClicked(mouseX, mouseY, button);
-        *///?} else
-        return super.mouseClicked(mouseButtonEvent, bl);
+        return super.mouseClicked(event, doubleClick);
     }
 
-    //? if >= 1.21.9 {
     @Override
     public boolean mouseReleased(@NotNull MouseButtonEvent mouseButtonEvent) {
         return this.open && super.mouseReleased(mouseButtonEvent);
@@ -206,35 +172,14 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
     public boolean mouseScrolled(double d, double e, double f, double g) {
         return this.open && super.mouseScrolled(d, e, f, g);
     }
-    //?}
-
-    //? if <= 1.21.6 {
-    /*@Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        return this.open && super.mouseReleased(mouseX, mouseY, button);
-    }
-
-    @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        return this.open && super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
-    }
-
-    @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double deltaX, double deltaY) {
-        return this.open && super.mouseScrolled(mouseX, mouseY, deltaX, deltaY);
-    }
-    *///?}
 
     public class Entry extends ObjectSelectionList.Entry<Entry> {
         private final @Nullable FontInfo fontInfo;
         private final Component[] fontPreview;
         private final Component name;
-
-        //? if > 1.21.6 {
+        private final List<FontInfo> children;
         private @Nullable Entry root = null;
         private boolean collapsed = true;
-        private final List<FontInfo> children;
-        //?}
 
         public Entry(@Nullable FontInfo fontInfo) {
             this.fontInfo = fontInfo;
@@ -242,7 +187,6 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
             this.name = fontInfo != null ?
                     Component.literal(fontInfo.name()) :
                     Component.translatable("bigsignwriter.font.none");
-            //? if > 1.21.6
             this.children = fontInfo != null ? fontInfo.visibleChildren() : List.of();
         }
 
@@ -251,7 +195,6 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
             return Component.translatable("narrator.select", this.name);
         }
 
-        //? if > 1.21.6 {
         @Override
         public int getHeight() {
             return this.isHidden() ? 0 : super.getHeight();
@@ -316,48 +259,26 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
         private boolean isHidden() {
             return this.hasRoot() && this.root.collapsed;
         }
-        //?}
 
         @Override
-        //? if <= 1.21.6 {
-        /*public void render(GuiGraphicsExtractor guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean mainHovered, float partialTick) {
-        *///?} else {
-        //? if >= 26.1 {
+        //~ if >= 26.1 'renderContent' -> 'extractContent'
         public void extractContent(
-        //?} else
-        //public void renderContent(
                 @NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean anyHovered, float partialTick
         ) {
-        //?}
-            //? if <= 1.21.6 {
-            /*width -= 4;
-            *///?} else {
             if (this.isHidden()) return;
 
             int left = this.getContentX();
             int top = this.getContentY();
             int width = this.getContentWidth();
             int height = this.getContentHeight();
-            //?}
 
-            //? if > 1.21.6
             boolean mainHovered = anyHovered && this.getRectangle().containsPoint(mouseX, mouseY);
             Font font = FontSelectionWidget.this.minecraft.font;
             
             if (mainHovered) {
                 guiGraphics.fill(left, top, left + width, top + height, 0x40FFFFFF);
-
-                //? if <= 1.21.6
-                //guiGraphics.disableScissor();
                 guiGraphics.setTooltipForNextFrame(font, this.name, mouseX, mouseY);
-
-                //? if >= 1.21.9 {
                 guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
-                //?} elif <= 1.21.1
-                //guiGraphics.flush();
-
-                //? if <= 1.21.6
-                //FontSelectionWidget.this.enableScissor(guiGraphics);
             }
 
             if (this.fontInfo != null && BigSignWriterConfig.MAIN_CONFIG.displayFontHeights) {
@@ -370,7 +291,6 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
                 );
             }
 
-            //? if > 1.21.6 {
             if (!this.children.isEmpty()) {
                 boolean expandHovered = anyHovered && !mainHovered;
                 MutableComponent text = Component.literal(this.collapsed ? "+" : "-");
@@ -382,18 +302,12 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
                         -1
                 );
 
-                //? if >= 1.21.9
                 if (expandHovered) guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
             } else if (this.hasRoot()) {
                 guiGraphics.horizontalLine(left - 8, left - 4, top + 7, -1);
                 guiGraphics.verticalLine(left - 8, top - 7, top + 7, -1);
             }
-            //?}
 
-            //? if < 1.21.6 {
-            /*guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(0, 0, 1);
-            *///?}
             if (this.fontPreview.length == 0)
                 GraphicsHelper.drawScrollingString(
                         guiGraphics,
@@ -412,8 +326,6 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
                     width - 10,
                     height - 4
             );
-            //? if < 1.21.6
-            //guiGraphics.pose().popMatrix();
         }
     }
 }

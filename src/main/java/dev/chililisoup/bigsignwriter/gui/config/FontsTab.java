@@ -1,5 +1,6 @@
 package dev.chililisoup.bigsignwriter.gui.config;
 
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.font.FontInfo;
 import dev.chililisoup.bigsignwriter.gui.AbstractLayoutElement;
@@ -19,6 +20,7 @@ import net.minecraft.client.gui.layouts.Layout;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -27,11 +29,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
-
-//? if >= 1.21.9 {
-import com.mojang.blaze3d.platform.cursor.CursorTypes;
-import net.minecraft.client.input.InputWithModifiers;
-//?}
 
 public class FontsTab extends ConfigTab<FontsTab.FontsSidePanel> {
     private @Nullable FontButton selected = null;
@@ -141,18 +138,15 @@ public class FontsTab extends ConfigTab<FontsTab.FontsSidePanel> {
         }
 
         @Override
-        public void onPress(
-                //? if >= 1.21.9
-                @NotNull InputWithModifiers input
-        ) {
+        public void onPress(@NotNull InputWithModifiers input) {
             FontsTab.this.selected = this;
             FontsTab.this.redoLayout();
         }
 
         @Override
-                //? if >= 1.21.11 {
+        //? if >= 1.21.11 {
         protected void extractContents(
-                //?} else
+        //?} else
         //protected void extractWidgetRenderState(
                 @NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick
         ) {
@@ -189,17 +183,8 @@ public class FontsTab extends ConfigTab<FontsTab.FontsSidePanel> {
                         bottom - 2,
                         0x40FFFFFF
                 );
-                //? if <= 1.21.6
-                //guiGraphics.disableScissor();
                 guiGraphics.setTooltipForNextFrame(Minecraft.getInstance().font, this.name, mouseX, mouseY);
-
-                //? if >= 1.21.9 {
                 guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
-                //?} elif <= 1.21.1
-                //guiGraphics.flush();
-
-                //? if <= 1.21.6
-                //FontsTab.this.enableScissor(guiGraphics);
             }
 
             if (this.fontInfo.error() != null) {

@@ -7,24 +7,14 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.components.tabs.Tab;
 import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.client.gui.screens.Screen;
-
-//? if < 1.21.3 {
-/*import com.mojang.blaze3d.systems.RenderSystem;
-*///?} else {
 import net.minecraft.client.renderer.RenderPipelines;
-//?}
 
-//? if >= 26.2 {
+//~ if >= 26.2 'TabNavigationBar' -> 'MenuTabBar'
 import net.minecraft.client.gui.components.tabs.MenuTabBar;
-//?} else {
-/*import net.minecraft.client.gui.components.tabs.TabNavigationBar;
-*///?}
 
 public class ConfigTabNavigationBar extends
-        //? if >= 26.2 {
+        //~ if >= 26.2 'TabNavigationBar' -> 'MenuTabBar'
         MenuTabBar
-        //?} else
-        //TabNavigationBar
 {
     private final int x;
     private final int y;
@@ -77,11 +67,7 @@ public class ConfigTabNavigationBar extends
     //public void render(
             GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick
     ) {
-        //? if < 1.21.3
-        //RenderSystem.enableBlend();
-
         guiGraphics.blit(
-                //? if >= 1.21.3
                 RenderPipelines.GUI_TEXTURED,
                 Screen.HEADER_SEPARATOR,
                 this.x,
@@ -96,7 +82,6 @@ public class ConfigTabNavigationBar extends
 
         int afterLastTab = ((TabButton) this.children().getLast()).getRight();
         guiGraphics.blit(
-                //? if >= 1.21.3
                 RenderPipelines.GUI_TEXTURED,
                 Screen.HEADER_SEPARATOR,
                 afterLastTab,
@@ -109,17 +94,8 @@ public class ConfigTabNavigationBar extends
                 2
         );
 
-        //? if < 1.21.3
-        //RenderSystem.disableBlend();
-
         for (GuiEventListener child : this.children())
-            ((TabButton) child)
-                    //? if >= 26.1 {
-                    .extractRenderState(
-                    //?} else {
-                    /*.render(
-                    *///?}
-                            guiGraphics, mouseX, mouseY, partialTick
-                    );
+            //~ if >= 26.1 'render' -> 'extractRenderState'
+            ((TabButton) child).extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
     }
 }

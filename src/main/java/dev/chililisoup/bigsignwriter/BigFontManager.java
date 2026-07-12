@@ -14,26 +14,7 @@ import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-//? if < 1.21.9 && fabric {
-/*import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
-import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
-import net.minecraft.resources.Identifier;
-*///?}
-
-//? if < 1.21.9 {
-/*import net.minecraft.server.packs.resources.ResourceManager;
-*///?}
-
-//? if <= 1.21.1 {
-/*import net.minecraft.util.profiling.ProfilerFiller;
-*///?}
-
-public final class BigFontManager implements
-        //? if >= 1.21.9 || neoforge {
-        PreparableReloadListener
-        //?} else
-        //IdentifiableResourceReloadListener
-{
+public final class BigFontManager implements PreparableReloadListener {
     public static final String DEFAULT_FONT_SOURCE = "builtin/default";
 
     private final ArrayList<FontInfo> availableFonts = new ArrayList<>();
@@ -85,21 +66,10 @@ public final class BigFontManager implements
 
     @Override
     public @NotNull CompletableFuture<Void> reload(
-            //? if >= 1.21.9 {
             @NotNull SharedState currentReload,
             @NotNull Executor taskExecutor,
             @NotNull PreparationBarrier preparationBarrier,
             @NotNull Executor reloadExecutor
-            //?} else {
-            /*@NotNull PreparableReloadListener.PreparationBarrier preparationBarrier,
-            @NotNull ResourceManager manager,
-            //? if <= 1.21.1 {
-            /^@NotNull ProfilerFiller preparationsProfiler,
-            @NotNull ProfilerFiller reloadProfiler,
-            ^///?}
-            @NotNull Executor taskExecutor,
-            @NotNull Executor reloadExecutor
-            *///?}
     ) {
         return CompletableFuture.supplyAsync(this::prepare, taskExecutor)
                 .thenCompose(preparationBarrier::wait)
@@ -163,18 +133,4 @@ public final class BigFontManager implements
             @Nullable String selectedFontSource,
             Map<String, FontInfoExtractor.FontInfoExtraction> preparedFonts
     ) {}
-
-    //? if < 1.21.9 && fabric {
-    /*private static final Identifier ID = BigSignWriter.id("big_font_manager");
-
-    @Override
-    public Identifier getFabricId() {
-        return ID;
-    }
-
-    @Override
-    public Collection<Identifier> getFabricDependencies() {
-        return List.of(ResourceReloadListenerKeys.FONTS);
-    }
-    *///?}
 }

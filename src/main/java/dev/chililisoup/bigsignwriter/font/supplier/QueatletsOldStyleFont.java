@@ -4,7 +4,6 @@
  * To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
  */
 
-//? if >= 1.21.4 {
 package dev.chililisoup.bigsignwriter.font.supplier;
 
 import dev.chililisoup.bigsignwriter.font.FontFile;
@@ -145,4 +144,3 @@ public final class QueatletsOldStyleFont {
                 );
     }
 }
-//?}
