@@ -30,9 +30,13 @@ public class NeoforgeEntrypoint {
     }
 
     public static void registerLoaders(AddClientReloadListenersEvent event) {
+        Identifier bigFontResourceProvider = BigSignWriter.id("big_font_resource_provider");
+        event.addListener(bigFontResourceProvider, BigSignWriter.getBigFontResourceProvider());
+
         Identifier bigFontManager = BigSignWriter.id("big_font_manager");
         event.addListener(bigFontManager, BigSignWriter.getBigFontManager());
         event.addDependency(VanillaClientListeners.FONTS, bigFontManager);
+        event.addDependency(bigFontResourceProvider, bigFontManager);
     }
 }
 //?}

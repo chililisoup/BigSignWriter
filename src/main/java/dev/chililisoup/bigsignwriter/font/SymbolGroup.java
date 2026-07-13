@@ -73,10 +73,10 @@ public record SymbolGroup(String name, Either<Map<String, String[]>, FontInfo> s
                 l -> l,
                 font -> this.entrySet().stream()
                         .filter(entry -> filter.apply(entry.getKey()))
-                        .map(entry -> Map.entry(
-                                font.source + ":" + entry.getKey(),
-                                entry.getValue()
-                        )).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+                        .collect(Collectors.toUnmodifiableMap(
+                                entry -> font.source + ":" + entry.getKey(),
+                                Map.Entry::getValue
+                        ))
         );
     }
 }

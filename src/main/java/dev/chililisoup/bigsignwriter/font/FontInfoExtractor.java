@@ -1,6 +1,6 @@
 package dev.chililisoup.bigsignwriter.font;
 
-import dev.chililisoup.bigsignwriter.BigFontManager;
+import dev.chililisoup.bigsignwriter.resources.BigFontManager;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import net.minecraft.client.Minecraft;
@@ -14,8 +14,10 @@ import java.util.stream.Collectors;
 public final class FontInfoExtractor {
     public static Map<String, FontInfoExtraction> prepareFonts(Map<String, FontFile> fontSources) {
         return fontSources.entrySet().stream()
-                .map(entry -> Map.entry(entry.getKey(), new FontInfoExtraction(entry.getValue(), entry.getKey())))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(Collectors.toUnmodifiableMap(
+                        Map.Entry::getKey,
+                        entry -> new FontInfoExtraction(entry.getValue(), entry.getKey())
+                ));
     }
 
     public static List<FontInfo> extractAll(Map<String, FontInfoExtraction> preparedFonts) {

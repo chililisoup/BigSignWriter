@@ -1,6 +1,6 @@
 package dev.chililisoup.bigsignwriter.font;
 
-import dev.chililisoup.bigsignwriter.BigFontManager;
+import dev.chililisoup.bigsignwriter.resources.BigFontManager;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import net.minecraft.network.chat.Component;

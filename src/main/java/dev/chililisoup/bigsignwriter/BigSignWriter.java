@@ -7,6 +7,8 @@ import dev.chililisoup.bigsignwriter.font.FamilyCharacterProvider;
 import dev.chililisoup.bigsignwriter.font.FontFile;
 import dev.chililisoup.bigsignwriter.font.FontInfo;
 import dev.chililisoup.bigsignwriter.font.SymbolGroup;
+import dev.chililisoup.bigsignwriter.resources.BigFontManager;
+import dev.chililisoup.bigsignwriter.resources.BigFontResourceProvider;
 import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,6 +21,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 public final class BigSignWriter {
+    private static final BigFontResourceProvider BIG_FONT_RESOURCE_PROVIDER = new BigFontResourceProvider();
     private static final BigFontManager BIG_FONT_MANAGER = new BigFontManager();
     public static final String MOD_ID = "bigsignwriter";
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
@@ -65,6 +68,10 @@ public final class BigSignWriter {
     public static int height() {
         FontInfo selected = selectedFont();
         return selected != null ? selected.height() : 1;
+    }
+
+    public static BigFontResourceProvider getBigFontResourceProvider() {
+        return BIG_FONT_RESOURCE_PROVIDER;
     }
 
     public static BigFontManager getBigFontManager() {
@@ -146,7 +153,7 @@ public final class BigSignWriter {
         }
     }
 
-    static BigSignWriterConfig.ConfigInterface<FontFile> getFontFileInterface(Gson gson, Path path) {
+    public static BigSignWriterConfig.ConfigInterface<FontFile> getFontFileInterface(Gson gson, Path path) {
         return new BigSignWriterConfig.ConfigInterface<>(
                 gson,
                 new TypeToken<>() {

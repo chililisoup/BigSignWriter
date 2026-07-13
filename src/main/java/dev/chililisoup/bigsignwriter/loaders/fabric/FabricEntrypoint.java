@@ -18,12 +18,19 @@ public class FabricEntrypoint implements ClientModInitializer {
         Path configDir = FabricLoader.getInstance().getConfigDir().resolve(BigSignWriter.MOD_ID);
         BigSignWriter.initialize(version, configDir);
 
-        Identifier bigFontManager = BigSignWriter.id("big_font_manager");
+        //~ if >= 26.1 'registerReloader' -> 'registerReloadListener' {
+        //~ if >= 26.1 'addReloaderOrdering' -> 'addListenerOrdering' {
         ResourceLoader resourceLoader = ResourceLoader.get(PackType.CLIENT_RESOURCES);
-        //~ if >= 26.1 'registerReloader' -> 'registerReloadListener'
+
+        Identifier bigFontResourceProvider = BigSignWriter.id("big_font_resource_provider");
+        resourceLoader.registerReloadListener(bigFontResourceProvider, BigSignWriter.getBigFontResourceProvider());
+
+        Identifier bigFontManager = BigSignWriter.id("big_font_manager");
         resourceLoader.registerReloadListener(bigFontManager, BigSignWriter.getBigFontManager());
-        //~ if >= 26.1 'addReloaderOrdering' -> 'addListenerOrdering'
         resourceLoader.addListenerOrdering(ResourceReloaderKeys.Client.FONTS, bigFontManager);
+        resourceLoader.addListenerOrdering(bigFontResourceProvider, bigFontManager);
+        //~}
+        //~}
     }
 }
 //?}

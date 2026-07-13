@@ -1,7 +1,9 @@
-package dev.chililisoup.bigsignwriter;
+package dev.chililisoup.bigsignwriter.resources;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dev.chililisoup.bigsignwriter.BigSignWriter;
+import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.font.*;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import org.jetbrains.annotations.NotNull;
@@ -83,8 +85,8 @@ public final class BigFontManager implements PreparableReloadListener {
         this.availableSymbolGroups.clear();
         this.selectedFont = null;
 
-        Stream<Map.Entry<String, FontFile>> combinedStream;
-        Stream<Map.Entry<String, FontFile>> builtInFontStream = BuiltInFonts.get().entrySet().stream()
+        // initialize combined stream with builtin fonts
+        Stream<Map.Entry<String, FontFile>> combinedStream = BuiltInFonts.get().entrySet().stream()
                 .map(entry -> Map.entry("builtin/" + entry.getKey(), entry.getValue().get()));
 
         File[] jsonFiles = BigSignWriter.getFontsDir().toFile().listFiles((dir, name) -> name.endsWith(".json"));
@@ -94,20 +96,26 @@ public final class BigFontManager implements PreparableReloadListener {
             Stream<Map.Entry<String, FontFile>> userFontStream = Arrays.stream(jsonFiles)
                     .map(file -> Map.entry(file.getName(), BigSignWriter.getFontFileInterface(gson, file.toPath()).load()));
 
-            combinedStream = Stream.concat(builtInFontStream, userFontStream);
-        } else combinedStream = builtInFontStream;
+            combinedStream = Stream.concat(combinedStream, userFontStream);
+        }
 
         return new Preparation(
                 selectedFontSource,
-                FontInfoExtractor.prepareFonts(combinedStream.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
+                FontInfoExtractor.prepareFonts(combinedStream.collect(
+                        Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue)
+                ))
         );
     }
 
     private void apply(Preparation preparation) {
-        this.availableFonts.addAll(FontInfoExtractor.extractAll(preparation.preparedFonts));
+        HashMap<String, FontInfoExtractor.FontInfoExtraction> preparedFonts = new HashMap<>(preparation.preparedFonts);
+        preparedFonts.putAll(BigSignWriter.getBigFontResourceProvider().preparedFonts);
+
+        this.availableFonts.addAll(FontInfoExtractor.extractAll(preparedFonts));
         this.availableFonts.sort(BigFontManager::compareFonts);
         this.availableSymbolGroups.addAll(SymbolGroup.availableGroups());
         this.reselectFont(preparation.selectedFontSource);
+
         BigSignWriter.LOGGER.info(BigSignWriter.LOGGER_PREFIX + "Fonts loaded!");
     }
 
