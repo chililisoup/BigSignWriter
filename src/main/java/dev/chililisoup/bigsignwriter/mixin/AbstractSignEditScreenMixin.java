@@ -150,7 +150,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                     y,
                     200,
                     Math.min(200, this.height - y - 5),
-                    this.bigSignWriter$fontTyper::typeLines
+                    this.bigSignWriter$fontTyper::typeSymbol
             );
             symbolPicker.visible = false;
 

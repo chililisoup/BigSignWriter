@@ -2,6 +2,7 @@ package dev.chililisoup.bigsignwriter.gui;
 
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import dev.chililisoup.bigsignwriter.font.SymbolGroup;
+import dev.chililisoup.bigsignwriter.font.SymbolReference;
 import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -17,7 +18,7 @@ import java.util.function.Consumer;
 
 public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry> {
     private final int maxHeight;
-    private final Consumer<String[]> symbolConsumer;
+    private final Consumer<SymbolReference> symbolConsumer;
     private final int itemWidth;
 
     public SymbolGridWidget(
@@ -28,7 +29,7 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
             int y,
             int itemWidth,
             int itemHeight,
-            Consumer<String[]> symbolConsumer
+            Consumer<SymbolReference> symbolConsumer
     ) {
         super(minecraft, width, height, y, itemHeight);
         this.maxHeight = height;
@@ -86,22 +87,22 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
     }
 
     public class Entry extends ObjectSelectionList.Entry<Entry> {
-        private final String[] symbol;
+        private final SymbolReference symbol;
         private final Component[] symbolPreview;
         private final Component name;
         private final List<Component> tooltip;
         private boolean shouldScrollPreview = false;
 
-        public Entry(Map.Entry<String, String[]> symbol) {
-            this.symbol = symbol.getValue();
-            this.symbolPreview = Arrays.stream(symbol.getValue())
+        public Entry(Map.Entry<String, SymbolReference> symbolEntry) {
+            this.symbol = symbolEntry.getValue();
+            this.symbolPreview = Arrays.stream(symbolEntry.getValue().get())
                     .map(Component::literal)
                     .toArray(Component[]::new);
-            this.name = Component.literal(symbol.getKey());
+            this.name = Component.literal(symbolEntry.getKey());
 
             ArrayList<Component> tooltip = new ArrayList<>(List.of(
                     this.name,
-                    Component.translatable("bigsignwriter.font.info.height", this.symbol.length),
+                    Component.translatable("bigsignwriter.font.info.height", this.symbol.height()),
                     CommonComponents.EMPTY
             ));
             tooltip.addAll(List.of(this.symbolPreview));
@@ -128,7 +129,7 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
         private void updateShouldScrollPreview() {
             int symbolWidth = Mth.ceil(GraphicsHelper.getScaledWidth(
                     SymbolGridWidget.this.minecraft.font,
-                    this.symbol,
+                    this.symbol.get(),
                     this.getContentHeight() - 2
             ));
             this.shouldScrollPreview = symbolWidth > this.getContentWidth() - 2;

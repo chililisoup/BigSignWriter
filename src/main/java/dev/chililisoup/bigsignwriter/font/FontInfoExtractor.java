@@ -129,7 +129,7 @@ public final class FontInfoExtractor {
 
         public Map<String, String[]> symbols() {
             Map<Character, String[]> characters = this.characters();
-            HashMap<String, String[]> symbols = new HashMap<>();
+            LinkedHashMap<String, String[]> symbols = new LinkedHashMap<>();
 
             for (char chr : BigSignWriterConfig.MAIN_CONFIG.charactersShownInSymbols.toCharArray()) {
                 if (characters.containsKey(chr))

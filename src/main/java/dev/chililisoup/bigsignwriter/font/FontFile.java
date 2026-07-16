@@ -2,6 +2,8 @@ package dev.chililisoup.bigsignwriter.font;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.chililisoup.bigsignwriter.util.ModUtil;
+import net.minecraft.util.ExtraCodecs;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,7 +21,7 @@ public class FontFile {
             Codec.STRING.optionalFieldOf("characterSeparator").forGetter(FontFile::characterSeparator),
             Codec.STRING.optionalFieldOf("parentFont").forGetter(FontFile::parentFont),
             Codec.unboundedMap(
-                    Codec.INT,
+                    ExtraCodecs.CODEPOINT,
                     Codec.STRING.listOf()
             ).optionalFieldOf("characters").forGetter(FontFile::characters),
             Codec.unboundedMap(
@@ -91,7 +93,7 @@ public class FontFile {
 
     private void characters(Map<Integer, List<String>> characters) {
         this.characters = characters.entrySet().stream()
-                .collect(Collectors.toUnmodifiableMap(
+                .collect(ModUtil.orderedMapCollector(
                         entry -> Character.toChars(entry.getKey())[0],
                         entry -> entry.getValue().toArray(String[]::new)
                 ));
@@ -105,7 +107,7 @@ public class FontFile {
 
     private void symbols(Map<String, List<String>> symbols) {
         this.symbols = symbols.entrySet().stream()
-                .collect(Collectors.toUnmodifiableMap(
+                .collect(ModUtil.orderedMapCollector(
                         Map.Entry::getKey,
                         entry -> entry.getValue().toArray(String[]::new)
                 ));
@@ -148,7 +150,7 @@ public class FontFile {
     private Optional<Map<Integer, List<String>>> characters() {
         return Optional.of(this.characters.entrySet().stream()
                 .collect(Collectors.toUnmodifiableMap(
-                        entry -> (int) entry.getKey(),
+                        entry -> Character.getNumericValue(entry.getKey()),
                         entry -> List.of(entry.getValue())
                 ))
         );

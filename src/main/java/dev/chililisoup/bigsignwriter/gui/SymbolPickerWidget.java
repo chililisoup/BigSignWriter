@@ -3,6 +3,7 @@ package dev.chililisoup.bigsignwriter.gui;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.font.SymbolGroup;
+import dev.chililisoup.bigsignwriter.font.SymbolReference;
 import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -30,7 +31,7 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
     private final SymbolGridWidget symbolGrid;
     private @Nullable Consumer<Boolean> onVisibilityToggle;
 
-    public SymbolPickerWidget(Minecraft minecraft, int x, int y, int width, int height, Consumer<String[]> symbolConsumer) {
+    public SymbolPickerWidget(Minecraft minecraft, int x, int y, int width, int height, Consumer<SymbolReference> symbolConsumer) {
         super(x, y, width, height, Component.translatable("bigsignwriter.symbols"));
         this.minecraft = minecraft;
         this.symbolTextWidth = Minecraft.getInstance().font.width(this.getMessage());

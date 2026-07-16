@@ -1,52 +1,49 @@
 package dev.chililisoup.bigsignwriter.font;
 
-import com.mojang.datafixers.util.Either;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
+import dev.chililisoup.bigsignwriter.util.ModUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-public record SymbolGroup(String name, Either<Map<String, String[]>, FontInfo> symbolSource) {
-    public static @Nullable SymbolGroup of(String name, @Nullable Map<String, String[]> symbols) {
-        return (symbols != null && !symbols.isEmpty()) ?
-                new SymbolGroup(name, Either.left(symbols)) : null;
+public record SymbolGroup(String name, Map<String, SymbolReference> symbols, VisibilityChecker visibilityChecker) {
+    public static @Nullable SymbolGroup of(
+            String name, Map<String, SymbolReference> symbols, VisibilityChecker visibilityChecker
+    ) {
+        return !symbols.isEmpty() ? new SymbolGroup(name, symbols, visibilityChecker) : null;
     }
 
     public static @Nullable SymbolGroup of(FontInfo font) {
-        return font.hasSymbols() ? new SymbolGroup(font.name(), Either.right(font)) : null;
-    }
-
-    public static @Nullable SymbolGroup ofMerged(String name, List<SymbolGroup> groups) {
-        return of(name, merged(groups));
-    }
-
-    public Map<String, String[]> symbols() {
-        return this.symbolSource.map(
-                l -> l,
-                FontInfo::symbols
+        return of(
+                font.name(),
+                font.symbols().entrySet().stream().collect(ModUtil.orderedMapCollector(
+                        Map.Entry::getKey,
+                        entry -> new SymbolReference(entry.getKey(), font)
+                )),
+                font::isVisible
         );
     }
 
-    public @Nullable String[] get(String id) {
+    public static @Nullable SymbolGroup ofMerged(String name, List<SymbolGroup> groups) {
+        return of(name, merged(groups), config -> true);
+    }
+
+    public @Nullable SymbolReference get(String id) {
         return this.symbols().get(id);
     }
 
-    public Set<Map.Entry<String, String[]>> entrySet() {
+    public Set<Map.Entry<String, SymbolReference>> entrySet() {
         return this.symbols().entrySet();
     }
 
     public boolean isVisible(BigSignWriterConfig.PersistentConfig config) {
-        return this.symbolSource.map(
-                l -> true,
-                font -> font.isVisible(config)
-        );
+        return this.visibilityChecker.check(config);
     }
 
     public boolean isVisible() {
-        return this.isVisible(BigSignWriterConfig.MAIN_CONFIG);
+        return this.visibilityChecker.check();
     }
 
     public static List<SymbolGroup> availableGroups() {
@@ -56,9 +53,14 @@ public record SymbolGroup(String name, Either<Map<String, String[]>, FontInfo> s
                 .toList();
     }
 
-    private static Map<String, String[]> merged(List<SymbolGroup> groups) {
-        TreeMap<String, String[]> merged = new TreeMap<>();
-        groups.forEach(group -> merged.putAll(group.expandIds(SymbolGroup::filterFromInclude)));
+    private static Map<String, SymbolReference> merged(List<SymbolGroup> groups) {
+        LinkedHashMap<String, SymbolReference> merged = new LinkedHashMap<>();
+        groups.stream()
+                .sorted(Comparator.comparing(SymbolGroup::name))
+                .forEach(group -> merged.putAll(
+                        group.expandIds(SymbolGroup::filterFromInclude)
+                ));
+
         return merged;
     }
 
@@ -68,15 +70,21 @@ public record SymbolGroup(String name, Either<Map<String, String[]>, FontInfo> s
         return !BigSignWriterConfig.MAIN_CONFIG.characterShownInSymbols(chars[0]);
     }
 
-    private Map<String, String[]> expandIds(Function<String, Boolean> filter) {
-        return this.symbolSource.map(
-                l -> l,
-                font -> this.entrySet().stream()
-                        .filter(entry -> filter.apply(entry.getKey()))
-                        .collect(Collectors.toUnmodifiableMap(
-                                entry -> font.source + ":" + entry.getKey(),
-                                Map.Entry::getValue
-                        ))
-        );
+    private Map<String, SymbolReference> expandIds(Function<String, Boolean> filter) {
+        return this.symbols.entrySet().stream()
+                .filter(entry -> filter.apply(entry.getKey()))
+                .collect(ModUtil.orderedMapCollector(
+                        entry -> entry.getValue().expandedId(),
+                        Map.Entry::getValue
+                ));
+    }
+
+    @FunctionalInterface
+    public interface VisibilityChecker {
+        boolean check(BigSignWriterConfig.PersistentConfig config);
+
+        default boolean check() {
+            return this.check(BigSignWriterConfig.MAIN_CONFIG);
+        }
     }
 }
