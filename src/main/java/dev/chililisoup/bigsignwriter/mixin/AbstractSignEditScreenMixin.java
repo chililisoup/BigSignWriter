@@ -50,8 +50,9 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         return Component.literal(open ? "▼" : "▶");
     }
 
-    @Unique private @Nullable Button bigSignWriter$doneButton;
     @Unique private @Nullable BigFontTyper bigSignWriter$fontTyper;
+    @Unique private @Nullable Button bigSignWriter$doneButton;
+    @Unique private @Nullable SymbolPickerWidget bigSignWriter$symbolPicker;
     @Unique private boolean bigSignWriter$inSymbolPicker = false;
     @Unique private boolean bigSignWriter$ignoreNextRemoval = false;
 
@@ -177,12 +178,20 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
             this.addRenderableWidget(symbolsButton);
             this.addRenderableWidget(symbolPicker);
+            this.bigSignWriter$symbolPicker = symbolPicker;
         }
     }
 
     @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
     private void charTypedInject(CharacterEvent event, CallbackInfoReturnable<Boolean> cir) {
-        if (BigSignWriter.isVanillaTyping() || this.bigSignWriter$fontTyper == null) return;
+        if (this.bigSignWriter$fontTyper == null) return;
+
+        if (this.bigSignWriter$symbolPicker != null && this.bigSignWriter$symbolPicker.charTyped(event)) {
+            cir.setReturnValue(true);
+            return;
+        }
+
+        if (BigSignWriter.isVanillaTyping()) return;
         cir.setReturnValue(true);
 
         char chr = Character.toChars(event.codepoint())[0];
@@ -191,9 +200,14 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void keyPressedInject(KeyEvent event, CallbackInfoReturnable<Boolean> cir) {
-        if (BigSignWriter.isVanillaTyping() || this.bigSignWriter$fontTyper == null) return;
+        if (this.bigSignWriter$fontTyper == null) return;
 
-        if (this.bigSignWriter$fontTyper.keyPressed(event))
+        if (this.bigSignWriter$symbolPicker != null && this.bigSignWriter$symbolPicker.keyPressed(event)) {
+            cir.setReturnValue(true);
+            return;
+        }
+
+        if (!BigSignWriter.isVanillaTyping() && this.bigSignWriter$fontTyper.keyPressed(event))
             cir.setReturnValue(true);
     }
 
@@ -268,6 +282,18 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             boolean shadow
     ) {
         return BigSignWriter.isVanillaTyping();
+    }
+
+    @WrapOperation(
+            method = "extractSignText", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/components/TextCursorUtils;isCursorVisible(J)Z"
+    ))
+    private boolean freezeCursor(long timeInMs, Operation<Boolean> original) {
+        if (this.bigSignWriter$symbolPicker != null && this.bigSignWriter$symbolPicker.isControllingKeyboard())
+            return true;
+
+        return original.call(timeInMs);
     }
 
     @WrapWithCondition(

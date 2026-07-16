@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry> {
-    private final int maxHeight;
+    private int maxHeight;
     private final Consumer<SymbolReference> symbolConsumer;
     private final int itemWidth;
 
@@ -40,8 +40,42 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
 
     public void updateEntries(SymbolGroup group) {
         this.replaceEntries(group.entrySet().stream().map(Entry::new).toList());
-        this.setHeight(Math.min(this.maxHeight, this.contentHeight()));
+        this.updateHeight();
         this.setScrollAmount(0.0);
+    }
+
+    public void clearFilter() {
+        this.children().forEach(entry -> entry.visible = true);
+        this.repositionEntries();
+        this.updateHeight();
+        this.refreshScrollAmount();
+    }
+
+    public void filterEntries(String query) {
+        String simpleQuery = simplifyQueryString(query);
+        this.children().forEach(entry ->
+            entry.visible = simplifyQueryString(entry.name).contains(simpleQuery)
+        );
+
+        this.repositionEntries();
+        this.updateHeight();
+        this.refreshScrollAmount();
+    }
+
+    private void updateHeight() {
+        this.setHeight(Math.min(this.maxHeight, this.contentHeight()));
+    }
+
+    public void setMaxHeight(int maxHeight) {
+        this.maxHeight = maxHeight;
+        this.updateHeight();
+        this.refreshScrollAmount();
+    }
+
+    private static String simplifyQueryString(String query) {
+        String lower = query.toLowerCase();
+        String filtered = query.replaceAll("[^a-z0-9]", "");
+        return filtered.isEmpty() ? lower : filtered;
     }
 
     @Override
@@ -66,9 +100,10 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
         int columns = this.columns();
 
         List<Entry> children = this.children();
-        for (int i = 0; i < children.size(); i++) {
-            Entry entry = children.get(i);
-            int column = i % columns;
+        int visibleIndex = 0;
+        for (Entry entry : children) {
+            int column = visibleIndex % columns;
+            if (entry.isVisible()) visibleIndex++;
 
             entry.setY(y);
             if (column == columns - 1)
@@ -82,26 +117,27 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
     @Override
     protected int contentHeight() {
         return Mth.ceil(
-                (this.children().size() / (float) this.columns())
+                (this.children().stream().filter(Entry::isVisible).count() / (float) this.columns())
         ) * this.defaultEntryHeight + 4;
     }
 
     public class Entry extends ObjectSelectionList.Entry<Entry> {
         private final SymbolReference symbol;
         private final Component[] symbolPreview;
-        private final Component name;
+        private final String name;
         private final List<Component> tooltip;
         private boolean shouldScrollPreview = false;
+        private boolean visible = true;
 
         public Entry(Map.Entry<String, SymbolReference> symbolEntry) {
             this.symbol = symbolEntry.getValue();
             this.symbolPreview = Arrays.stream(symbolEntry.getValue().get())
                     .map(Component::literal)
                     .toArray(Component[]::new);
-            this.name = Component.literal(symbolEntry.getKey());
+            this.name = symbolEntry.getKey();
 
             ArrayList<Component> tooltip = new ArrayList<>(List.of(
-                    this.name,
+                    Component.literal(this.name),
                     Component.translatable("bigsignwriter.font.info.height", this.symbol.height()),
                     CommonComponents.EMPTY
             ));
@@ -114,10 +150,24 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
             return Component.translatable("narrator.select", this.name);
         }
 
+        public boolean isVisible() {
+            return this.visible;
+        }
+
+        @Override
+        public int getHeight() {
+            return this.isVisible() ? super.getHeight() : 0;
+        }
+
         @Override
         public void setHeight(int height) {
             super.setHeight(height);
             this.updateShouldScrollPreview();
+        }
+
+        @Override
+        public int getWidth() {
+            return this.isVisible() ? super.getWidth() : 0;
         }
 
         @Override
@@ -140,6 +190,8 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
         public void extractContent(
                 @NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick
         ) {
+            if (!this.isVisible()) return;
+
             int left = this.getContentX();
             int top = this.getContentY();
             int width = this.getContentWidth();

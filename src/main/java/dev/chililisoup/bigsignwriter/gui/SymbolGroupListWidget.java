@@ -17,8 +17,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class SymbolGroupListWidget extends ObjectSelectionList<SymbolGroupListWidget.Entry> {
-    private final int maxHeight;
+    private int maxHeight;
     private final Consumer<@Nullable SymbolGroup> onSelect;
+    public @Nullable SymbolGroup allGroup;
 
     public SymbolGroupListWidget(
             Minecraft minecraft,
@@ -40,17 +41,27 @@ public class SymbolGroupListWidget extends ObjectSelectionList<SymbolGroupListWi
         List<SymbolGroup> visibleGroups = BigSignWriter.availableSymbolGroups().stream()
                 .filter(SymbolGroup::isVisible)
                 .toList();
-        SymbolGroup merged = SymbolGroup.ofMerged(Component.translatable("bigsignwriter.symbols.all").getString(), visibleGroups);
+        this.allGroup = SymbolGroup.ofMerged(Component.translatable("bigsignwriter.symbols.all").getString(), visibleGroups);
 
         ArrayList<SymbolGroup> groups = new ArrayList<>();
-        if (merged != null) groups.add(merged);
+        if (this.allGroup != null) groups.add(this.allGroup);
         groups.addAll(visibleGroups);
 
         this.replaceEntries(groups.stream().map(Entry::new).toList());
         super.setSelected(null);
 
-        this.setHeight(Math.min(this.maxHeight, this.contentHeight()));
+        this.updateHeight();
         this.setScrollAmount(0.0);
+    }
+
+    private void updateHeight() {
+        this.setHeight(Math.min(this.maxHeight, this.contentHeight()));
+    }
+
+    public void setMaxHeight(int maxHeight) {
+        this.maxHeight = maxHeight;
+        this.updateHeight();
+        this.refreshScrollAmount();
     }
 
     @Override

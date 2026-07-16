@@ -10,8 +10,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -29,6 +31,7 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
     private final int symbolTextWidth;
     private final SymbolGroupListWidget groupList;
     private final SymbolGridWidget symbolGrid;
+    private final SymbolSearchBar searchBar;
     private @Nullable Consumer<Boolean> onVisibilityToggle;
 
     public SymbolPickerWidget(Minecraft minecraft, int x, int y, int width, int height, Consumer<SymbolReference> symbolConsumer) {
@@ -49,9 +52,19 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
                 symbolConsumer
         );
         this.symbolGrid.visible = false;
+        this.searchBar = new SymbolSearchBar(minecraft.font, x, y + 26, width, 16, Component.translatable("bigsignwriter.symbols.search"));
+        this.searchBar.setSuggestion(this.searchBar.getMessage().getString());
+        this.searchBar.setResponder(this::onSearchQueryChanged);
+        this.searchBar.visible = false;
+    }
+
+    public boolean isControllingKeyboard() {
+        return this.getFocused() == this.searchBar;
     }
 
     public void toggleVisibility() {
+        if (this.visible && this.searchBar.visible)
+            this.toggleSearchBarVisibility();
         this.visible = !this.visible;
         if (this.onVisibilityToggle != null)
             this.onVisibilityToggle.accept(this.visible);
@@ -61,44 +74,107 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
         this.onVisibilityToggle = onVisibilityToggle;
     }
 
-    public void openGroup(@Nullable SymbolGroup group) {
+    public void openGroup(@Nullable SymbolGroup group, boolean closeSearch) {
+        if (closeSearch) {
+            this.searchBar.setVisible(false);
+            if (this.searchBar.isFocused())
+                this.setFocused(null);
+            this.searchBar.setValue("");
+        }
+
         this.groupList.setSelectedGroup(group);
         this.groupList.visible = group == null;
         this.symbolGrid.visible = group != null;
         if (group != null) this.symbolGrid.updateEntries(group);
     }
 
+    public void openGroup(@Nullable SymbolGroup group) {
+        this.openGroup(group, true);
+    }
+
+    public void setSearchBarVisibility(boolean visible) {
+        this.searchBar.setVisible(visible);
+        this.setFocused(visible ? this.searchBar : null);
+    }
+
+    public void toggleSearchBarVisibility() {
+        this.setSearchBarVisibility(!this.searchBar.isVisible());
+    }
+
+    private void onSearchBarVisibilityChanged(boolean visible) {
+        int contentOffset = visible ? 48 : 28;
+        int contentY = this.getY() + contentOffset;
+        int contentHeight = this.getHeight() - contentOffset;
+
+        this.groupList.setY(contentY);
+        this.groupList.setMaxHeight(contentHeight);
+        this.symbolGrid.setY(contentY);
+        this.symbolGrid.setMaxHeight(contentHeight);
+    }
+
+    private void onSearchQueryChanged(String query) {
+        this.searchBar.setSuggestion(query.isEmpty() ?
+                this.searchBar.getMessage().getString() : ""
+        );
+
+        if (query.isBlank()) {
+            this.symbolGrid.clearFilter();
+            return;
+        }
+
+        if (this.groupList.getSelected() == null)
+            this.openGroup(this.groupList.allGroup, false);
+
+        this.symbolGrid.filterEntries(query);
+    }
+
     @Override
     public @NotNull List<AbstractWidget> children() {
-        return List.of(this.groupList, this.symbolGrid);
+        return List.of(this.groupList, this.symbolGrid, this.searchBar);
+    }
+
+    private boolean navigatorAreaHovered(int x, int width, int mouseX, int mouseY) {
+        return mouseX >= this.getX() + x && mouseX < this.getX() + x + width
+                && mouseY >= this.getY() + 6 && mouseY < this.getY() + 16;
     }
 
     private boolean backHovered(int mouseX, int mouseY) {
-        return mouseX >= this.getX() + 6 && mouseX < this.getX() + 16
-                && mouseY >= this.getY() + 6 && mouseY < this.getY() + 16;
+        return this.navigatorAreaHovered(6, 10, mouseX, mouseY);
     }
 
     private boolean symbolTextHovered(int mouseX, int mouseY) {
-        return mouseX >= this.getX() + 24 && mouseX < this.getX() + 24 + this.symbolTextWidth
-                && mouseY >= this.getY() + 6 && mouseY < this.getY() + 16;
+        return this.navigatorAreaHovered(24, this.symbolTextWidth, mouseX, mouseY);
+    }
+
+    private boolean searchHovered(int mouseX, int mouseY) {
+        return this.navigatorAreaHovered(this.width - 18, 10, mouseX, mouseY);
+    }
+
+    @Override
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        return this.searchBar.isFocused() || super.isMouseOver(mouseX, mouseY);
     }
 
     @Override
     public boolean mouseClicked(@NotNull MouseButtonEvent mouseButtonEvent, boolean doubleClick) {
+        if (this.searchBar.isFocused() && !this.searchBar.isMouseOver(
+                mouseButtonEvent.x(), mouseButtonEvent.y()
+        )) this.setFocused(null);
+
         if (!this.isActive()) return false;
 
-        double mouseX = mouseButtonEvent.x();
-        double mouseY = mouseButtonEvent.y();
+        int mouseX = (int) mouseButtonEvent.x();
+        int mouseY = (int) mouseButtonEvent.y();
         int button = mouseButtonEvent.button();
 
         if (button == 0) {
-            if (this.symbolTextHovered((int) mouseX, (int) mouseY)) {
+            if (this.symbolTextHovered(mouseX, mouseY)) {
                 this.playDownSound(Minecraft.getInstance().getSoundManager());
                 this.openGroup(null);
                 return true;
             }
 
-            if (this.backHovered((int) mouseX, (int) mouseY)) {
+            if (this.backHovered(mouseX, mouseY)) {
                 this.playDownSound(Minecraft.getInstance().getSoundManager());
 
                 if (this.groupList.getSelected() != null) {
@@ -107,6 +183,12 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
                 }
 
                 this.toggleVisibility();
+                return true;
+            }
+
+            if (this.searchHovered(mouseX, mouseY)) {
+                this.playDownSound(Minecraft.getInstance().getSoundManager());
+                this.toggleSearchBarVisibility();
                 return true;
             }
         }
@@ -155,6 +237,9 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
                 backHovered ? backText.withStyle(ChatFormatting.UNDERLINE) : backText,
                 8
         );
+        if (backHovered) guiGraphics.setTooltipForNextFrame(
+                Component.translatable("gui.back"), mouseX, mouseY
+        );
 
         boolean symbolTextHovered = !backHovered && this.symbolTextHovered(mouseX, mouseY);
         this.navigatorText(
@@ -164,15 +249,24 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
                 24
         );
 
-        if (backHovered) guiGraphics.setTooltipForNextFrame(
-                Component.translatable("gui.back"), mouseX, mouseY
+        boolean searchHovered = !symbolTextHovered && this.searchHovered(mouseX, mouseY);
+        MutableComponent searchText = Component.literal("🔍");
+        this.navigatorText(
+                guiGraphics,
+                font,
+                searchHovered ? searchText.withStyle(ChatFormatting.UNDERLINE) : searchText,
+                this.width - 16
+        );
+        if (searchHovered) guiGraphics.setTooltipForNextFrame(
+                Component.translatable("bigsignwriter.symbols.search_hint"), mouseX, mouseY
         );
 
-        if (backHovered || symbolTextHovered) guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
+        if (backHovered || symbolTextHovered || searchHovered)
+            guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
 
         SymbolGroupListWidget.Entry selected = this.groupList.getSelected();
         if (selected == null) {
-            this.navigatorText(guiGraphics, font, Component.literal("🖫"), this.width - 16);
+            this.navigatorText(guiGraphics, font, Component.literal("🖫"), this.width - 32);
             return;
         }
 
@@ -181,14 +275,37 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
                 guiGraphics,
                 selected.getName(),
                 this.getX() + 40 + this.symbolTextWidth,
-                this.getRight() - 8,
+                this.getRight() - 20,
                 this.getY() + 6
         );
     }
 
     @Override
-    // TODO: Implement
     protected void updateWidgetNarration(@NotNull NarrationElementOutput output) {
+        this.children().forEach(widget -> widget.updateNarration(output));
+    }
 
+    private class SymbolSearchBar extends EditBox {
+        public SymbolSearchBar(Font font, int x, int y, int width, int height, Component narration) {
+            super(font, x, y, width, height, narration);
+        }
+
+        @Override
+        public void setVisible(boolean visible) {
+            if (this.isVisible() == visible) return;
+            super.setVisible(visible);
+            SymbolPickerWidget.this.onSearchBarVisibilityChanged(visible);
+            if (!visible) this.setValue("");
+        }
+
+        @Override
+        public boolean keyPressed(KeyEvent event) {
+            if (event.isConfirmation() && this.isFocused()) {
+                SymbolPickerWidget.this.setFocused(null);
+                return true;
+            }
+
+            return super.keyPressed(event);
+        }
     }
 }
