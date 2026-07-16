@@ -7,10 +7,7 @@ import net.minecraft.util.ExtraCodecs;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FontFile {
@@ -101,7 +98,7 @@ public class FontFile {
 
     @SafeVarargs
     public final FontFile symbols(Map.Entry<String, String[]>... entries) {
-        this.symbols = Map.ofEntries(entries);
+        this.symbols = Arrays.stream(entries).collect(ModUtil.orderedMapCollector());
         return this;
     }
 

@@ -1,6 +1,7 @@
 package dev.chililisoup.bigsignwriter.util;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.SequencedMap;
 import java.util.function.Function;
 import java.util.stream.Collector;
@@ -16,5 +17,9 @@ public final class ModUtil {
                 (x, y) -> y,
                 LinkedHashMap::new
         );
+    }
+
+    public static <K, U> Collector<Map.Entry<K, U>, ?, SequencedMap<K, U>> orderedMapCollector() {
+        return orderedMapCollector(Map.Entry::getKey, Map.Entry::getValue);
     }
 }

@@ -32,7 +32,9 @@ public class BuiltInFonts {
                 entry("minecraft", MinecraftFont::get),
                 entry("outlined", OutlinedFont::get),
                 entry("outlined_short", OutlinedShortFont::get),
-                entry("shulkerware", ShulkerwareFont::get)
+                entry("shulkerware", ShulkerwareFont::get),
+
+                entry("largemojis", LargemojisSymbolPack::get)
         );
     }
 
