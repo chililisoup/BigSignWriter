@@ -37,7 +37,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 //? if >= 26.1 {
 import org.joml.Vector2f;
-//?}
+//?} else {
+/*import org.spongepowered.asm.mixin.injection.ModifyVariable;
+*///?}
 
 import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.*;
 
@@ -263,9 +265,9 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             method = "extractSignText",
             at = @At(
                     value = "INVOKE",
-                    //? if < 21.6
+                    //? if < 26.1
                     //ordinal = 1,
-                    //? if >= 21.6 {
+                    //? if >= 26.1 {
                     target = "Lnet/minecraft/client/gui/components/TextCursorUtils;extractAppendCursor(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIIZ)V"
                     //?} else
                     //target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V"
@@ -284,6 +286,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         return BigSignWriter.isVanillaTyping();
     }
 
+    //? if >= 26.1 {
     @WrapOperation(
             method = "extractSignText", at = @At(
             value = "INVOKE",
@@ -295,6 +298,14 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
         return original.call(timeInMs);
     }
+    //?} else {
+    /*@ModifyVariable(method = "extractSignText", at = @At(value = "STORE", ordinal = 0))
+    private boolean freezeCursor(boolean cursor) {
+        return cursor || (
+                this.bigSignWriter$symbolPicker != null && this.bigSignWriter$symbolPicker.isControllingKeyboard()
+        );
+    }
+    *///?}
 
     @WrapWithCondition(
             method = "removed", at = @At(
