@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.font.*;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class BigFontManager implements PreparableReloadListener {
-    public static final String DEFAULT_FONT_SOURCE = "builtin/default";
+    public static final Identifier DEFAULT_FONT_ID = BigSignWriter.id("default");
 
     private final ArrayList<FontInfo> availableFonts = new ArrayList<>();
     private final ArrayList<SymbolGroup> availableSymbolGroups = new ArrayList<>();
@@ -48,9 +49,9 @@ public final class BigFontManager implements PreparableReloadListener {
         ) ? fontInfo : null;
     }
 
-    private void reselectFont(@Nullable String source) {
-        if (source != null) for (FontInfo fontInfo : this.availableFonts) {
-            if (fontInfo.source.equals(source)) {
+    private void reselectFont(@Nullable Identifier id) {
+        if (id != null) for (FontInfo fontInfo : this.availableFonts) {
+            if (fontInfo.id.equals(id)) {
                 this.selectFont(fontInfo);
                 return;
             }
@@ -79,36 +80,33 @@ public final class BigFontManager implements PreparableReloadListener {
     }
 
     private Preparation prepare() {
-        String selectedFontSource = this.selectedFont != null ? this.selectedFont.source : null;
+        Identifier selectedFontId = this.selectedFont != null ? this.selectedFont.id : null;
 
         this.availableFonts.clear();
         this.availableSymbolGroups.clear();
         this.selectedFont = null;
 
-        // initialize combined stream with builtin fonts
-        Stream<Map.Entry<String, FontFile>> combinedStream = BuiltInFonts.get().entrySet().stream()
-                .map(entry -> Map.entry("builtin/" + entry.getKey(), entry.getValue().get()));
-
         File[] jsonFiles = BigSignWriter.getFontsDir().toFile().listFiles((dir, name) -> name.endsWith(".json"));
-        if (jsonFiles != null && jsonFiles.length > 0) {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        if (jsonFiles == null || jsonFiles.length == 0)
+            return new Preparation(selectedFontId, Map.of());
 
-            Stream<Map.Entry<String, FontFile>> userFontStream = Arrays.stream(jsonFiles)
-                    .map(file -> Map.entry(file.getName(), BigSignWriter.getFontFileInterface(gson, file.toPath()).load()));
-
-            combinedStream = Stream.concat(combinedStream, userFontStream);
-        }
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Stream<Map.Entry<Identifier, FontFile>> userFontStream = Arrays.stream(jsonFiles)
+                .map(file -> Map.entry(
+                        BigSignWriter.userFontId(file.getName()),
+                        BigSignWriter.getFontFileInterface(gson, file.toPath()).load()
+                ));
 
         return new Preparation(
-                selectedFontSource,
-                FontInfoExtractor.prepareFonts(combinedStream.collect(
+                selectedFontId,
+                FontInfoExtractor.prepareFonts(userFontStream.collect(
                         Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue)
                 ))
         );
     }
 
     private void apply(Preparation preparation) {
-        HashMap<String, FontInfoExtractor.FontInfoExtraction> preparedFonts = new HashMap<>(preparation.preparedFonts);
+        HashMap<Identifier, FontInfoExtractor.FontInfoExtraction> preparedFonts = new HashMap<>(preparation.preparedFonts);
         preparedFonts.putAll(BigSignWriter.getBigFontResourceProvider().preparedFonts);
 
         this.availableFonts.addAll(FontInfoExtractor.extractAll(preparedFonts));
@@ -138,7 +136,7 @@ public final class BigFontManager implements PreparableReloadListener {
     }
 
     private record Preparation(
-            @Nullable String selectedFontSource,
-            Map<String, FontInfoExtractor.FontInfoExtraction> preparedFonts
+            @Nullable Identifier selectedFontSource,
+            Map<Identifier, FontInfoExtractor.FontInfoExtraction> preparedFonts
     ) {}
 }

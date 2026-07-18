@@ -16,6 +16,6 @@ public record SymbolReference(String key, FontInfo sourceFont) {
     }
 
     public String expandedId() {
-        return this.sourceFont.source + ":" + this.key;
+        return this.sourceFont.id + ":" + this.key;
     }
 }

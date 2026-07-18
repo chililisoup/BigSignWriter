@@ -295,7 +295,7 @@ public class FontsTab extends ConfigTab<FontsTab.FontsSidePanel> {
             this.zoomOutButton.visible = selected != null && selected.fontInfo.isWorking();
             this.zoomInButton.visible = this.zoomOutButton.visible;
             this.copyButton.visible = this.zoomOutButton.visible
-                    && selected.fontInfo.isBuiltIn();
+                    && !selected.fontInfo.isFromConfigFolder();
             this.inheritedCharactersToggle.visible = this.zoomOutButton.visible
                     && selected.fontInfo.hasExplicitParent();
             if (selected == null) {
@@ -308,7 +308,7 @@ public class FontsTab extends ConfigTab<FontsTab.FontsSidePanel> {
             Optional.ofNullable(fontInfo.credits()).ifPresent(
                     credits -> infoLines.add(infoLine("bigsignwriter.font.info.credits", credits))
             );
-            infoLines.add(infoLine("bigsignwriter.font.info.source", fontInfo.source));
+            infoLines.add(infoLine("bigsignwriter.font.info.id", fontInfo.id));
             FontInfo parentFont = fontInfo.parentFont();
             if (parentFont != null) infoLines.add(infoLine(
                     fontInfo.parentIsImplicit() ?

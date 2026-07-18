@@ -3,8 +3,8 @@ package dev.chililisoup.bigsignwriter.font;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.chililisoup.bigsignwriter.util.ModUtil;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ExtraCodecs;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -14,9 +14,10 @@ public class FontFile {
     public static final Codec<FontFile> CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.STRING.fieldOf("name").forGetter(FontFile::name),
             Codec.STRING.optionalFieldOf("credits").forGetter(FontFile::credits),
+            Codec.STRING.listOf().optionalFieldOf("license").forGetter(FontFile::license),
             Codec.INT.optionalFieldOf("height").forGetter(FontFile::height),
             Codec.STRING.optionalFieldOf("characterSeparator").forGetter(FontFile::characterSeparator),
-            Codec.STRING.optionalFieldOf("parentFont").forGetter(FontFile::parentFont),
+            Identifier.CODEC.optionalFieldOf("parentFont").forGetter(FontFile::parentFont),
             Codec.unboundedMap(
                     ExtraCodecs.CODEPOINT,
                     Codec.STRING.listOf()
@@ -28,6 +29,7 @@ public class FontFile {
     ).apply(i, (
             name,
             credits,
+            license,
             height,
             characterSeparator,
             parentFont,
@@ -38,6 +40,7 @@ public class FontFile {
 
         fontFile.name = name;
         credits.ifPresent(fontFile::credits);
+        license.ifPresent(fontFile::license);
         height.ifPresent(fontFile::height);
         characterSeparator.ifPresent(fontFile::characterSeparator);
         parentFont.ifPresent(fontFile::parentFont);
@@ -49,43 +52,31 @@ public class FontFile {
 
     public String name = "Font";
     public @Nullable String credits = null;
+    public @Nullable String[] license = null;
     public int height = 4;
     public @Nullable String characterSeparator = null;
-    public @Nullable String parentFont = null;
+    private @Nullable String parentFont = null;
     public Map<Character, String[]> characters = Map.of();
     public @Nullable Map<String, String[]> symbols = null;
-
-    public FontFile() {}
-
-    public FontFile(String name, @NotNull String credits) {
-        this.name = name;
-        this.credits = credits;
-    }
 
     private void credits(String credits) {
         this.credits = credits;
     }
 
-    public FontFile height(int height) {
+    private void license(List<String> license) {
+        this.license = license.toArray(String[]::new);
+    }
+
+    public void height(int height) {
         this.height = height;
-        return this;
     }
 
-    public FontFile characterSeparator(String characterSeparator) {
+    public void characterSeparator(String characterSeparator) {
         this.characterSeparator = characterSeparator;
-        return this;
     }
 
-    public FontFile parentFont(String parentFont) {
-        this.parentFont = "builtin/" + parentFont;
-        return this;
-    }
-
-    @SafeVarargs
-    public final FontFile characters(Map.Entry<Character, String[]>... entries) {
-        this.characters = new TreeMap<>(FontFile::compareChars);
-        this.characters.putAll(Map.ofEntries(entries));
-        return this;
+    public void parentFont(Identifier parentFont) {
+        this.parentFont = parentFont.toString();
     }
 
     private void characters(Map<Integer, List<String>> characters) {
@@ -94,12 +85,6 @@ public class FontFile {
                         entry -> Character.toChars(entry.getKey())[0],
                         entry -> entry.getValue().toArray(String[]::new)
                 ));
-    }
-
-    @SafeVarargs
-    public final FontFile symbols(Map.Entry<String, String[]>... entries) {
-        this.symbols = Arrays.stream(entries).collect(ModUtil.orderedMapCollector());
-        return this;
     }
 
     private void symbols(Map<String, List<String>> symbols) {
@@ -132,6 +117,10 @@ public class FontFile {
         return Optional.ofNullable(this.credits);
     }
 
+    private Optional<List<String>> license() {
+        return Optional.ofNullable(this.license).map(List::of);
+    }
+
     private Optional<Integer> height() {
         return Optional.of(this.height);
     }
@@ -140,8 +129,8 @@ public class FontFile {
         return Optional.ofNullable(this.characterSeparator);
     }
 
-    private Optional<String> parentFont() {
-        return Optional.ofNullable(this.parentFont);
+    public Optional<Identifier> parentFont() {
+        return Optional.ofNullable(this.parentFont).map(Identifier::tryParse);
     }
 
     private Optional<Map<Integer, List<String>>> characters() {

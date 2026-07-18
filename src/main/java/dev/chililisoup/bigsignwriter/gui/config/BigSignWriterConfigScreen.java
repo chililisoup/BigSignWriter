@@ -41,7 +41,9 @@ public class BigSignWriterConfigScreen extends Screen {
         this.parent = parent;
         this.tabManager.setTabArea(ScreenRectangle.empty());
 
-        List<FontInfo> workingFonts = BigSignWriter.availableFonts().stream().filter(FontInfo::isWorking).toList();
+        List<FontInfo> workingFonts = BigSignWriter.availableFonts().stream()
+                .filter(font -> font.isWorking() && font.hasCharacters())
+                .toList();
         this.title = workingFonts.isEmpty() ?
                 new Component[]{ Component.empty() } :
                 workingFonts.get(Mth.floor(Math.random() * workingFonts.size()))

@@ -4,13 +4,14 @@ import dev.chililisoup.bigsignwriter.resources.BigFontManager;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public class FontInfo implements FamilyCharacterProvider {
     public final FontFile fontFile;
-    public final String source;
+    public final Identifier id;
     private final @Nullable FontInfo parentFont;
     private final @Nullable FontInfo rootAncestorFont;
     private final @Nullable Component error;
@@ -22,7 +23,7 @@ public class FontInfo implements FamilyCharacterProvider {
 
     FontInfo(FontInfoExtractor.FontInfoExtraction extraction) {
         this.fontFile = extraction.fontFile;
-        this.source = extraction.source;
+        this.id = extraction.id;
         this.parentFont = extraction.parentFontInfo();
         this.rootAncestorFont = extraction.rootAncestorFont();
         this.error = extraction.error;
@@ -74,7 +75,7 @@ public class FontInfo implements FamilyCharacterProvider {
 
     @Override
     public boolean parentIsImplicit() {
-        return this.fontFile.parentFont == null;
+        return this.fontFile.parentFont().isEmpty();
     }
 
     public boolean hasExplicitParent() {
@@ -97,12 +98,14 @@ public class FontInfo implements FamilyCharacterProvider {
         return !this.isBroken();
     }
 
-    public boolean isBuiltIn() {
-        return this.getBuiltInName() != null;
+    public boolean isFromConfigFolder() {
+        return this.id.getNamespace().equals(BigSignWriter.MOD_ID)
+                && this.id.getPath().startsWith("user/")
+                && this.id.getPath().endsWith(".json");
     }
 
     public boolean isVisible(BigSignWriterConfig.PersistentConfig config) {
-        return !config.hiddenFonts.contains(this.source);
+        return !config.isFontHidden(this.id);
     }
 
     public boolean isVisible() {
@@ -110,12 +113,12 @@ public class FontInfo implements FamilyCharacterProvider {
     }
 
     public void setVisible(BigSignWriterConfig.PersistentConfig config, boolean visible) {
-        if (visible) config.hiddenFonts.remove(this.source);
-        else config.hiddenFonts.add(this.source);
+        if (visible) config.showFont(this.id);
+        else config.hideFont(this.id);
     }
 
     public boolean isDefault() {
-        return this.source.equals(BigFontManager.DEFAULT_FONT_SOURCE);
+        return this.id.equals(BigFontManager.DEFAULT_FONT_ID);
     }
 
     public String widthInfo() {
@@ -124,12 +127,6 @@ public class FontInfo implements FamilyCharacterProvider {
 
     public @Nullable String cumulativeWidthInfo() {
         return this.cumulativeWidthInfo;
-    }
-
-    public @Nullable String getBuiltInName() {
-        String[] fontSource = this.source.split("/");
-        return fontSource.length == 2 && fontSource[0].equals("builtin") ?
-                fontSource[1] : null;
     }
 
     public @Nullable Component error() {

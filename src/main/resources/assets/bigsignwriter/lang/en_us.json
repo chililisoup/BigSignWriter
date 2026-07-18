@@ -3,7 +3,7 @@
   "bigsignwriter.font.none": "None (Vanilla)",
   "bigsignwriter.font.unknown": "Unknown",
   "bigsignwriter.font.info.credits": "Credits: %s",
-  "bigsignwriter.font.info.source": "Source: %s",
+  "bigsignwriter.font.info.id": "ID: %s",
   "bigsignwriter.font.info.parentFont": "Parent Font: %s",
   "bigsignwriter.font.info.parentFont.implicit": "Parent Font: %s (Implicit)",
   "bigsignwriter.font.info.characterCount": "Characters: %s",

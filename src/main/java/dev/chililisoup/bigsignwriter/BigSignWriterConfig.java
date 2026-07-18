@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import net.minecraft.resources.Identifier;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -13,15 +14,17 @@ import java.nio.file.Path;
 import java.util.HashSet;
 
 public abstract class BigSignWriterConfig {
+    public static final int CONFIG_VERSION = 3;
     public static final MainConfig MAIN_CONFIG = new MainConfig();
 
     public static void init() {}
 
     static {
-        reloadConfig();
+        loadConfig();
     }
 
     public static class PersistentConfig {
+        public int configVersionDontTouch = 0;
         public int buttonsX = 0;
         public int buttonsY = 120;
         public double buttonsAlignmentX = 0.5;
@@ -34,6 +37,12 @@ public abstract class BigSignWriterConfig {
         public boolean largeSymbolPreviews = false;
         public String charactersShownInSymbols = "£€";
         public HashSet<String> hiddenFonts = new HashSet<>();
+
+        static PersistentConfig initial() {
+            PersistentConfig initial = new PersistentConfig();
+            initial.configVersionDontTouch = CONFIG_VERSION;
+            return initial;
+        }
 
         public PersistentConfig copyFrom(PersistentConfig other) {
             for (Field field : PersistentConfig.class.getDeclaredFields()) {
@@ -52,6 +61,18 @@ public abstract class BigSignWriterConfig {
             return this.charactersShownInSymbols.indexOf(chr) >= 0;
         }
 
+        public boolean isFontHidden(Identifier id) {
+            return this.hiddenFonts.contains(id.toString());
+        }
+
+        public void showFont(Identifier id) {
+            this.hiddenFonts.remove(id.toString());
+        }
+
+        public void hideFont(Identifier id) {
+            this.hiddenFonts.add(id.toString());
+        }
+
         @Override
         public boolean equals(Object other) {
             if (other == this) return true;
@@ -63,6 +84,45 @@ public abstract class BigSignWriterConfig {
                 } catch (IllegalAccessException ignored) {}
             }
             return true;
+        }
+
+        void migrateVersion() {
+            if (this.configVersionDontTouch >= CONFIG_VERSION) return;
+
+            BigSignWriter.LOGGER.info(
+                    BigSignWriter.LOGGER_PREFIX + "Migrating config from version {}",
+                    this.configVersionDontTouch
+            );
+
+            // Hidden Fonts now uses Identifiers instead of old font source strings
+            // Monospace was renamed to Default Mono
+            if (this.configVersionDontTouch < 3) {
+                HashSet<String> fixedHiddenFonts = new HashSet<>();
+                this.hiddenFonts.forEach(source -> {
+                    if (source.matches("builtin/\\w+")) {
+                        String path = source.substring(8);
+                        fixedHiddenFonts.add(BigSignWriter.id(
+                                path.equals("monospace") ? "default_mono" : path
+                        ).toString());
+                        return;
+                    }
+
+                    if (source.matches(".+\\.json")) {
+                        fixedHiddenFonts.add(BigSignWriter.userFontId(source).toString());
+                        return;
+                    }
+
+                    BigSignWriter.LOGGER.warn(
+                            BigSignWriter.LOGGER_PREFIX + "Unable to migrate hidden font '{}' to config version 3",
+                            source
+                    );
+                });
+
+                this.hiddenFonts.clear();
+                this.hiddenFonts.addAll(fixedHiddenFonts);
+            }
+
+            this.configVersionDontTouch = CONFIG_VERSION;
         }
     }
 
@@ -118,7 +178,7 @@ public abstract class BigSignWriterConfig {
                 gson,
                 TypeToken.get(PersistentConfig.class),
                 configDir.resolve("config.json"),
-                new PersistentConfig()
+                PersistentConfig.initial()
         );
     }
 
@@ -131,10 +191,11 @@ public abstract class BigSignWriterConfig {
         BigSignWriter.LOGGER.info(BigSignWriter.LOGGER_PREFIX + "Config saved!");
     }
 
-    public static void reloadConfig() {
+    public static void loadConfig() {
         ConfigInterface<PersistentConfig> persistentConfig = getConfig();
 
         MAIN_CONFIG.copyFrom(persistentConfig.load());
+        MAIN_CONFIG.migrateVersion();
         persistentConfig.save(new PersistentConfig().copyFrom(MAIN_CONFIG));
 
         BigSignWriter.LOGGER.debug(BigSignWriter.LOGGER_PREFIX + "Config loaded!");

@@ -6,13 +6,14 @@ import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public final class FontInfoExtractor {
-    public static Map<String, FontInfoExtraction> prepareFonts(Map<String, FontFile> fontSources) {
+    public static Map<Identifier, FontInfoExtraction> prepareFonts(Map<Identifier, FontFile> fontSources) {
         return fontSources.entrySet().stream()
                 .collect(Collectors.toUnmodifiableMap(
                         Map.Entry::getKey,
@@ -20,7 +21,7 @@ public final class FontInfoExtractor {
                 ));
     }
 
-    public static List<FontInfo> extractAll(Map<String, FontInfoExtraction> preparedFonts) {
+    public static List<FontInfo> extractAll(Map<Identifier, FontInfoExtraction> preparedFonts) {
         preparedFonts.values().forEach(extraction -> extraction.preparedFonts = preparedFonts);
         preparedFonts.values().forEach(FontInfoExtraction::ensureInfoChecked);
         return preparedFonts.values().stream().map(FontInfoExtraction::get).toList();
@@ -41,7 +42,7 @@ public final class FontInfoExtractor {
 
     public static class FontInfoExtraction implements FamilyCharacterProvider {
         final FontFile fontFile;
-        final String source;
+        final Identifier id;
 
         @Nullable FontInfoExtraction parentFont = null;
         private @Nullable FontInfoExtraction rootAncestorFont = null;
@@ -50,14 +51,14 @@ public final class FontInfoExtractor {
         String widthInfo = "0";
         @Nullable String cumulativeWidthInfo = null;
 
-        private Map<String, FontInfoExtraction> preparedFonts = Map.of();
+        private Map<Identifier, FontInfoExtraction> preparedFonts = Map.of();
         private boolean relationsChecked = false;
         private boolean infoChecked = false;
         private @Nullable FontInfo result = null;
 
-        private FontInfoExtraction(FontFile fontFile, String source) {
+        private FontInfoExtraction(FontFile fontFile, Identifier id) {
             this.fontFile = fontFile;
-            this.source = source;
+            this.id = id;
         }
 
         FontInfo get() {
@@ -85,7 +86,7 @@ public final class FontInfoExtractor {
 
         @Override
         public boolean parentIsImplicit() {
-            return this.fontFile.parentFont == null;
+            return this.fontFile.parentFont().isEmpty();
         }
 
         private boolean hasExplicitParent() {
@@ -217,16 +218,16 @@ public final class FontInfoExtractor {
         }
 
         private @Nullable FontInfoExtraction findParent() {
-            if (this.source.equals(BigFontManager.DEFAULT_FONT_SOURCE)) return null;
+            if (this.id.equals(BigFontManager.DEFAULT_FONT_ID)) return null;
 
             FontInfoExtraction parentFont = null;
-            if (this.fontFile.parentFont == null) {
+            if (this.fontFile.parentFont().isEmpty()) {
                 if (this.height() == 4) {
-                    parentFont = this.preparedFonts.get(BigFontManager.DEFAULT_FONT_SOURCE);
+                    parentFont = this.preparedFonts.get(BigFontManager.DEFAULT_FONT_ID);
                 } else return null;
             } else for (FontInfoExtraction extraction : this.preparedFonts.values()) {
                 if (this == extraction) continue;
-                if (extraction.source.equals(this.fontFile.parentFont)) {
+                if (extraction.id.equals(this.fontFile.parentFont().get())) {
                     parentFont = extraction;
                     break;
                 }

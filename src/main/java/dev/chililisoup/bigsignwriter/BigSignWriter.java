@@ -34,6 +34,10 @@ public final class BigSignWriter {
         return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 
+    public static Identifier userFontId(String path) {
+        return id("user/" + path.toLowerCase().replaceAll("[^a-z0-9_.-]", ""));
+    }
+
     public static void initialize(String version, Path configDir) {
         VERSION = version;
         CONFIG_DIR = configDir;
@@ -128,14 +132,11 @@ public final class BigSignWriter {
     }
 
     public static void copyFontToFile(FontInfo fontInfo) {
-        String name = fontInfo.getBuiltInName();
-        if (name == null) return;
-
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Path configFonts = getFontsDir();
 
         try {
-            String path = name + "_copy";
+            String path = fontInfo.id.getPath() + "_copy";
             String fontName = fontInfo.name() + " Copy";
             Path target = configFonts.resolve(path + ".json");
             int i = 1;
