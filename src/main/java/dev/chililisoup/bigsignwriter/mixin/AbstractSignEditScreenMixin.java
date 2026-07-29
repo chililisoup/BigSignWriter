@@ -41,9 +41,6 @@ import org.joml.Vector2f;
 /*import org.spongepowered.asm.mixin.injection.ModifyVariable;
 *///?}
 
-import java.util.Arrays;
-import java.util.Comparator;
-
 import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.*;
 
 @Mixin(value = AbstractSignEditScreen.class, priority = 999)
@@ -244,16 +241,18 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             return;
         }
 
-        String wideLine = Arrays.stream(this.messages)
-                .max(Comparator.comparing(this.font::width))
-                .orElse(this.messages[this.line]);
-
+        String wideLine = this.bigSignWriter$fontTyper.getWidestMessage();
         int lineHeight = this.sign.getTextLineHeight();
         int cursorHeight = this.bigSignWriter$cursorHeight();
         int fullHeight = Math.min(BigSignWriter.height(), this.messages.length - this.line);
         int opaqueColor = 0xFF000000 | color;
 
-        int cursorPosition = this.font.width(wideLine.substring(0, Math.min(cursorPos, wideLine.length())));
+        int cursorPosition = this.font.width(
+                wideLine.substring(0, cursorPos != 0 && cursorPos == this.messages[this.line].length() ?
+                        wideLine.length() :
+                        Math.min(cursorPos, wideLine.length())
+                )
+        );
         int cursorX = cursorPosition - this.font.width(wideLine) / 2;
         int cursorY = (this.line - 2) * lineHeight;
 

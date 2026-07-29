@@ -281,6 +281,26 @@ public final class BigFontTyper {
                 Pair.of(splitIndices.lastEntry().getValue(), endLength);
     }
 
+    public String getWidestMessage(int startLine, int endLine) {
+        String widestMessage = this.messages[startLine];
+        int maxWidth = this.font.width(widestMessage);
+
+        for (int i = startLine + 1; i < endLine; i++) {
+            String message = this.messages[i];
+            int width = this.font.width(message);
+            if (width > maxWidth) {
+                widestMessage = message;
+                maxWidth = width;
+            }
+        }
+
+        return widestMessage;
+    }
+
+    public String getWidestMessage() {
+        return this.getWidestMessage(this.getLine(), this.getEndLine());
+    }
+
     private Pair<Integer, Integer> getMaxWidths(Integer[] split, int startLine, int endLine) {
         int maxPrefixWidth = 0;
         int maxSuffixWidth = 0;
@@ -384,8 +404,7 @@ public final class BigFontTyper {
 
         Pair<Integer, Integer> maxWidths = this.getMaxWidths(split, startLine, endLine);
         String bigCharFiller = getGapFiller(this.font.width(lines[0]));
-        String separator = Arrays.stream(this.messages).anyMatch(message -> !message.isEmpty()) ?
-                characterSeparator : "";
+        String separator = Math.max(maxWidths.first, maxWidths.second) > 0 ? characterSeparator : "";
         boolean atEnd = endLength != 0 && split[0] == endLength;
         int newCursorPos = -1;
 
