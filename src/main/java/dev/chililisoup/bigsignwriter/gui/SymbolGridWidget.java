@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import dev.chililisoup.bigsignwriter.font.SymbolGroup;
 import dev.chililisoup.bigsignwriter.font.SymbolReference;
 import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
@@ -20,6 +21,7 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
     private int maxHeight;
     private final Consumer<SymbolReference> symbolConsumer;
     private final int itemWidth;
+    private int contentHeight;
 
     public SymbolGridWidget(
             Minecraft minecraft,
@@ -39,7 +41,9 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
     }
 
     public void updateEntries(SymbolGroup group) {
-        this.replaceEntries(group.entrySet().stream().map(Entry::new).toList());
+        this.replaceEntries(group.entrySet().stream()
+                .map(entry -> new Entry(entry.getValue(), group.isMerged())).toList());
+        this.repositionEntries();
         this.updateHeight();
         this.setScrollAmount(0.0);
     }
@@ -54,7 +58,7 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
     public void filterEntries(String query) {
         String simpleQuery = simplifyQueryString(query);
         this.children().forEach(entry ->
-            entry.visible = simplifyQueryString(entry.name).contains(simpleQuery)
+            entry.visible = simplifyQueryString(entry.symbol.key()).contains(simpleQuery)
         );
 
         this.repositionEntries();
@@ -80,7 +84,12 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
 
     @Override
     public int getRowWidth() {
-        return this.width - 32;
+        return this.width - 20;
+    }
+
+    @Override
+    protected int scrollBarX() {
+        return this.getRight() - 8;
     }
 
     @Override
@@ -96,58 +105,69 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
 
     @Override
     public void repositionEntries() {
-        int y = this.getY() + 2 - (int) this.scrollAmount();
+        int top = this.getY() + 2 - (int) this.scrollAmount();
         int columns = this.columns();
+        int contentHeight = 0;
 
         List<Entry> children = this.children();
         int visibleIndex = 0;
         for (Entry entry : children) {
-            int column = visibleIndex % columns;
-            if (entry.isVisible()) visibleIndex++;
+            if (!entry.isVisible()) continue;
 
-            entry.setY(y);
-            if (column == columns - 1)
-                y += entry.getHeight();
-
-            entry.setX(this.getRowLeft() + this.itemWidth * column);
             entry.setWidth(this.itemWidth);
+            boolean wide = entry.shouldScrollPreview;
+            if (wide) {
+                entry.setWidth(this.itemWidth * 2);
+                if (visibleIndex % columns == columns - 1) visibleIndex++;
+            }
+
+            int column = visibleIndex % columns;
+            entry.setX(this.getRowLeft() + this.itemWidth * column);
+            contentHeight = (visibleIndex / columns) * this.defaultEntryHeight;
+            entry.setY(top + contentHeight);
+
+            if (wide) visibleIndex++;
+            visibleIndex++;
         }
+
+        this.contentHeight = contentHeight + this.defaultEntryHeight + 4;
     }
 
     @Override
     protected int contentHeight() {
-        return Mth.ceil(
-                (this.children().stream().filter(Entry::isVisible).count() / (float) this.columns())
-        ) * this.defaultEntryHeight + 4;
+        return this.contentHeight;
     }
 
     public class Entry extends ObjectSelectionList.Entry<Entry> {
         private final SymbolReference symbol;
         private final Component[] symbolPreview;
-        private final String name;
-        private final List<Component> tooltip;
+        private final ArrayList<Component> tooltip;
         private boolean shouldScrollPreview = false;
         private boolean visible = true;
 
-        public Entry(Map.Entry<String, SymbolReference> symbolEntry) {
-            this.symbol = symbolEntry.getValue();
-            this.symbolPreview = Arrays.stream(symbolEntry.getValue().get())
+        public Entry(SymbolReference symbol, boolean addFontToTooltip) {
+            this.symbol = symbol;
+            this.symbolPreview = Arrays.stream(symbol.get())
                     .map(Component::literal)
                     .toArray(Component[]::new);
-            this.name = symbolEntry.getKey();
 
-            ArrayList<Component> tooltip = new ArrayList<>(List.of(
-                    Component.literal(this.name),
-                    Component.translatable("bigsignwriter.font.info.height", this.symbol.height()),
+            this.tooltip = new ArrayList<>(List.of(
+                    Component.literal(symbol.key()),
+                    Component.translatable("bigsignwriter.font.info.height", this.symbol.height())
+                            .withStyle(ChatFormatting.GRAY),
                     CommonComponents.EMPTY
             ));
-            tooltip.addAll(List.of(this.symbolPreview));
-            this.tooltip = List.copyOf(tooltip);
+            this.tooltip.addAll(List.of(this.symbolPreview));
+            if (addFontToTooltip) this.tooltip.addAll(List.of(
+                    CommonComponents.EMPTY,
+                    Component.literal(symbol.sourceFont().name())
+                            .withStyle(ChatFormatting.BLUE)
+            ));
         }
 
         @Override
         public @NotNull Component getNarration() {
-            return Component.translatable("narrator.select", this.name);
+            return Component.translatable("narrator.select", this.symbol.key());
         }
 
         public boolean isVisible() {
@@ -180,9 +200,9 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
             int symbolWidth = Mth.ceil(GraphicsHelper.getScaledWidth(
                     SymbolGridWidget.this.minecraft.font,
                     this.symbol.get(),
-                    this.getContentHeight() - 2
+                    this.getContentHeight()
             ));
-            this.shouldScrollPreview = symbolWidth > this.getContentWidth() - 2;
+            this.shouldScrollPreview = symbolWidth > this.getContentWidth();
         }
 
         @Override
@@ -198,7 +218,7 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
             int height = this.getContentHeight();
 
             if (hovered) {
-                guiGraphics.fill(left, top, left + width, top + height, 0x40FFFFFF);
+                guiGraphics.fill(left - 1, top - 1, left + width + 1, top + height + 1, 0x40FFFFFF);
                 guiGraphics.setTooltipForNextFrame(
                         SymbolGridWidget.this.minecraft.font, this.tooltip, Optional.empty(), mouseX, mouseY
                 );
@@ -209,18 +229,18 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
                 GraphicsHelper.drawScrollingFontPreview(
                         guiGraphics,
                         this.symbolPreview,
-                        left + 1,
-                        top + 1,
-                        width - 2,
-                        height - 2
+                        left,
+                        top,
+                        width,
+                        height
                 );
             } else GraphicsHelper.drawFontPreview(
                     guiGraphics,
                     this.symbolPreview,
                     0.5F,
                     this.getContentXMiddle(),
-                    top + 1,
-                    height - 2
+                    top,
+                    height
             );
         }
     }

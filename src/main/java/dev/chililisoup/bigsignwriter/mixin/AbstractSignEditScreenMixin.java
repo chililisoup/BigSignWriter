@@ -173,7 +173,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                     y + 3,
                     14,
                     14,
-                    Component.literal("❤"),
+                    Component.literal("☻"),
                     button -> symbolPicker.toggleVisibility()
             );
             symbolsButton.setTooltip(Tooltip.create(Component.translatable("bigsignwriter.symbols")));

@@ -34,7 +34,7 @@ public abstract class BigSignWriterConfig {
         public boolean displayFontHeights = true;
         public boolean showConfigButton = true;
         public boolean showSymbolsButton = true;
-        public boolean largeSymbolPreviews = false;
+        public boolean largeSymbolPreviews = true;
         public String charactersShownInSymbols = "£€";
         public HashSet<String> hiddenFonts = new HashSet<>();
 

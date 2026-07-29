@@ -47,8 +47,8 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
                 height - 28,
                 x,
                 y + 28,
-                BigSignWriterConfig.MAIN_CONFIG.largeSymbolPreviews ? 42 : 28,
-                BigSignWriterConfig.MAIN_CONFIG.largeSymbolPreviews ? 30 : 18,
+                BigSignWriterConfig.MAIN_CONFIG.largeSymbolPreviews ? 30 : 20,
+                BigSignWriterConfig.MAIN_CONFIG.largeSymbolPreviews ? 22 : 16,
                 symbolConsumer
         );
         this.symbolGrid.visible = false;

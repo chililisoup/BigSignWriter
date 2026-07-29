@@ -8,11 +8,19 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Function;
 
-public record SymbolGroup(String name, Map<String, SymbolReference> symbols, VisibilityChecker visibilityChecker) {
+public record SymbolGroup(
+        String name,
+        Map<String, SymbolReference> symbols,
+        VisibilityChecker visibilityChecker,
+        boolean isMerged
+) {
     public static @Nullable SymbolGroup of(
-            String name, Map<String, SymbolReference> symbols, VisibilityChecker visibilityChecker
+            String name,
+            Map<String, SymbolReference> symbols,
+            VisibilityChecker visibilityChecker,
+            boolean isMerged
     ) {
-        return !symbols.isEmpty() ? new SymbolGroup(name, symbols, visibilityChecker) : null;
+        return !symbols.isEmpty() ? new SymbolGroup(name, symbols, visibilityChecker, isMerged) : null;
     }
 
     public static @Nullable SymbolGroup of(FontInfo font) {
@@ -22,16 +30,13 @@ public record SymbolGroup(String name, Map<String, SymbolReference> symbols, Vis
                         Map.Entry::getKey,
                         entry -> new SymbolReference(entry.getKey(), font)
                 )),
-                font::isVisible
+                font::isVisible,
+                false
         );
     }
 
     public static @Nullable SymbolGroup ofMerged(String name, List<SymbolGroup> groups) {
-        return of(name, merged(groups), config -> true);
-    }
-
-    public @Nullable SymbolReference get(String id) {
-        return this.symbols().get(id);
+        return of(name, merged(groups), config -> true, true);
     }
 
     public Set<Map.Entry<String, SymbolReference>> entrySet() {

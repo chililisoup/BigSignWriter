@@ -51,8 +51,22 @@ public final class GraphicsHelper {
         drawScrollingString(guiGraphics, text, left, left, right, y, y + 8);
     }
 
-    public static void drawScrollingFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, int x, int y, int width, int height) {
-        float scale = (height / 9F) / (float) fontPreview.length;
+    private static float getScale(int lineCount, int height, int gap) {
+        return (height / (9F + gap)) / (float) lineCount;
+    }
+
+    public static float getScaledWidth(Font font, String[] lines, int height, int gap) {
+        return lines.length != 0 ?
+                font.width(lines[0]) * getScale(lines.length, height, gap) :
+                0;
+    }
+
+    public static float getScaledWidth(Font font, String[] lines, int height) {
+        return getScaledWidth(font, lines, height, 0);
+    }
+
+    public static void drawScrollingFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, int x, int y, int width, int height, int gap) {
+        float scale = getScale(fontPreview.length, height, gap);
         int scaledWidth = (int) (width / scale);
 
         guiGraphics.pose().pushMatrix();
@@ -63,7 +77,7 @@ public final class GraphicsHelper {
         int previewWidth = font.width(fontPreview[0]);
         if (previewWidth <= scaledWidth) {
             for (int i = 0; i < fontPreview.length; i++)
-                guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], 0, i * 9, -1, false);
+                guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], 0, i * (9 + gap), -1, false);
         } else {
             int scaledHeight = (int) (height / scale);
             int hiddenWidth = previewWidth - scaledWidth;
@@ -74,7 +88,7 @@ public final class GraphicsHelper {
             guiGraphics.enableScissor(0, 0, scaledWidth, scaledHeight);
 
             for (int i = 0; i < fontPreview.length; i++)
-                guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], -(int) scrollPos, i * 9, -1, false);
+                guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], -(int) scrollPos, i * (9 + gap), -1, false);
 
             guiGraphics.disableScissor();
         }
@@ -82,8 +96,12 @@ public final class GraphicsHelper {
         guiGraphics.pose().popMatrix();
     }
 
+    public static void drawScrollingFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, int x, int y, int width, int height) {
+        drawScrollingFontPreview(guiGraphics, fontPreview, x, y, width, height, 0);
+    }
+
     public static void drawFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, float anchorX, int x, int y, int height, int gap) {
-        float scale = (height / 9F) / (float) fontPreview.length;
+        float scale = getScale(fontPreview.length, height, gap);
 
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(x, y);
@@ -134,13 +152,6 @@ public final class GraphicsHelper {
             previewLines.add(fontInfo.getPreview(runningString.toString(), characterSeparator));
 
         return previewLines;
-    }
-
-    public static float getScaledWidth(Font font, String[] lines, int lineHeight) {
-        if (lines.length == 0) return 0;
-
-        float scale = (lineHeight / 9F) / (float) lines.length;
-        return font.width(lines[0]) * scale;
     }
 
     private static void drawSeparator(GuiGraphicsExtractor guiGraphics, int x, int y, int width, Identifier texture) {

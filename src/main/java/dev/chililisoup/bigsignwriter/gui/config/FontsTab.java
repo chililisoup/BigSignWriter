@@ -226,19 +226,19 @@ public class FontsTab extends ConfigTab<FontsTab.FontsSidePanel> {
     }
 
     protected final class FontsSidePanel extends ConfigTab.SidePanel {
-        private static int PREVIEW_LINE_HEIGHT = 18;
+        private static int PREVIEW_LINE_HEIGHT = 20;
 
         private final ArrayList<Component> infoLines = new ArrayList<>();
         private @Nullable List<Component[]> wrappedFontPreview = null;
         private boolean showInheritedCharacters = true;
 
         private final Button zoomOutButton = Button.builder(Component.literal("\uD83D\uDD0D-"), button -> {
-            PREVIEW_LINE_HEIGHT = Math.max(PREVIEW_LINE_HEIGHT - 6, 12);
+            PREVIEW_LINE_HEIGHT = Math.max(PREVIEW_LINE_HEIGHT - 4, 12);
             FontsTab.this.redoLayout();
         }).width(20).build();
 
         private final Button zoomInButton = Button.builder(Component.literal("\uD83D\uDD0D+"), button -> {
-            PREVIEW_LINE_HEIGHT = Math.min(PREVIEW_LINE_HEIGHT + 6, 36);
+            PREVIEW_LINE_HEIGHT = Math.min(PREVIEW_LINE_HEIGHT + 4, 40);
             FontsTab.this.redoLayout();
         }).width(20).build();
 
