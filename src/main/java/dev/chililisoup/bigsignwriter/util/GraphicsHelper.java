@@ -1,6 +1,5 @@
 package dev.chililisoup.bigsignwriter.util;
 
-import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.font.FontInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -12,7 +11,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 
-import java.util.ArrayList;
 import java.util.List;
 
 //? if < 1.21.11 {
@@ -122,36 +120,14 @@ public final class GraphicsHelper {
 
     public static List<Component[]> getWrappedFontPreview(FontInfo fontInfo, String text, int width, int lineHeight) {
         if (fontInfo.isBroken()) return List.of();
+        float scale = getScale(fontInfo.height(), lineHeight, 1);
+        return fontInfo.getWrappedFontPreview(text, (int) (width / scale));
+    }
 
-        Font font = Minecraft.getInstance().font;
-        float scale = (lineHeight / 9F) / (float) fontInfo.height();
-        String characterSeparator = fontInfo.characterSeparator();
-        if (characterSeparator.isEmpty()) characterSeparator = " ";
-        float separatorWidth = font.width(characterSeparator) * scale;
-
-        ArrayList<Component[]> previewLines = new ArrayList<>();
-        StringBuilder runningString = new StringBuilder();
-        float runningWidth = 0F;
-        for (char chr : text.toCharArray()) {
-            String top = BigSignWriter.getBigChar(chr, fontInfo).orElse(new String[]{""})[0];
-
-            float chrWidth = font.width(top) * scale;
-            if (runningWidth > 0 && runningWidth + chrWidth > width) {
-                if (!runningString.isEmpty())
-                    previewLines.add(fontInfo.getPreview(runningString.toString(), characterSeparator));
-
-                runningWidth = chrWidth + separatorWidth;
-                runningString = new StringBuilder(String.valueOf(chr));
-            } else {
-                runningWidth += chrWidth + separatorWidth;
-                runningString.append(chr);
-            }
-        }
-
-        if (!runningString.isEmpty())
-            previewLines.add(fontInfo.getPreview(runningString.toString(), characterSeparator));
-
-        return previewLines;
+    public static List<Component[]> getWrappedSymbolsPreview(FontInfo fontInfo, int width, int lineHeight) {
+        if (fontInfo.areSymbolsBroken()) return List.of();
+        float scale = getScale(fontInfo.height(), lineHeight, 1);
+        return fontInfo.getWrappedSymbolsPreview((int) (width / scale));
     }
 
     private static void drawSeparator(GuiGraphicsExtractor guiGraphics, int x, int y, int width, Identifier texture) {

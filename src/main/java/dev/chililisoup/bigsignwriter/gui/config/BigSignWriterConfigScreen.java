@@ -71,7 +71,11 @@ public class BigSignWriterConfigScreen extends Screen {
                 this.layout.getHeaderHeight(),
                 this.columnWidth(),
                 this.tabManager,
-                ImmutableList.of(new OptionsTab(this), new FontsTab(this))
+                ImmutableList.of(
+                        new OptionsTab(this),
+                        new FontsTab(this),
+                        new SymbolPacksTab(this)
+                )
         );
         this.tabNavigationBar.selectTab(0, false);
         this.addRenderableWidget(this.tabNavigationBar);

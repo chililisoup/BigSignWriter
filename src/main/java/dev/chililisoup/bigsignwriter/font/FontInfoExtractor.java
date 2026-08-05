@@ -27,16 +27,16 @@ public final class FontInfoExtractor {
         return preparedFonts.values().stream().map(FontInfoExtraction::get).toList();
     }
 
-    private static String createWidthInfo(ArrayList<Integer> widths) {
-        int minWidth = Collections.min(widths);
-        int maxWidth = Collections.max(widths);
-        return minWidth == maxWidth ?
-                String.valueOf(minWidth) :
+    private static String createRangeInfo(ArrayList<Integer> samples) {
+        int minSample = Collections.min(samples);
+        int maxSample = Collections.max(samples);
+        return minSample == maxSample ?
+                String.valueOf(minSample) :
                 String.format(
                         "%d-%d ~%.2f",
-                        minWidth,
-                        maxWidth,
-                        (float) widths.stream().mapToInt(Integer::intValue).sum() / widths.size()
+                        minSample,
+                        maxSample,
+                        (float) samples.stream().mapToInt(Integer::intValue).sum() / samples.size()
                 );
     }
 
@@ -50,6 +50,9 @@ public final class FontInfoExtractor {
         private @Nullable TreeSet<Character> cumulativeCharacters = null;
         String widthInfo = "0";
         @Nullable String cumulativeWidthInfo = null;
+        @Nullable Component symbolError = null;
+        String symbolWidthInfo = "0";
+        String symbolHeightInfo = "0";
 
         private Map<Identifier, FontInfoExtraction> preparedFonts = Map.of();
         private boolean relationsChecked = false;
@@ -150,7 +153,8 @@ public final class FontInfoExtractor {
         private void ensureInfoChecked() {
             if (this.infoChecked) return;
             this.infoChecked = true;
-            this.error = extractInfo();
+            this.error = this.extractInfo();
+            this.symbolError = this.extractSymbolInfo();
         }
 
         private @Nullable Component extractInfo() {
@@ -207,12 +211,52 @@ public final class FontInfoExtractor {
                 cumulativeWidths.add(topWidth);
             }
 
-            this.widthInfo = createWidthInfo(ownWidths);
+            this.widthInfo = createRangeInfo(ownWidths);
             if (!this.parentIsImplicit()) {
-                String cumulativeWidthInfo = createWidthInfo(cumulativeWidths);
+                String cumulativeWidthInfo = createRangeInfo(cumulativeWidths);
                 if (!this.widthInfo.equals(cumulativeWidthInfo))
                     this.cumulativeWidthInfo = cumulativeWidthInfo;
             }
+
+            return null;
+        }
+
+        private @Nullable Component extractSymbolInfo() {
+            if (this.fontFile.symbols == null || this.fontFile.symbols.isEmpty())
+                return null;
+
+            Font font = Minecraft.getInstance().font;
+            ArrayList<Integer> allWidths = new ArrayList<>(this.fontFile.symbols.size());
+            ArrayList<Integer> allHeights = new ArrayList<>(this.fontFile.symbols.size());
+
+            for (Map.Entry<String, String[]> entry : this.fontFile.symbols.entrySet()) {
+                String key = entry.getKey();
+                String[] symbol = entry.getValue();
+
+                if (symbol.length == 0)
+                    return Component.translatable("bigsignwriter.font.error.emptySymbol", key);
+
+                int[] widths = new int[symbol.length];
+                int topWidth = font.width(symbol[0]);
+                widths[0] = topWidth;
+
+                boolean unfixed = false;
+                for (int i = 1; i < symbol.length; i++) {
+                    widths[i] = font.width(symbol[i]);
+                    if (widths[i] != widths[0]) unfixed = true;
+                }
+                if (unfixed) return Component.translatable(
+                        "bigsignwriter.font.error.unfixedSymbolWidth",
+                        key,
+                        Arrays.toString(widths)
+                );
+
+                allWidths.add(topWidth);
+                allHeights.add(symbol.length);
+            }
+
+            this.symbolWidthInfo = createRangeInfo(allWidths);
+            this.symbolHeightInfo = createRangeInfo(allHeights);
 
             return null;
         }

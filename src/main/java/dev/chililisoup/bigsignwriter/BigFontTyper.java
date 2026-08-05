@@ -3,6 +3,7 @@ package dev.chililisoup.bigsignwriter;
 import com.google.common.collect.ImmutableMap;
 import com.ibm.icu.impl.Pair;
 import dev.chililisoup.bigsignwriter.font.SymbolReference;
+import dev.chililisoup.bigsignwriter.util.ModUtil;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.input.KeyEvent;
@@ -130,30 +131,6 @@ public final class BigFontTyper {
 
     private int getCursorPos() {
         return Math.min(this.signField.getCursorPos(), this.getMessage().length());
-    }
-
-    @SuppressWarnings("UnnecessaryUnicodeEscape")
-    private static String getGapFiller(int width) {
-        return width <= 0 ? "" : switch (width) {
-            case 1 -> "\u073C";
-            case 2 -> "\u073C\u073C";
-            case 3 -> "\u073C\u073C\u073C";
-            case 6 -> " \u073C";
-            case 7 -> " \u073C\u073C";
-            case 11 -> "  \u073C";
-            default -> {
-                String filler = "";
-                while (width % 5 != 0) {
-                    filler += " ";
-                    width -= 4;
-                }
-                while (width > 0) {
-                    filler += " ";
-                    width -= 5;
-                }
-                yield filler;
-            }
-        };
     }
 
     private TreeMap<Integer, Integer[]> getSplitIndices(
@@ -403,7 +380,7 @@ public final class BigFontTyper {
         int cursorPos = splitPair.second;
 
         Pair<Integer, Integer> maxWidths = this.getMaxWidths(split, startLine, endLine);
-        String bigCharFiller = getGapFiller(this.font.width(lines[0]));
+        String bigCharFiller = ModUtil.getGapFiller(this.font.width(lines[0]));
         String separator = Math.max(maxWidths.first, maxWidths.second) > 0 ? characterSeparator : "";
         boolean atEnd = endLength != 0 && split[0] == endLength;
         int newCursorPos = -1;
@@ -418,10 +395,10 @@ public final class BigFontTyper {
                     bigCharFiller;
 
             String prefix = this.messages[i].substring(0, split[splitLine]);
-            String prefixFiller = getGapFiller(maxWidths.first - this.font.width(prefix));
+            String prefixFiller = ModUtil.getGapFiller(maxWidths.first - this.font.width(prefix));
             String addition = atEnd ? separator + charText : charText + separator;
             String suffix = this.messages[i].substring(split[splitLine]);
-            String suffixFiller = getGapFiller(maxWidths.second - this.font.width(suffix));
+            String suffixFiller = ModUtil.getGapFiller(maxWidths.second - this.font.width(suffix));
             String message = prefix + prefixFiller + addition + suffixFiller + suffix;
 
             if (this.font.width(message) > this.sign.getMaxTextLineWidth())
