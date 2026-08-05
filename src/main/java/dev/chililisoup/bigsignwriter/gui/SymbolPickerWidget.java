@@ -1,6 +1,7 @@
 package dev.chililisoup.bigsignwriter.gui;
 
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
+import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.font.SymbolGroup;
 import dev.chililisoup.bigsignwriter.font.SymbolReference;
@@ -15,6 +16,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
@@ -26,6 +28,8 @@ import java.util.function.Consumer;
 
 public class SymbolPickerWidget extends SimpleContainerWidget {
     private static final Identifier INWORLD_MENU_LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
+    private static final Identifier SEARCH_SPRITE = BigSignWriter.id("search");
+    private static final Identifier SAVE_SPRITE = BigSignWriter.id("save");
 
     private final Minecraft minecraft;
     private final int symbolTextWidth;
@@ -146,8 +150,12 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
         return this.navigatorAreaHovered(24, this.symbolTextWidth, mouseX, mouseY);
     }
 
+    private boolean saveHovered(int mouseX, int mouseY) {
+        return this.navigatorAreaHovered(this.width - 33, 10, mouseX, mouseY);
+    }
+
     private boolean searchHovered(int mouseX, int mouseY) {
-        return this.navigatorAreaHovered(this.width - 18, 10, mouseX, mouseY);
+        return this.navigatorAreaHovered(this.width - 17, 10, mouseX, mouseY);
     }
 
     @Override
@@ -191,13 +199,18 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
                 this.toggleSearchBarVisibility();
                 return true;
             }
+
+            if (this.groupList.getSelected() == null && this.saveHovered(mouseX, mouseY)) {
+                this.playDownSound(Minecraft.getInstance().getSoundManager());
+                return true;
+            }
         }
 
         return super.mouseClicked(mouseButtonEvent, doubleClick);
     }
 
-    private void navigatorText(GuiGraphicsExtractor guiGraphics, Font font, Component text, int xOffset) {
-        guiGraphics.text(font, text, this.getX() + xOffset, this.getY() + 6, -1);
+    private void navigatorText(GuiGraphicsExtractor guiGraphics, Component text, int xOffset) {
+        guiGraphics.text(this.minecraft.font, text, this.getX() + xOffset, this.getY() + 6, -1);
     }
 
     @Override
@@ -227,13 +240,10 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
                 this.width
         );
 
-        Font font = this.minecraft.font;
-
         boolean backHovered = this.backHovered(mouseX, mouseY);
         MutableComponent backText = Component.literal("<");
         this.navigatorText(
                 guiGraphics,
-                font,
                 backHovered ? backText.withStyle(ChatFormatting.UNDERLINE) : backText,
                 8
         );
@@ -244,33 +254,60 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
         boolean symbolTextHovered = !backHovered && this.symbolTextHovered(mouseX, mouseY);
         this.navigatorText(
                 guiGraphics,
-                font,
                 symbolTextHovered ? this.getMessage().copy().withStyle(ChatFormatting.UNDERLINE) : this.getMessage(),
                 24
         );
 
         boolean searchHovered = !symbolTextHovered && this.searchHovered(mouseX, mouseY);
-        MutableComponent searchText = Component.literal("🔍");
-        this.navigatorText(
-                guiGraphics,
-                font,
-                searchHovered ? searchText.withStyle(ChatFormatting.UNDERLINE) : searchText,
-                this.width - 16
+        guiGraphics.blitSprite(
+                RenderPipelines.GUI_TEXTURED,
+                SEARCH_SPRITE,
+                this.getRight() - 20,
+                this.getY() + 2,
+                16,
+                16
         );
-        if (searchHovered) guiGraphics.setTooltipForNextFrame(
-                Component.translatable("bigsignwriter.symbols.search_hint"), mouseX, mouseY
-        );
-
-        if (backHovered || symbolTextHovered || searchHovered)
-            guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
+        if (searchHovered) {
+            guiGraphics.horizontalLine(
+                    this.getRight() - 17,
+                    this.getRight() - 8,
+                    this.getY() + 16,
+                    -1
+            );
+            guiGraphics.setTooltipForNextFrame(
+                    Component.translatable("bigsignwriter.symbols.search_hint"), mouseX, mouseY
+            );
+        }
 
         SymbolGroupListWidget.Entry selected = this.groupList.getSelected();
+        boolean saveHovered = selected == null && this.saveHovered(mouseX, mouseY);
+        if (backHovered || symbolTextHovered || saveHovered || searchHovered)
+            guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
+
         if (selected == null) {
-            this.navigatorText(guiGraphics, font, Component.literal("🖫"), this.width - 32);
+            guiGraphics.blitSprite(
+                    RenderPipelines.GUI_TEXTURED,
+                    SAVE_SPRITE,
+                    this.getRight() - 36,
+                    this.getY() + 2,
+                    16,
+                    16
+            );
+            if (saveHovered) {
+                guiGraphics.horizontalLine(
+                        this.getRight() - 33,
+                        this.getRight() - 24,
+                        this.getY() + 16,
+                        -1
+                );
+                guiGraphics.setTooltipForNextFrame(
+                        Component.translatable("bigsignwriter.symbols.save"), mouseX, mouseY
+                );
+            }
             return;
         }
 
-        this.navigatorText(guiGraphics, font, Component.literal(">"), 30 + this.symbolTextWidth);
+        this.navigatorText(guiGraphics, Component.literal(">"), 30 + this.symbolTextWidth);
         GraphicsHelper.drawScrollingString(
                 guiGraphics,
                 selected.getName(),

@@ -226,21 +226,23 @@ public class FontsTab extends ConfigTab<FontsTab.FontsSidePanel> {
     }
 
     protected final class FontsSidePanel extends ConfigTab.SidePanel {
+        private static final Identifier ZOOM_OUT_SPRITE = BigSignWriter.id("zoom_out");
+        private static final Identifier ZOOM_IN_SPRITE = BigSignWriter.id("zoom_in");
         private static int PREVIEW_LINE_HEIGHT = 20;
 
         private final ArrayList<Component> infoLines = new ArrayList<>();
         private @Nullable List<Component[]> wrappedFontPreview = null;
         private boolean showInheritedCharacters = true;
 
-        private final Button zoomOutButton = Button.builder(Component.literal("\uD83D\uDD0D-"), button -> {
+        private final Button zoomOutButton = IconButton.basic(ZOOM_OUT_SPRITE, button -> {
             PREVIEW_LINE_HEIGHT = Math.max(PREVIEW_LINE_HEIGHT - 4, 12);
             FontsTab.this.redoLayout();
-        }).width(20).build();
+        });
 
-        private final Button zoomInButton = Button.builder(Component.literal("\uD83D\uDD0D+"), button -> {
+        private final Button zoomInButton = IconButton.basic(ZOOM_IN_SPRITE, button -> {
             PREVIEW_LINE_HEIGHT = Math.min(PREVIEW_LINE_HEIGHT + 4, 40);
             FontsTab.this.redoLayout();
-        }).width(20).build();
+        });
 
         private final Button copyButton = Button.builder(Component.translatable("bigsignwriter.config.fonts.createCopy"), button -> {
             if (FontsTab.this.selected != null) {

@@ -18,6 +18,7 @@
   "bigsignwriter.symbols.all": "All",
   "bigsignwriter.symbols.search": "Search...",
   "bigsignwriter.symbols.search_hint": "Search",
+  "bigsignwriter.symbols.save": "Save sign content as symbol",
   "bigsignwriter.config": "Big Sign Writer Config",
   "bigsignwriter.config.openFontsFolder": "Open Fonts Folder",
   "bigsignwriter.config.reloadFonts": "Reload Fonts",
