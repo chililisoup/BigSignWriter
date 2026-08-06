@@ -105,7 +105,7 @@ public class FontsTab extends AbstractFontsTab {
         }
 
         @Override
-        protected boolean shouldMoveCopyButtonDown() {
+        protected boolean copyButtonOccupiesFullRow() {
             return this.inheritedCharactersToggle.visible;
         }
 

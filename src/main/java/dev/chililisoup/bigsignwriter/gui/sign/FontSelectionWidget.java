@@ -1,4 +1,4 @@
-package dev.chililisoup.bigsignwriter.gui;
+package dev.chililisoup.bigsignwriter.gui.sign;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;

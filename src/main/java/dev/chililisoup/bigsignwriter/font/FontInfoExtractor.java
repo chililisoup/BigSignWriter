@@ -71,12 +71,12 @@ public final class FontInfoExtractor {
         }
 
         private int height() {
-            return this.fontFile.height > 0 ? this.fontFile.height : 4;
+            return this.fontFile.getHeight();
         }
 
         @Override
         public Map<Character, String[]> characters() {
-            return this.fontFile.characters;
+            return this.fontFile.getCharacters();
         }
 
         private void ensureRelationsChecked() {
@@ -158,14 +158,14 @@ public final class FontInfoExtractor {
         }
 
         private @Nullable Component extractInfo() {
-            if (this.fontFile.height <= 0) return Component.translatable(
+            if (this.fontFile.height != null && this.fontFile.height <= 0) return Component.translatable(
                     "bigsignwriter.font.error.invalidHeight",
                     fontFile.height
             );
 
             this.parentFont = this.findParent();
             this.rootAncestorFont = this.findRootAncestor();
-            if (this.fontFile.characters.isEmpty()) {
+            if (this.fontFile.getCharacters().isEmpty()) {
                 if (!this.parentIsImplicit() && this.parentFont != null)
                     this.cumulativeWidthInfo = this.parentFont.widthInfo();
                 return null;
@@ -173,27 +173,27 @@ public final class FontInfoExtractor {
 
             Font font = Minecraft.getInstance().font;
             Set<Character> cumulativeCharacters = this.cumulativeCharacters();
-            ArrayList<Integer> ownWidths = new ArrayList<>(this.fontFile.characters.size());
+            ArrayList<Integer> ownWidths = new ArrayList<>(this.fontFile.getCharacters().size());
             ArrayList<Integer> cumulativeWidths = new ArrayList<>(cumulativeCharacters.size());
 
             for (char chr : cumulativeCharacters) {
-                String[] bigChar = this.fontFile.characters.get(chr);
+                String[] bigChar = this.fontFile.getCharacters().get(chr);
                 if (bigChar == null && this.parentFont != null)
                     bigChar = BigSignWriter.getBigChar(chr, this.parentFont).orElse(null);
                 if (bigChar == null) continue;
 
-                if (bigChar.length != this.fontFile.height) return Component.translatable(
+                if (bigChar.length != this.fontFile.getHeight()) return Component.translatable(
                         "bigsignwriter.font.error.wrongLineCount",
                         String.valueOf(chr),
                         bigChar.length,
-                        this.fontFile.height
+                        this.fontFile.getHeight()
                 );
 
                 int[] widths = new int[bigChar.length];
                 int topWidth = font.width(bigChar[0]);
                 widths[0] = topWidth;
 
-                if (this.fontFile.characters.containsKey(chr)) {
+                if (this.fontFile.getCharacters().containsKey(chr)) {
                     boolean unfixed = false;
                     for (int i = 1; i < bigChar.length; i++) {
                         widths[i] = font.width(bigChar[i]);

@@ -155,12 +155,6 @@ public final class BigSignWriter {
     }
 
     public static BigSignWriterConfig.ConfigInterface<FontFile> getFontFileInterface(Gson gson, Path path) {
-        return new BigSignWriterConfig.ConfigInterface<>(
-                gson,
-                new TypeToken<>() {
-                },
-                path,
-                new FontFile()
-        );
+        return new BigSignWriterConfig.ConfigInterface<>(gson, new TypeToken<>() {}, path, new FontFile());
     }
 }

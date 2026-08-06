@@ -113,6 +113,7 @@ public final class BigFontManager implements PreparableReloadListener {
         this.availableFonts.sort(BigFontManager::compareFonts);
         this.availableSymbolGroups.addAll(SymbolGroup.availableGroups());
         this.reselectFont(preparation.selectedFontSource);
+        UserSymbolsManager.reload();
 
         BigSignWriter.LOGGER.info(BigSignWriter.LOGGER_PREFIX + "Fonts loaded!");
     }

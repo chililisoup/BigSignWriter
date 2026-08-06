@@ -102,6 +102,10 @@ public final class BigFontTyper {
         return this.messages[this.getLine()];
     }
 
+    public String[] getMessages() {
+        return this.messages.clone();
+    }
+
     private void setMessage(String message) {
         this.messageSetter.accept(message);
     }

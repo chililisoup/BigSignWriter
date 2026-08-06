@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 public class SymbolPacksTab extends AbstractFontsTab {
     public SymbolPacksTab(BigSignWriterConfigScreen screen) {
-        super(screen, Component.translatable("bigsignwriter.config.symbol_packs"));
+        super(screen, Component.translatable("bigsignwriter.config.symbolPacks"));
     }
 
     @Override

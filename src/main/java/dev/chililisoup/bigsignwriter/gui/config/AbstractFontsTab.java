@@ -275,7 +275,7 @@ public abstract class AbstractFontsTab extends ConfigTab<AbstractFontsTab.Abstra
         }
 
         private int buttonsHeight() {
-            return this.copyButton.visible && this.shouldMoveCopyButtonDown() ? 52 : 30;
+            return this.copyButton.visible && this.copyButtonOccupiesFullRow() ? 52 : 30;
         }
 
         protected abstract void addInfoLines(FontInfo fontInfo, Consumer<Component> lines);
@@ -315,7 +315,7 @@ public abstract class AbstractFontsTab extends ConfigTab<AbstractFontsTab.Abstra
             this.height = Math.max(bottom - this.getY(), this.maxHeight);
         }
 
-        protected boolean shouldMoveCopyButtonDown() {
+        protected boolean copyButtonOccupiesFullRow() {
             return false;
         }
 
@@ -328,7 +328,7 @@ public abstract class AbstractFontsTab extends ConfigTab<AbstractFontsTab.Abstra
         protected void arrangeOthers() {
             int y = this.afterInfoLines() + 10;
 
-            if (this.shouldMoveCopyButtonDown()) {
+            if (this.copyButtonOccupiesFullRow()) {
                 this.copyButton.setPosition(this.getX(), y);
                 this.copyButton.setWidth(this.getWidth());
 

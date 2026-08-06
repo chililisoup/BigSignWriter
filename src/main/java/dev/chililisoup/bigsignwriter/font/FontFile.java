@@ -53,11 +53,19 @@ public class FontFile {
     public String name = "Font";
     public @Nullable String credits = null;
     public @Nullable String[] license = null;
-    public int height = 4;
+    public @Nullable Integer height = null;
     public @Nullable String characterSeparator = null;
     private @Nullable String parentFont = null;
-    public Map<Character, String[]> characters = Map.of();
+    public @Nullable Map<Character, String[]> characters = null;
     public @Nullable Map<String, String[]> symbols = null;
+
+    public int getHeight() {
+        return this.height != null && this.height > 0 ? this.height : 4;
+    }
+
+    public Map<Character, String[]> getCharacters() {
+        return this.characters != null ? this.characters : Map.of();
+    }
 
     private void credits(String credits) {
         this.credits = credits;
@@ -122,7 +130,7 @@ public class FontFile {
     }
 
     private Optional<Integer> height() {
-        return Optional.of(this.height);
+        return Optional.ofNullable(this.height);
     }
 
     private Optional<String> characterSeparator() {
@@ -134,12 +142,13 @@ public class FontFile {
     }
 
     private Optional<Map<Integer, List<String>>> characters() {
-        return Optional.of(this.characters.entrySet().stream()
-                .collect(Collectors.toUnmodifiableMap(
-                        entry -> Character.getNumericValue(entry.getKey()),
-                        entry -> List.of(entry.getValue())
-                ))
-        );
+        return Optional.ofNullable(this.characters)
+                .map(characters -> characters.entrySet().stream()
+                        .collect(Collectors.toUnmodifiableMap(
+                                entry -> Character.getNumericValue(entry.getKey()),
+                                entry -> List.of(entry.getValue())
+                        ))
+                );
     }
 
     private Optional<Map<String, List<String>>> symbols() {

@@ -18,6 +18,10 @@ import java.util.List;
 *///?}
 
 public final class GraphicsHelper {
+    public static final Identifier INWORLD_MENU_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/inworld_menu_background.png");
+    public static final Identifier MENU_LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/menu_list_background.png");
+    public static final Identifier INWORLD_MENU_LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
+
     public static void drawScrollingString(GuiGraphicsExtractor guiGraphics, Component text, int centerX, int left, int right, int top, int bottom) {
         //? if < 1.21.11 {
         /*AbstractWidget.renderScrollingString(
@@ -155,5 +159,36 @@ public final class GraphicsHelper {
         drawSeparator(guiGraphics, x, y, width, Minecraft.getInstance().level == null ?
                 Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR
         );
+    }
+
+    public static void drawCompleteMenuBackground(GuiGraphicsExtractor guiGraphics, Identifier menuBackground, int x, int y, int width, int height) {
+        Screen.extractMenuBackgroundTexture(
+                guiGraphics,
+                menuBackground,
+                x,
+                y,
+                0,
+                0,
+                width,
+                height
+        );
+        drawHeaderSeparator(guiGraphics, x, y - 2, width);
+        drawFooterSeparator(guiGraphics, x, y + height, width);
+    }
+
+    public static void drawCompleteMenuBackground(GuiGraphicsExtractor guiGraphics, boolean inWorld, int x, int y, int width, int height) {
+        drawCompleteMenuBackground(guiGraphics, inWorld ? INWORLD_MENU_BACKGROUND : Screen.MENU_BACKGROUND, x, y, width, height);
+    }
+
+    public static void drawCompleteMenuBackground(GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height) {
+        drawCompleteMenuBackground(guiGraphics, true, x, y, width, height);
+    }
+
+    public static void drawCompleteMenuListBackground(GuiGraphicsExtractor guiGraphics, boolean inWorld, int x, int y, int width, int height) {
+        drawCompleteMenuBackground(guiGraphics, inWorld ? INWORLD_MENU_LIST_BACKGROUND : MENU_LIST_BACKGROUND, x, y, width, height);
+    }
+
+    public static void drawCompleteMenuListBackground(GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height) {
+        drawCompleteMenuListBackground(guiGraphics, true, x, y, width, height);
     }
 }

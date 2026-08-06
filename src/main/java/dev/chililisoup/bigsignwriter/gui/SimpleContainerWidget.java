@@ -47,6 +47,14 @@ public abstract class SimpleContainerWidget extends AbstractWidget implements Co
         return this.focused;
     }
 
+    public @Nullable GuiEventListener getFocusedDescendant() {
+        if (this.getFocused() instanceof SimpleContainerWidget container) {
+            GuiEventListener focusedDescendant = container.getFocusedDescendant();
+            return focusedDescendant != null ? focusedDescendant : container;
+        }
+        return this.getFocused();
+    }
+
     @Override
     public void setFocused(@Nullable GuiEventListener focused) {
         if (this.focused != null) this.focused.setFocused(false);

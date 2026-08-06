@@ -51,7 +51,7 @@ public class FontInfo implements FamilyCharacterProvider {
     }
 
     public int height() {
-        return this.fontFile.height > 0 ? this.fontFile.height : 4;
+        return this.fontFile.getHeight();
     }
 
     public String characterSeparator() {
@@ -62,7 +62,7 @@ public class FontInfo implements FamilyCharacterProvider {
 
     @Override
     public Map<Character, String[]> characters() {
-        return this.fontFile.characters;
+        return this.fontFile.getCharacters();
     }
 
     public Set<Character> cumulativeCharacters() {
