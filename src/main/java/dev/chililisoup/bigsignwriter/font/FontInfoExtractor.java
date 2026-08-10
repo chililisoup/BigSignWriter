@@ -135,10 +135,10 @@ public final class FontInfoExtractor {
             Map<Character, String[]> characters = this.characters();
             LinkedHashMap<String, String[]> symbols = new LinkedHashMap<>();
 
-            for (char chr : BigSignWriterConfig.MAIN_CONFIG.charactersShownInSymbols.toCharArray()) {
-                if (characters.containsKey(chr))
-                    symbols.put(String.valueOf(chr), characters.get(chr));
-            }
+            if (BigSignWriterConfig.MAIN_CONFIG.nonUSCharactersInSymbols)
+                characters.entrySet().stream()
+                        .filter(entry -> entry.getKey().toString().matches("[^ -~]"))
+                        .forEach(entry -> symbols.put(entry.getKey().toString(), entry.getValue()));
 
             if (this.fontFile.symbols != null) symbols.putAll(this.fontFile.symbols);
 

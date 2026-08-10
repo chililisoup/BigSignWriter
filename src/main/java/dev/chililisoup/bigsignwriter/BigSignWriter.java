@@ -49,8 +49,8 @@ public final class BigSignWriter {
         return selectedFont() == null;
     }
 
-    public static void forceReload() {
-        BIG_FONT_MANAGER.forceReload();
+    public static void reloadUserFonts() {
+        BIG_FONT_MANAGER.reloadUserFonts();
     }
 
     public static List<FontInfo> availableFonts() {
@@ -148,7 +148,7 @@ public final class BigSignWriter {
             FontFile copy = fontInfo.fontFile.copyWithUnsafeCharacters();
             copy.name = fontName;
             getFontFileInterface(gson, target).save(copy);
-            forceReload();
+            reloadUserFonts();
         } catch (Exception e) {
             LOGGER.error(LOGGER_PREFIX + "Error saving font", e);
         }

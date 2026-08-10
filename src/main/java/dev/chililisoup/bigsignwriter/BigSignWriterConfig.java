@@ -34,8 +34,9 @@ public abstract class BigSignWriterConfig {
         public boolean displayFontHeights = true;
         public boolean showConfigButton = true;
         public boolean showSymbolsButton = true;
+        public boolean showSymbolSaveButton = true;
         public boolean largeSymbolPreviews = true;
-        public String charactersShownInSymbols = "£€";
+        public boolean nonUSCharactersInSymbols = true;
         public HashSet<String> hiddenFonts = new HashSet<>();
 
         static PersistentConfig initial() {
@@ -55,10 +56,6 @@ public abstract class BigSignWriterConfig {
             this.hiddenFonts = new HashSet<>(other.hiddenFonts);
 
             return this;
-        }
-
-        public boolean characterShownInSymbols(char chr) {
-            return this.charactersShownInSymbols.indexOf(chr) >= 0;
         }
 
         public boolean isFontHidden(Identifier id) {

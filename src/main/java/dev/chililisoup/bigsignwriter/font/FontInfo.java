@@ -261,7 +261,10 @@ public class FontInfo implements FamilyCharacterProvider {
     public final List<Component[]> getWrappedSymbolsPreview(int width) {
         String characterSeparator = this.characterSeparator().isEmpty() ? " " : this.characterSeparator();
         return getWrappedSymbolsPreview(
-                this.symbols.values(),
+                this.symbols.entrySet().stream()
+                        .filter(entry -> SymbolGroup.filterFromInclude(entry.getKey()))
+                        .map(Map.Entry::getValue)
+                        .toList(),
                 characterSeparator + characterSeparator,
                 width
         );

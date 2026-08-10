@@ -3,7 +3,6 @@ package dev.chililisoup.bigsignwriter.gui.config;
 import com.google.common.collect.ImmutableList;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.font.FontInfo;
-import dev.chililisoup.bigsignwriter.gui.*;
 import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
@@ -53,13 +52,13 @@ public class BigSignWriterConfigScreen extends Screen {
     @Override
     public void onClose() {
         if (!this.workingConfig.equals(MAIN_CONFIG)) {
-            boolean needsReload = !this.workingConfig.charactersShownInSymbols
-                    .equals(MAIN_CONFIG.charactersShownInSymbols);
+            boolean needsReload = this.workingConfig.nonUSCharactersInSymbols
+                    != MAIN_CONFIG.nonUSCharactersInSymbols;
 
             MAIN_CONFIG.copyFrom(this.workingConfig);
             saveConfig();
 
-            if (needsReload) BigSignWriter.forceReload();
+            if (needsReload) this.minecraft.reloadResourcePacks();
         }
         this.minecraft.gui.setScreen(this.parent);
     }
@@ -81,16 +80,16 @@ public class BigSignWriterConfigScreen extends Screen {
         this.addRenderableWidget(this.tabNavigationBar);
 
         GridLayout footerButtons = new GridLayout().columnSpacing(8).rowSpacing(4);
-        footerButtons.addChild(Button.builder(Component.translatable("bigsignwriter.config.openFontsFolder"), button ->
+        footerButtons.addChild(Button.builder(Component.translatable("bigsignwriter.config.openUserFontsFolder"), button ->
                 Util.getPlatform().openPath(BigSignWriter.getFontsDir())
-        ).width(120).build(), 0, 0);
-        footerButtons.addChild(Button.builder(Component.translatable("bigsignwriter.config.reloadFonts"), button -> {
-            BigSignWriter.forceReload();
+        ).width(140).build(), 0, 0);
+        footerButtons.addChild(Button.builder(Component.translatable("bigsignwriter.config.reloadUserFonts"), button -> {
+            BigSignWriter.reloadUserFonts();
             this.reload();
-        }).width(120).build(), 0, 1);
+        }).width(140).build(), 0, 1);
         footerButtons.addChild(Button.builder(CommonComponents.GUI_DONE, button ->
                 this.onClose()
-        ).width(248).build(), 1, 0, 1, 2);
+        ).width(288).build(), 1, 0, 1, 2);
         this.layout.addToFooter(footerButtons);
 
         this.layout.visitWidgets(button -> {

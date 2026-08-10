@@ -101,6 +101,7 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
                 this.getY() + 16,
                 this::openSymbolSaver
         );
+        this.saveButton.visible = BigSignWriterConfig.MAIN_CONFIG.showSymbolSaveButton;
         this.searchButton = new ClickableSprite(
                 SEARCH_SPRITE,
                 Component.translatable("bigsignwriter.symbols.search.hint"),
@@ -154,7 +155,8 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
         this.symbolGrid.visible = group != null;
         if (group != null) this.symbolGrid.updateEntries(group);
 
-        this.saveButton.visible = group == null;
+        this.saveButton.visible = group == null
+                && BigSignWriterConfig.MAIN_CONFIG.showSymbolSaveButton;
     }
 
     public void openGroup(@Nullable SymbolGroup group) {

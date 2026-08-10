@@ -95,19 +95,25 @@ public class OptionsTab extends ConfigTab<OptionsTab.OptionsSidePanel> {
                 Component.translatable("bigsignwriter.config.showSymbolsButton.desc")
         ));
         rowHelper.addChild(new OptionElement.BooleanOption(
+                workingConfig.showSymbolSaveButton,
+                defaults.showSymbolSaveButton,
+                value -> workingConfig.showSymbolSaveButton = value,
+                Component.translatable("bigsignwriter.config.showSymbolSaveButton"),
+                Component.translatable("bigsignwriter.config.showSymbolSaveButton.desc")
+        ));
+        rowHelper.addChild(new OptionElement.BooleanOption(
                 workingConfig.largeSymbolPreviews,
                 defaults.largeSymbolPreviews,
                 value -> workingConfig.largeSymbolPreviews = value,
                 Component.translatable("bigsignwriter.config.largeSymbolPreviews"),
                 Component.translatable("bigsignwriter.config.largeSymbolPreviews.desc")
         ));
-        rowHelper.addChild(new OptionElement.StringOption(
-                workingConfig.charactersShownInSymbols,
-                defaults.charactersShownInSymbols,
-                40,
-                value -> workingConfig.charactersShownInSymbols = value,
-                Component.translatable("bigsignwriter.config.charactersShownInSymbols"),
-                Component.translatable("bigsignwriter.config.charactersShownInSymbols.desc")
+        rowHelper.addChild(new OptionElement.BooleanOption(
+                workingConfig.nonUSCharactersInSymbols,
+                defaults.nonUSCharactersInSymbols,
+                value -> workingConfig.nonUSCharactersInSymbols = value,
+                Component.translatable("bigsignwriter.config.nonUSCharactersInSymbols"),
+                Component.translatable("bigsignwriter.config.nonUSCharactersInSymbols.desc")
         ));
         rowHelper.addChild(new OptionElement.BooleanOption(
                 workingConfig.characterSeparatorOverrideEnabled,

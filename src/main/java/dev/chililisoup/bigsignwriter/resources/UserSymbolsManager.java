@@ -44,7 +44,7 @@ public final class UserSymbolsManager {
         FontFile fontFile = getUserSymbolsFile();
         fontFile.symbols = USER_SYMBOLS;
         getUserFontInterface(userSymbolsPath()).save(fontFile);
-        BigSignWriter.forceReload();
+        BigSignWriter.reloadUserFonts();
     }
 
     private static Path userSymbolsPath() {

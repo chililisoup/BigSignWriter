@@ -63,7 +63,7 @@ public final class BigFontManager implements PreparableReloadListener {
         selectFont(this.selectedFont);
     }
 
-    public void forceReload() {
+    public void reloadUserFonts() {
         this.apply(this.prepare());
     }
 
@@ -112,6 +112,7 @@ public final class BigFontManager implements PreparableReloadListener {
         this.availableFonts.addAll(FontInfoExtractor.extractAll(preparedFonts));
         this.availableFonts.sort(BigFontManager::compareFonts);
         this.availableSymbolGroups.addAll(SymbolGroup.availableGroups());
+
         this.reselectFont(preparation.selectedFontSource);
         UserSymbolsManager.reload();
 

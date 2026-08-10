@@ -69,10 +69,10 @@ public record SymbolGroup(
         return merged;
     }
 
-    private static boolean filterFromInclude(String key) {
+    public static boolean filterFromInclude(String key) {
+        if (!BigSignWriterConfig.MAIN_CONFIG.nonUSCharactersInSymbols) return true;
         char[] chars = key.toCharArray();
-        if (chars.length != 1) return true;
-        return !BigSignWriterConfig.MAIN_CONFIG.characterShownInSymbols(chars[0]);
+        return chars.length != 1 || String.valueOf(chars[0]).matches("[ -~]");
     }
 
     private Map<String, SymbolReference> expandIds(Function<String, Boolean> filter) {
