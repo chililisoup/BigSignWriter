@@ -1,8 +1,10 @@
 package dev.chililisoup.bigsignwriter.gui;
 
 import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
@@ -28,10 +30,24 @@ public class IntegerSlider extends AbstractSliderButton {
     }
 
     public int getValue() {
-        return Mth.roundToward(
+        return Math.clamp(Mth.roundToward(
                 (int) Math.round(this.value * (this.max - this.min) + this.min),
                 this.step
-        );
+        ), this.min, this.max);
+    }
+
+    @Override
+    public boolean keyPressed(@NotNull KeyEvent event) {
+        if (event.isSelection()) {
+            this.canChangeValue = !this.canChangeValue;
+            return true;
+        }
+
+        if (!this.canChangeValue) return false;
+        if (!event.isLeft() && !event.isRight()) return false;
+
+        this.setValueFrom(this.getValue() + (event.isLeft() ? -this.step : this.step));
+        return true;
     }
 
     @Override

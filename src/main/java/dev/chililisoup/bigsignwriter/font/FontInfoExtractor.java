@@ -2,7 +2,6 @@ package dev.chililisoup.bigsignwriter.font;
 
 import dev.chililisoup.bigsignwriter.resources.BigFontManager;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
-import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
@@ -11,6 +10,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.MAIN_CONFIG;
 
 public final class FontInfoExtractor {
     public static Map<Identifier, FontInfoExtraction> prepareFonts(Map<Identifier, FontFile> fontSources) {
@@ -135,12 +136,16 @@ public final class FontInfoExtractor {
             Map<Character, String[]> characters = this.characters();
             LinkedHashMap<String, String[]> symbols = new LinkedHashMap<>();
 
-            if (BigSignWriterConfig.MAIN_CONFIG.nonUSCharactersInSymbols)
+            if (MAIN_CONFIG.addNonUSCharactersLast && this.fontFile.symbols != null)
+                symbols.putAll(this.fontFile.symbols);
+
+            if (MAIN_CONFIG.nonUSCharactersInSymbols)
                 characters.entrySet().stream()
                         .filter(entry -> entry.getKey().toString().matches("[^ -~]"))
                         .forEach(entry -> symbols.put(entry.getKey().toString(), entry.getValue()));
 
-            if (this.fontFile.symbols != null) symbols.putAll(this.fontFile.symbols);
+            if (!MAIN_CONFIG.addNonUSCharactersLast && this.fontFile.symbols != null)
+                symbols.putAll(this.fontFile.symbols);
 
             return symbols.isEmpty() ? Map.of() : symbols;
         }

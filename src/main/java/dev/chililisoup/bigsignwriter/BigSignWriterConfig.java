@@ -24,9 +24,10 @@ public abstract class BigSignWriterConfig {
     }
 
     public static class PersistentConfig {
-        public int configVersionDontTouch = 0;
+        public int configVersionDontTouch = 0; // Current config version set in CONFIG_VERSION
         public int buttonsX = 0;
         public int buttonsY = 120;
+        public int buttonsWidth = 200;
         public double buttonsAlignmentX = 0.5;
         public double buttonsAlignmentY = 0.25;
         public boolean fontSelectorCoversDoneButton = true;
@@ -37,6 +38,7 @@ public abstract class BigSignWriterConfig {
         public boolean showSymbolSaveButton = true;
         public boolean largeSymbolPreviews = true;
         public boolean nonUSCharactersInSymbols = true;
+        public boolean addNonUSCharactersLast = true;
         public HashSet<String> hiddenFonts = new HashSet<>();
 
         static PersistentConfig initial() {

@@ -1,6 +1,7 @@
 package dev.chililisoup.bigsignwriter.gui.config;
 
 import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
+import dev.chililisoup.bigsignwriter.gui.DividerWidget;
 import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -42,6 +43,14 @@ public class OptionsTab extends ConfigTab<OptionsTab.OptionsSidePanel> {
                 Component.translatable("bigsignwriter.config.buttonsY.desc")
         ));
         rowHelper.addChild(new OptionElement<>(
+                workingConfig.buttonsWidth,
+                defaults.buttonsWidth,
+                value -> workingConfig.buttonsWidth = value,
+                option -> new OptionController.IntegerController(option, 200, 500, 2),
+                Component.translatable("bigsignwriter.config.buttonsWidth"),
+                Component.translatable("bigsignwriter.config.buttonsWidth.desc")
+        ));
+        rowHelper.addChild(new OptionElement<>(
                 workingConfig.buttonsAlignmentX,
                 defaults.buttonsAlignmentX,
                 value -> workingConfig.buttonsAlignmentX = value,
@@ -59,6 +68,7 @@ public class OptionsTab extends ConfigTab<OptionsTab.OptionsSidePanel> {
                 Component.translatable("bigsignwriter.config.buttonsAlignmentY"),
                 Component.translatable("bigsignwriter.config.buttonsAlignmentY.desc")
         ));
+        rowHelper.addChild(new DividerWidget());
         rowHelper.addChild(new OptionElement.BooleanOption(
                 workingConfig.fontSelectorCoversDoneButton,
                 defaults.fontSelectorCoversDoneButton,
@@ -87,6 +97,7 @@ public class OptionsTab extends ConfigTab<OptionsTab.OptionsSidePanel> {
                 Component.translatable("bigsignwriter.config.showConfigButton"),
                 Component.translatable("bigsignwriter.config.showConfigButton.desc")
         ));
+        rowHelper.addChild(new DividerWidget());
         rowHelper.addChild(new OptionElement.BooleanOption(
                 workingConfig.showSymbolsButton,
                 defaults.showSymbolsButton,
@@ -116,6 +127,14 @@ public class OptionsTab extends ConfigTab<OptionsTab.OptionsSidePanel> {
                 Component.translatable("bigsignwriter.config.nonUSCharactersInSymbols.desc")
         ));
         rowHelper.addChild(new OptionElement.BooleanOption(
+                workingConfig.addNonUSCharactersLast,
+                defaults.addNonUSCharactersLast,
+                value -> workingConfig.addNonUSCharactersLast = value,
+                Component.translatable("bigsignwriter.config.addNonUSCharactersLast"),
+                Component.translatable("bigsignwriter.config.addNonUSCharactersLast.desc")
+        ));
+        rowHelper.addChild(new DividerWidget());
+        rowHelper.addChild(new OptionElement.BooleanOption(
                 workingConfig.characterSeparatorOverrideEnabled,
                 defaults.characterSeparatorOverrideEnabled,
                 value -> workingConfig.characterSeparatorOverrideEnabled = value,
@@ -142,6 +161,8 @@ public class OptionsTab extends ConfigTab<OptionsTab.OptionsSidePanel> {
         this.getContent().visitChildren(element -> {
             if (element instanceof OptionElement<?> optionElement)
                 optionElement.setWidth(contentWidth);
+            else if (element instanceof DividerWidget dividerWidget)
+                dividerWidget.setWidth(contentWidth);
         });
     }
 
