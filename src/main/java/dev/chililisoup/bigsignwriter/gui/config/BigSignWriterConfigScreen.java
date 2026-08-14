@@ -54,9 +54,6 @@ public class BigSignWriterConfigScreen extends Screen {
         if (!this.workingConfig.equals(MAIN_CONFIG)) {
             boolean needsReload = this.workingConfig.nonUSCharactersInSymbols
                     != MAIN_CONFIG.nonUSCharactersInSymbols;
-            needsReload |= this.workingConfig.nonUSCharactersInSymbols
-                    && this.workingConfig.addNonUSCharactersLast
-                    != MAIN_CONFIG.addNonUSCharactersLast;
 
             MAIN_CONFIG.copyFrom(this.workingConfig);
             saveConfig();

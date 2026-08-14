@@ -136,16 +136,12 @@ public final class FontInfoExtractor {
             Map<Character, String[]> characters = this.characters();
             LinkedHashMap<String, String[]> symbols = new LinkedHashMap<>();
 
-            if (MAIN_CONFIG.addNonUSCharactersLast && this.fontFile.symbols != null)
-                symbols.putAll(this.fontFile.symbols);
+            if (this.fontFile.symbols != null) symbols.putAll(this.fontFile.symbols);
 
             if (MAIN_CONFIG.nonUSCharactersInSymbols)
                 characters.entrySet().stream()
                         .filter(entry -> entry.getKey().toString().matches("[^ -~]"))
                         .forEach(entry -> symbols.put(entry.getKey().toString(), entry.getValue()));
-
-            if (!MAIN_CONFIG.addNonUSCharactersLast && this.fontFile.symbols != null)
-                symbols.putAll(this.fontFile.symbols);
 
             return symbols.isEmpty() ? Map.of() : symbols;
         }

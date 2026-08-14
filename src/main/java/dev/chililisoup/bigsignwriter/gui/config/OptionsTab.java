@@ -126,13 +126,6 @@ public class OptionsTab extends ConfigTab<OptionsTab.OptionsSidePanel> {
                 Component.translatable("bigsignwriter.config.nonUSCharactersInSymbols"),
                 Component.translatable("bigsignwriter.config.nonUSCharactersInSymbols.desc")
         ));
-        rowHelper.addChild(new OptionElement.BooleanOption(
-                workingConfig.addNonUSCharactersLast,
-                defaults.addNonUSCharactersLast,
-                value -> workingConfig.addNonUSCharactersLast = value,
-                Component.translatable("bigsignwriter.config.addNonUSCharactersLast"),
-                Component.translatable("bigsignwriter.config.addNonUSCharactersLast.desc")
-        ));
         rowHelper.addChild(new DividerWidget());
         rowHelper.addChild(new OptionElement.BooleanOption(
                 workingConfig.characterSeparatorOverrideEnabled,
