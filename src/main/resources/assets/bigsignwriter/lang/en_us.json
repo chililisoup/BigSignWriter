@@ -62,6 +62,8 @@
   "bigsignwriter.config.showSymbolSaveButton.desc": "Whether to show the button to save sign content to user symbols in the symbols menu",
   "bigsignwriter.config.largeSymbolPreviews": "Large Symbol Previews",
   "bigsignwriter.config.largeSymbolPreviews.desc": "Enlarges the symbols in the symbol selector to fit 6 columns instead of 9",
+  "bigsignwriter.config.rememberOpenSymbolGroup": "Remember Open Symbol Group",
+  "bigsignwriter.config.rememberOpenSymbolGroup.desc": "Makes it so closing the sign edit screen with a symbol group open will have the next sign edit screen start with the same group open instead of the font selector",
   "bigsignwriter.config.nonUSCharactersInSymbols": "Show non-US Characters in Symbols",
   "bigsignwriter.config.nonUSCharactersInSymbols.desc": "Adds characters not accessible through the standard US keyboard layout to the symbols menu (characters outside the \"Basic Latin\" Unicode block)",
   "bigsignwriter.config.characterSeparatorOverride": "Character Separator Override",

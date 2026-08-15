@@ -3,28 +3,32 @@ package dev.chililisoup.bigsignwriter.font;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.util.ModUtil;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
 
 public record SymbolGroup(
+        Identifier id,
         String name,
         Map<String, SymbolReference> symbols,
         VisibilityChecker visibilityChecker,
         boolean isMerged
 ) {
     public static @Nullable SymbolGroup of(
+            Identifier id,
             String name,
             Map<String, SymbolReference> symbols,
             VisibilityChecker visibilityChecker,
             boolean isMerged
     ) {
-        return !symbols.isEmpty() ? new SymbolGroup(name, symbols, visibilityChecker, isMerged) : null;
+        return !symbols.isEmpty() ? new SymbolGroup(id, name, symbols, visibilityChecker, isMerged) : null;
     }
 
     public static @Nullable SymbolGroup of(FontInfo font) {
         return of(
+                font.id,
                 font.name(),
                 font.symbols().entrySet().stream().collect(ModUtil.orderedMapCollector(
                         Map.Entry::getKey,
@@ -35,8 +39,8 @@ public record SymbolGroup(
         );
     }
 
-    public static @Nullable SymbolGroup ofMerged(String name, List<SymbolGroup> groups) {
-        return of(name, merged(groups), config -> true, true);
+    public static @Nullable SymbolGroup ofMerged(Identifier id, String name, List<SymbolGroup> groups) {
+        return of(id, name, merged(groups), config -> true, true);
     }
 
     public Set<Map.Entry<String, SymbolReference>> entrySet() {

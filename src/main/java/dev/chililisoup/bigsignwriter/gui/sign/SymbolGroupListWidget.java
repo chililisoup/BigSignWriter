@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,7 +42,11 @@ public class SymbolGroupListWidget extends ObjectSelectionList<SymbolGroupListWi
         List<SymbolGroup> visibleGroups = BigSignWriter.availableSymbolGroups().stream()
                 .filter(SymbolGroup::isVisible)
                 .toList();
-        this.allGroup = SymbolGroup.ofMerged(Component.translatable("bigsignwriter.symbols.all").getString(), visibleGroups);
+        this.allGroup = SymbolGroup.ofMerged(
+                BigSignWriter.id("all"),
+                Component.translatable("bigsignwriter.symbols.all").getString(),
+                visibleGroups
+        );
 
         ArrayList<SymbolGroup> groups = new ArrayList<>();
         if (this.allGroup != null) groups.add(this.allGroup);
@@ -69,16 +74,20 @@ public class SymbolGroupListWidget extends ObjectSelectionList<SymbolGroupListWi
         return this.width - 32;
     }
 
+    public @Nullable SymbolGroup getListedGroup(Identifier id) {
+        for (Entry entry : this.children()) {
+            if (entry.group.id().equals(id))
+                return entry.group;
+        }
+        return null;
+    }
+
     @Override
     public void setSelected(@Nullable Entry entry) {
         if (this.getSelected() == entry) return;
         this.playDownSound(this.minecraft.getSoundManager());
         super.setSelected(entry);
         this.onSelect.accept(getEntryGroup(entry));
-    }
-
-    public @Nullable SymbolGroup getSelectedGroup() {
-        return getEntryGroup(this.getSelected());
     }
 
     private static @Nullable SymbolGroup getEntryGroup(@Nullable Entry entry) {

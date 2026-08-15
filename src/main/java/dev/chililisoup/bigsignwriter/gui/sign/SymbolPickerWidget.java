@@ -30,8 +30,11 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
     private static final Identifier SAVE_SPRITE = BigSignWriter.id("save");
     private static final Identifier SEARCH_SPRITE = BigSignWriter.id("search");
 
+    private static @Nullable Identifier LAST_OPEN_GROUP;
+
     private final Minecraft minecraft;
     private final BigFontTyper fontTyper;
+    private final Consumer<Boolean> onVisibilityToggle;
 
     private final SymbolGroupListWidget groupList;
     private final SymbolGridWidget symbolGrid;
@@ -43,12 +46,20 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
     private final ClickableSprite saveButton;
     private final ClickableSprite searchButton;
 
-    private @Nullable Consumer<Boolean> onVisibilityToggle;
-
-    public SymbolPickerWidget(Minecraft minecraft, BigFontTyper fontTyper, int x, int y, int width, int height, Runnable onReload) {
+    public SymbolPickerWidget(
+            Minecraft minecraft,
+            BigFontTyper fontTyper,
+            int x,
+            int y,
+            int width,
+            int height,
+            Runnable onReload,
+            Consumer<Boolean> onVisibilityToggle
+    ) {
         super(x, y, width, height, Component.translatable("bigsignwriter.symbols"));
         this.minecraft = minecraft;
         this.fontTyper = fontTyper;
+        this.onVisibilityToggle = onVisibilityToggle;
 
         this.groupList = new SymbolGroupListWidget(
                 minecraft, width, height - 28, x, y + 28, 14, this::openGroup
@@ -116,6 +127,23 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
         );
     }
 
+    public void initForSignEditScreen() {
+        this.visible = false;
+
+        if (!BigSignWriterConfig.MAIN_CONFIG.rememberOpenSymbolGroup)
+            LAST_OPEN_GROUP = null;
+        if (LAST_OPEN_GROUP == null) return;
+
+        SymbolGroup group = this.groupList.getListedGroup(LAST_OPEN_GROUP);
+        if (group == null) {
+            LAST_OPEN_GROUP = null;
+            return;
+        }
+
+        this.openGroup(group);
+        this.toggleVisibility();
+    }
+
     @Override
     public @NotNull List<AbstractWidget> children() {
         return List.of(this.groupList, this.symbolGrid, this.symbolSaver, this.searchBar);
@@ -130,18 +158,18 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
     }
 
     public void toggleVisibility() {
-        if (this.visible && this.searchBar.visible)
-            this.toggleSearchBar();
-        this.visible = !this.visible;
-        if (this.onVisibilityToggle != null)
-            this.onVisibilityToggle.accept(this.visible);
-    }
+        if (this.visible) {
+            LAST_OPEN_GROUP = null;
+            if (this.searchBar.visible)
+                this.toggleSearchBar();
+        }
 
-    public void setOnVisibilityToggle(@Nullable Consumer<Boolean> onVisibilityToggle) {
-        this.onVisibilityToggle = onVisibilityToggle;
+        this.visible = !this.visible;
+        this.onVisibilityToggle.accept(this.visible);
     }
 
     public void openGroup(@Nullable SymbolGroup group, boolean closeSearch) {
+        LAST_OPEN_GROUP = group != null ? group.id() : null;
         this.symbolSaver.close();
 
         if (closeSearch) {

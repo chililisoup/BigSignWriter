@@ -157,21 +157,20 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                     y,
                     buttonsWidth,
                     Math.min(200, this.height - y - 5),
-                    this::repositionElements
+                    this::repositionElements,
+                    visible -> {
+                        this.bigSignWriter$inSymbolPicker = visible;
+                        if (!visible && this.bigSignWriter$fontTyper != null)
+                            this.bigSignWriter$fontTyper.clampLine();
+
+                        if (fontSelector.isOpen()) fontSelector.setOpen(false);
+                        fontSelector.visible = !visible;
+                        fontSelectorToggleButton.visible = !visible;
+                        if (this.bigSignWriter$doneButton != null) this.bigSignWriter$doneButton.visible =
+                                !MAIN_CONFIG.fontSelectorCoversDoneButton || !visible;
+                    }
             );
-            symbolPicker.visible = false;
-
-            symbolPicker.setOnVisibilityToggle(visible -> {
-                this.bigSignWriter$inSymbolPicker = visible;
-                if (!visible && this.bigSignWriter$fontTyper != null)
-                    this.bigSignWriter$fontTyper.clampLine();
-
-                if (fontSelector.isOpen()) fontSelector.setOpen(false);
-                fontSelector.visible = !visible;
-                fontSelectorToggleButton.visible = !visible;
-                if (this.bigSignWriter$doneButton != null) this.bigSignWriter$doneButton.visible =
-                        !MAIN_CONFIG.fontSelectorCoversDoneButton || !visible;
-            });
+            symbolPicker.initForSignEditScreen();
 
             ClickableButtonWidget symbolsButton = new ClickableButtonWidget(
                     x + halfButtonsWidth + 4,
