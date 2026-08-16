@@ -127,7 +127,7 @@ public final class FontInfoExtractor {
             FontInfoExtraction nextFont = this;
             while (nextFont != null) {
                 this.cumulativeCharacters.addAll(nextFont.characters().keySet());
-                nextFont = nextFont.parentFont();
+                nextFont = nextFont.hasExplicitParent() ? nextFont.parentFont() : null;
             }
             return this.cumulativeCharacters;
         }
