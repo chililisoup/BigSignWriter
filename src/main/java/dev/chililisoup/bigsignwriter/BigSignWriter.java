@@ -61,6 +61,12 @@ public final class BigSignWriter {
         return BIG_FONT_MANAGER.availableSymbolGroups();
     }
 
+    public static @Nullable FontInfo getFont(Identifier id) {
+        for (FontInfo fontInfo : availableFonts())
+            if (fontInfo.id.equals(id)) return fontInfo;
+        return null;
+    }
+
     public static @Nullable FontInfo selectedFont() {
         return BIG_FONT_MANAGER.selectedFont();
     }

@@ -47,21 +47,17 @@ public final class BigFontTyper {
         this.signField = signField;
     }
 
-    private int getClampedLine() {
+    public int getClampedLine() {
         return Math.clamp(this.lineCount() - BigSignWriter.height(), 0, this.getLine());
     }
 
-    public void clampLine() {
-        this.setLine(this.getClampedLine());
-    }
-
-    public void onFontSelected() {
+    public void fixCursor() {
         this.signField.setSelectionPos(this.signField.getCursorPos());
         if (BigSignWriter.isVanillaTyping()) return;
 
         int cursorPos = this.getCursorPos();
         int width = this.font.width(this.getMessage().substring(0, cursorPos));
-        this.clampLine();
+        this.setLine(this.getClampedLine());
 
         TreeMap<Integer, Integer[]> splitIndices = this.getSplitIndices(true);
         if (splitIndices.isEmpty()) this.signField.setCursorToEnd();

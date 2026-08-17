@@ -233,12 +233,12 @@ public abstract class AbstractFontsTab extends ConfigTab<AbstractFontsTab.Abstra
         private @Nullable List<Component[]> wrappedFontPreview = null;
 
         private final Button zoomOutButton = IconButton.basic(ZOOM_OUT_SPRITE, button -> {
-            PREVIEW_LINE_HEIGHT = Math.max(PREVIEW_LINE_HEIGHT - 4, 12);
+            PREVIEW_LINE_HEIGHT = PREVIEW_LINE_HEIGHT > 40 ? 40 : Math.max(PREVIEW_LINE_HEIGHT - 4, 12);
             AbstractFontsTab.this.redoLayout();
         });
 
         private final Button zoomInButton = IconButton.basic(ZOOM_IN_SPRITE, button -> {
-            PREVIEW_LINE_HEIGHT = Math.min(PREVIEW_LINE_HEIGHT + 4, 40);
+            PREVIEW_LINE_HEIGHT = PREVIEW_LINE_HEIGHT >= 40 ? 80 : Math.min(PREVIEW_LINE_HEIGHT + 4, 40);
             AbstractFontsTab.this.redoLayout();
         });
 

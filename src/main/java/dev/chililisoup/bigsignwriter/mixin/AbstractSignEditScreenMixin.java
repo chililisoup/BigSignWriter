@@ -110,7 +110,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 y,
                 20,
                 this.messages.length,
-                this.bigSignWriter$fontTyper::onFontSelected
+                this.bigSignWriter$fontTyper::fixCursor
         );
 
         ClickableButtonWidget fontSelectorToggleButton = new ClickableButtonWidget(
@@ -161,7 +161,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                     visible -> {
                         this.bigSignWriter$inSymbolPicker = visible;
                         if (!visible && this.bigSignWriter$fontTyper != null)
-                            this.bigSignWriter$fontTyper.clampLine();
+                            this.bigSignWriter$fontTyper.fixCursor();
 
                         if (fontSelector.isOpen()) fontSelector.setOpen(false);
                         fontSelector.visible = !visible;
@@ -248,9 +248,6 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         String wideLine = this.bigSignWriter$fontTyper.getWidestMessage();
         int lineHeight = this.sign.getTextLineHeight();
         int cursorHeight = this.bigSignWriter$cursorHeight();
-        int fullHeight = Math.min(BigSignWriter.height(), this.messages.length - this.line);
-        int opaqueColor = 0xFF000000 | color;
-
         int cursorPosition = this.font.width(
                 wideLine.substring(0, cursorPos != 0 && cursorPos == this.messages[this.line].length() ?
                         wideLine.length() :
@@ -259,13 +256,18 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         );
         int cursorX = cursorPosition - this.font.width(wideLine) / 2;
         int cursorY = (this.line - 2) * lineHeight;
-
         int endY = cursorY + lineHeight * cursorHeight;
+
+        int opaqueColor = 0xFF000000 | color;
         guiGraphics.fill(cursorX, cursorY - 1, cursorX + 1, endY, opaqueColor);
 
-        if (fullHeight > cursorHeight)
-            for (int y = endY + 2; y < cursorY + lineHeight * fullHeight; y += 4)
+        int clampedLine = this.bigSignWriter$fontTyper.getClampedLine();
+        int fullHeight = Math.min(BigSignWriter.height(), this.messages.length - clampedLine);
+        if (fullHeight > cursorHeight) {
+            int trueY = (clampedLine - 2) * lineHeight;
+            for (int y = trueY; y < trueY + lineHeight * fullHeight; y += 4)
                 guiGraphics.fill(cursorX, y, cursorX + 1, y + 2, opaqueColor);
+        }
 
         ci.cancel();
     }

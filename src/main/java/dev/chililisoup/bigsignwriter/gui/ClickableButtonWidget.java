@@ -27,4 +27,7 @@ public class ClickableButtonWidget extends
     public boolean keyPressed(@NotNull KeyEvent event) {
         return false;
     }
+
+    @Override
+    public void setFocused(boolean focused) {}
 }

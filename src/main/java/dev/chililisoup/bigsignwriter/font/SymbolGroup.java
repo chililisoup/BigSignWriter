@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public record SymbolGroup(
         Identifier id,
@@ -56,10 +57,14 @@ public record SymbolGroup(
     }
 
     public static List<SymbolGroup> availableGroups() {
-        return BigSignWriter.availableFonts().stream()
+        Stream<SymbolGroup> groupStream = BigSignWriter.availableFonts().stream()
                 .map(SymbolGroup::of)
-                .filter(Objects::nonNull)
-                .toList();
+                .filter(Objects::nonNull);
+
+        if (BigSignWriterConfig.MAIN_CONFIG.nonUSCharactersInSymbols)
+            groupStream = groupStream.sorted(SymbolGroup::compare);
+
+        return groupStream.toList();
     }
 
     private static Map<String, SymbolReference> merged(List<SymbolGroup> groups) {
@@ -86,6 +91,20 @@ public record SymbolGroup(
                         entry -> entry.getValue().expandedId(),
                         Map.Entry::getValue
                 ));
+    }
+
+    private static int compare(SymbolGroup a, SymbolGroup b) {
+        FontInfo fontA = BigSignWriter.getFont(a.id);
+        FontInfo fontB = BigSignWriter.getFont(b.id);
+
+        if (fontA == null && fontB == null) return 0;
+        if (fontA == null) return 1;
+        if (fontB == null) return -1;
+
+        boolean aExplicit = fontA.hasExplicitSymbols();
+        boolean bExplicit = fontB.hasExplicitSymbols();
+        if (aExplicit != bExplicit) return aExplicit ? -1 : 1;
+        return 0;
     }
 
     @FunctionalInterface
