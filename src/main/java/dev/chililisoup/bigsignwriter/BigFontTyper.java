@@ -47,8 +47,16 @@ public final class BigFontTyper {
         this.signField = signField;
     }
 
+    private int getClampedLine(int height, int line) {
+        return Math.clamp(this.lineCount() - height, 0, line);
+    }
+
+    private int getClampedLine(int height) {
+        return this.getClampedLine(height, this.getLine());
+    }
+
     public int getClampedLine() {
-        return Math.clamp(this.lineCount() - BigSignWriter.height(), 0, this.getLine());
+        return this.getClampedLine(BigSignWriter.height());
     }
 
     public void fixCursor() {
@@ -59,7 +67,7 @@ public final class BigFontTyper {
         int width = this.font.width(this.getMessage().substring(0, cursorPos));
         this.setLine(this.getClampedLine());
 
-        TreeMap<Integer, Integer[]> splitIndices = this.getSplitIndices(true);
+        TreeMap<Integer, Integer[]> splitIndices = this.getSplitIndices();
         if (splitIndices.isEmpty()) this.signField.setCursorToEnd();
         else if (splitIndices.containsKey(width)) this.signField.setCursorPos(splitIndices.get(width)[0], false);
         else {
@@ -219,8 +227,8 @@ public final class BigFontTyper {
         return this.getSplitIndices(afterSeparator, startLine, endLine, BigSignWriter.characterSeparator());
     }
 
-    private TreeMap<Integer, Integer[]> getSplitIndices(boolean afterSeparator) {
-        return this.getSplitIndices(afterSeparator, this.getLine(), this.getEndLine());
+    private TreeMap<Integer, Integer[]> getSplitIndices() {
+        return this.getSplitIndices(true, this.getLine(), this.getEndLine());
     }
 
     private Pair<Integer[], Integer> getSplit(int startLine, int endLine, String characterSeparator) {
@@ -309,7 +317,9 @@ public final class BigFontTyper {
             return;
         }
 
-        TreeMap<Integer, Integer[]> splitIndices = this.getSplitIndices(!atEnd);
+        int startLine = this.getClampedLine();
+        int endLine = this.getEndLine();
+        TreeMap<Integer, Integer[]> splitIndices = this.getSplitIndices(!atEnd, startLine, endLine);
         if (splitIndices.isEmpty()) {
             this.clearSign();
             return;
@@ -334,8 +344,7 @@ public final class BigFontTyper {
             }
         }
 
-        int startLine = this.getLine();
-        int endLine = this.getEndLine();
+        int cursorLine = this.getLine();
         for (int i = startLine; i < endLine; i++) {
             this.setLine(i);
             this.setMessage(
@@ -343,15 +352,16 @@ public final class BigFontTyper {
                             + this.messages[i].substring(endSplit.getValue()[i - startLine])
             );
         }
-        this.setLine(startLine);
+        this.setLine(cursorLine);
+        int cursorIndex = cursorLine - startLine;
         this.signField.setCursorPos(
-                cursorPos - (endSplit.getValue()[0] - startSplit.getValue()[0]),
+                cursorPos - (endSplit.getValue()[cursorIndex] - startSplit.getValue()[cursorIndex]),
                 false
         );
     }
 
     private void moveCursor(boolean higher) {
-        TreeMap<Integer, Integer[]> splitIndices = this.getSplitIndices(true);
+        TreeMap<Integer, Integer[]> splitIndices = this.getSplitIndices();
         int cursorPos = this.getCursorPos();
         int width = this.font.width(this.getMessage().substring(0, cursorPos));
 
@@ -367,7 +377,8 @@ public final class BigFontTyper {
     public void typeLines(String[] lines, String characterSeparator) {
         if (lines.length == 0) return;
 
-        int currentLine = this.getLine();
+        int cursorLine = this.getLine();
+        int topLine = this.getClampedLine(lines.length);
         int startLine = this.getClampedLine();
         int endLine = Math.min(
                 Math.max(BigSignWriter.height(), lines.length) + startLine,
@@ -389,7 +400,7 @@ public final class BigFontTyper {
             int splitLine = i - startLine;
             if (splitLine >= split.length) continue;
 
-            int charLine = i - currentLine;
+            int charLine = i - topLine;
             String charText = charLine >= 0 && charLine < lines.length && lines[charLine] != null ?
                     lines[charLine] :
                     bigCharFiller;
@@ -406,10 +417,10 @@ public final class BigFontTyper {
 
             this.setLine(i);
             this.setMessage(message);
-            if (charLine == 0) newCursorPos = cursorPos + prefixFiller.length() + addition.length();
+            if (i - cursorLine == 0) newCursorPos = cursorPos + prefixFiller.length() + addition.length();
         }
 
-        this.setLine(currentLine);
+        this.setLine(cursorLine);
         if (newCursorPos >= 0)
             this.signField.setCursorPos(newCursorPos, false);
         else this.signField.setCursorPos(cursorPos, false);
