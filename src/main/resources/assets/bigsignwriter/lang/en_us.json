@@ -35,7 +35,7 @@
   "bigsignwriter.config.options": "Options",
   "bigsignwriter.config.fonts": "Fonts",
   "bigsignwriter.config.fonts.createCopy": "Create Local Copy",
-  "bigsignwriter.config.fonts.createCopy.desc": "Saves a copy of this font to your fonts folder",
+  "bigsignwriter.config.fonts.createCopy.desc": "Saves a copy of this font to the user fonts folder",
   "bigsignwriter.config.fonts.showInheritedCharacters": "Show Inherited Characters",
   "bigsignwriter.config.symbolPacks": "Symbol Packs",
   "bigsignwriter.config.buttonsX": "Buttons X",
