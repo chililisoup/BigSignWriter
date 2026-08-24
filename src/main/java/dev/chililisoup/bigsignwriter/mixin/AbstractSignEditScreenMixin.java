@@ -68,10 +68,6 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     @Shadow
     private SignText text;
 
-    @Unique private int bigSignWriter$cursorHeight() {
-        return this.bigSignWriter$inSymbolPicker ? 1 : BigSignWriter.height();
-    }
-
     @WrapOperation(
             method = "init",
             at = @At(
@@ -252,7 +248,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
         String wideLine = this.bigSignWriter$context.getWidestMessage();
         int lineHeight = this.sign.getTextLineHeight();
-        int cursorHeight = this.bigSignWriter$cursorHeight();
+        int cursorHeight = this.bigSignWriter$context.cursorHeight();
         int cursorPosition = this.font.width(
                 wideLine.substring(0, cursorPos != 0 && cursorPos == this.messages[this.line].length() ?
                         wideLine.length() :
@@ -292,7 +288,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     private boolean hideUnderscore(
             GuiGraphicsExtractor guiGraphics,
             Font font,
-            //? if < 21.6
+            //? if < 26.1
             //String string,
             int x,
             int y,
