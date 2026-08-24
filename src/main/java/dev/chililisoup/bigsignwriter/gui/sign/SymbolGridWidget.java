@@ -1,8 +1,10 @@
 package dev.chililisoup.bigsignwriter.gui.sign;
 
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
+import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.font.SymbolGroup;
 import dev.chililisoup.bigsignwriter.font.SymbolReference;
+import dev.chililisoup.bigsignwriter.input.SignEditContext;
 import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -15,11 +17,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry> {
     private int maxHeight;
-    private final Consumer<SymbolReference> symbolConsumer;
+    private final SignEditContext context;
     private final int itemWidth;
     private int contentHeight;
 
@@ -31,11 +32,11 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
             int y,
             int itemWidth,
             int itemHeight,
-            Consumer<SymbolReference> symbolConsumer
+            SignEditContext context
     ) {
         super(minecraft, width, height, y, itemHeight);
         this.maxHeight = height;
-        this.symbolConsumer = symbolConsumer;
+        this.context = context;
         this.setX(x);
         this.itemWidth = itemWidth;
     }
@@ -96,7 +97,7 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
     public void setSelected(@Nullable Entry entry) {
         if (entry == null) return;
         this.playDownSound(this.minecraft.getSoundManager());
-        this.symbolConsumer.accept(entry.symbol);
+        this.context.fontTyper.typeSymbol(entry.symbol);
     }
 
     private int columns() {
@@ -217,8 +218,18 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
             int width = this.getContentWidth();
             int height = this.getContentHeight();
 
+            boolean colorPreview = BigSignWriterConfig.MAIN_CONFIG.alwaysColorSymbolPreviews
+                    || SymbolGridWidget.this.minecraft.hasShiftDown();
+            if (colorPreview || hovered) guiGraphics.fill(
+                    left - 1,
+                    top - 1,
+                    left + width + 1,
+                    top + height + 1,
+                    (colorPreview ? SymbolGridWidget.this.context.signColor : -1)
+                            & (hovered ? (colorPreview ? 0x80FFFFFF : 0x40FFFFFF) : -1)
+            );
+
             if (hovered) {
-                guiGraphics.fill(left - 1, top - 1, left + width + 1, top + height + 1, 0x40FFFFFF);
                 guiGraphics.setTooltipForNextFrame(
                         SymbolGridWidget.this.minecraft.font, this.tooltip, Optional.empty(), mouseX, mouseY
                 );
@@ -232,7 +243,9 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
                         left,
                         top,
                         width,
-                        height
+                        height,
+                        0,
+                        colorPreview ? SymbolGridWidget.this.context.textColor : -1
                 );
             } else GraphicsHelper.drawFontPreview(
                     guiGraphics,
@@ -240,7 +253,9 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
                     0.5F,
                     this.getContentXMiddle(),
                     top,
-                    height
+                    height,
+                    0,
+                    colorPreview ? SymbolGridWidget.this.context.textColor : -1
             );
         }
     }

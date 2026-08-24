@@ -394,7 +394,8 @@ public abstract class AbstractFontsTab extends ConfigTab<AbstractFontsTab.Abstra
                         this.getX(),
                         y + i * (PREVIEW_LINE_HEIGHT + previewGap),
                         PREVIEW_LINE_HEIGHT,
-                        1
+                        1,
+                        -1
                 );
             }
         }

@@ -4,12 +4,12 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import dev.chililisoup.bigsignwriter.BigFontTyper;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.gui.ClickableButtonWidget;
 import dev.chililisoup.bigsignwriter.gui.sign.FontSelectionWidget;
 import dev.chililisoup.bigsignwriter.gui.sign.SymbolPickerWidget;
 import dev.chililisoup.bigsignwriter.gui.config.BigSignWriterConfigScreen;
+import dev.chililisoup.bigsignwriter.input.SignEditContext;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -24,6 +24,7 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.entity.SignText;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
@@ -52,7 +53,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         return Component.literal(open ? "▼" : "▶");
     }
 
-    @Unique private @Nullable BigFontTyper bigSignWriter$fontTyper;
+    @Unique private @Nullable SignEditContext bigSignWriter$context;
     @Unique private @Nullable Button bigSignWriter$doneButton;
     @Unique private @Nullable SymbolPickerWidget bigSignWriter$symbolPicker;
     @Unique private boolean bigSignWriter$inSymbolPicker = false;
@@ -63,6 +64,9 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     @Shadow private void setMessage(String message) {}
     @Shadow private int line;
     @Shadow private @Nullable TextFieldHelper signField;
+
+    @Shadow
+    private SignText text;
 
     @Unique private int bigSignWriter$cursorHeight() {
         return this.bigSignWriter$inSymbolPicker ? 1 : BigSignWriter.height();
@@ -85,10 +89,11 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     private void bigSignWriterInit(CallbackInfo ci) {
         if (this.signField == null) return;
 
-        this.bigSignWriter$fontTyper = new BigFontTyper(
+        this.bigSignWriter$context = new SignEditContext(
                 this.sign,
+                this.text,
                 this.font,
-                this::bigSignWriter$cursorHeight,
+                () -> this.bigSignWriter$inSymbolPicker,
                 () -> this.line,
                 i -> this.line = i,
                 this.messages,
@@ -110,7 +115,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                 y,
                 20,
                 this.messages.length,
-                this.bigSignWriter$fontTyper::fixCursor
+                this.bigSignWriter$context.fontTyper::fixCursor
         );
 
         ClickableButtonWidget fontSelectorToggleButton = new ClickableButtonWidget(
@@ -152,7 +157,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         if (MAIN_CONFIG.showSymbolsButton) {
             SymbolPickerWidget symbolPicker = new SymbolPickerWidget(
                     this.minecraft,
-                    this.bigSignWriter$fontTyper,
+                    this.bigSignWriter$context,
                     x - halfButtonsWidth,
                     y,
                     buttonsWidth,
@@ -160,8 +165,8 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
                     this::repositionElements,
                     visible -> {
                         this.bigSignWriter$inSymbolPicker = visible;
-                        if (!visible && this.bigSignWriter$fontTyper != null)
-                            this.bigSignWriter$fontTyper.fixCursor();
+                        if (!visible && this.bigSignWriter$context != null)
+                            this.bigSignWriter$context.fontTyper.fixCursor();
 
                         if (fontSelector.isOpen()) fontSelector.setOpen(false);
                         fontSelector.visible = !visible;
@@ -190,7 +195,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
     @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
     private void charTypedInject(CharacterEvent event, CallbackInfoReturnable<Boolean> cir) {
-        if (this.bigSignWriter$fontTyper == null) return;
+        if (this.bigSignWriter$context == null) return;
 
         if (this.bigSignWriter$symbolPicker != null && this.bigSignWriter$symbolPicker.charTyped(event)) {
             cir.setReturnValue(true);
@@ -201,19 +206,19 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         cir.setReturnValue(true);
 
         char chr = Character.toChars(event.codepoint())[0];
-        this.bigSignWriter$fontTyper.charTyped(chr);
+        this.bigSignWriter$context.fontTyper.charTyped(chr);
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void keyPressedInject(KeyEvent event, CallbackInfoReturnable<Boolean> cir) {
-        if (this.bigSignWriter$fontTyper == null) return;
+        if (this.bigSignWriter$context == null) return;
 
         if (this.bigSignWriter$symbolPicker != null && this.bigSignWriter$symbolPicker.keyPressed(event)) {
             cir.setReturnValue(true);
             return;
         }
 
-        if (!BigSignWriter.isVanillaTyping() && this.bigSignWriter$fontTyper.keyPressed(event))
+        if (!BigSignWriter.isVanillaTyping() && this.bigSignWriter$context.fontTyper.keyPressed(event))
             cir.setReturnValue(true);
     }
 
@@ -238,14 +243,14 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             @Local(ordinal = 0) boolean showCursor,
             @Local(ordinal = 1) int cursorPos
     ) {
-        if (BigSignWriter.isVanillaTyping() || this.bigSignWriter$fontTyper == null) return;
+        if (BigSignWriter.isVanillaTyping() || this.bigSignWriter$context == null) return;
 
         if (!showCursor) {
             ci.cancel();
             return;
         }
 
-        String wideLine = this.bigSignWriter$fontTyper.getWidestMessage();
+        String wideLine = this.bigSignWriter$context.getWidestMessage();
         int lineHeight = this.sign.getTextLineHeight();
         int cursorHeight = this.bigSignWriter$cursorHeight();
         int cursorPosition = this.font.width(
@@ -261,7 +266,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         int opaqueColor = 0xFF000000 | color;
         guiGraphics.fill(cursorX, cursorY - 1, cursorX + 1, endY, opaqueColor);
 
-        int clampedLine = this.bigSignWriter$fontTyper.getClampedLine();
+        int clampedLine = this.bigSignWriter$context.getClampedLine();
         int fullHeight = Math.min(BigSignWriter.height(), this.messages.length - clampedLine);
         if (fullHeight > cursorHeight) {
             int trueY = (clampedLine - 2) * lineHeight;

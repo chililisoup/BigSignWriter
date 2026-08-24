@@ -120,6 +120,13 @@ public class OptionsTab extends ConfigTab<OptionsTab.OptionsSidePanel> {
                 Component.translatable("bigsignwriter.config.largeSymbolPreviews.desc")
         ));
         rowHelper.addChild(new OptionElement.BooleanOption(
+                workingConfig.alwaysColorSymbolPreviews,
+                defaults.alwaysColorSymbolPreviews,
+                value -> workingConfig.alwaysColorSymbolPreviews = value,
+                Component.translatable("bigsignwriter.config.alwaysColorSymbolPreviews"),
+                Component.translatable("bigsignwriter.config.alwaysColorSymbolPreviews.desc")
+        ));
+        rowHelper.addChild(new OptionElement.BooleanOption(
                 workingConfig.rememberOpenSymbolGroup,
                 defaults.rememberOpenSymbolGroup,
                 value -> workingConfig.rememberOpenSymbolGroup = value,

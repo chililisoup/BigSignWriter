@@ -1,6 +1,5 @@
 package dev.chililisoup.bigsignwriter.gui.sign;
 
-import dev.chililisoup.bigsignwriter.BigFontTyper;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.font.SymbolGroup;
@@ -8,6 +7,7 @@ import dev.chililisoup.bigsignwriter.gui.ClickableSprite;
 import dev.chililisoup.bigsignwriter.gui.ClickableText;
 import dev.chililisoup.bigsignwriter.gui.ClickableWidgetPart;
 import dev.chililisoup.bigsignwriter.gui.SimpleContainerWidget;
+import dev.chililisoup.bigsignwriter.input.SignEditContext;
 import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -33,7 +33,7 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
     private static @Nullable Identifier LAST_OPEN_GROUP;
 
     private final Minecraft minecraft;
-    private final BigFontTyper fontTyper;
+    private final SignEditContext context;
     private final Consumer<Boolean> onVisibilityToggle;
 
     private final SymbolGroupListWidget groupList;
@@ -48,7 +48,7 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
 
     public SymbolPickerWidget(
             Minecraft minecraft,
-            BigFontTyper fontTyper,
+            SignEditContext context,
             int x,
             int y,
             int width,
@@ -58,7 +58,7 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
     ) {
         super(x, y, width, height, Component.translatable("bigsignwriter.symbols"));
         this.minecraft = minecraft;
-        this.fontTyper = fontTyper;
+        this.context = context;
         this.onVisibilityToggle = onVisibilityToggle;
 
         this.groupList = new SymbolGroupListWidget(
@@ -72,7 +72,7 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
                 y + 28,
                 BigSignWriterConfig.MAIN_CONFIG.largeSymbolPreviews ? 30 : 20,
                 BigSignWriterConfig.MAIN_CONFIG.largeSymbolPreviews ? 22 : 16,
-                fontTyper::typeSymbol
+                this.context
         );
         this.symbolGrid.visible = false;
         this.symbolSaver = new SymbolSaveWidget(
@@ -195,7 +195,7 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
         this.searchBar.setVisible(false);
         this.groupList.visible = false;
         this.symbolGrid.visible = false;
-        this.symbolSaver.open(this.fontTyper.getMessages());
+        this.symbolSaver.open(this.context.messages.clone());
         this.setFocused(this.symbolSaver);
     }
 

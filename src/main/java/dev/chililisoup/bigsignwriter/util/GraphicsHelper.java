@@ -67,7 +67,7 @@ public final class GraphicsHelper {
         return getScaledWidth(font, lines, height, 0);
     }
 
-    public static void drawScrollingFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, int x, int y, int width, int height, int gap) {
+    public static void drawScrollingFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, int x, int y, int width, int height, int gap, int color) {
         float scale = getScale(fontPreview.length, height, gap);
         int scaledWidth = (int) (width / scale);
 
@@ -79,7 +79,7 @@ public final class GraphicsHelper {
         int previewWidth = font.width(fontPreview[0]);
         if (previewWidth <= scaledWidth) {
             for (int i = 0; i < fontPreview.length; i++)
-                guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], 0, i * (9 + gap), -1, false);
+                guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], 0, i * (9 + gap), color, false);
         } else {
             int scaledHeight = (int) (height / scale);
             int hiddenWidth = previewWidth - scaledWidth;
@@ -90,7 +90,7 @@ public final class GraphicsHelper {
             guiGraphics.enableScissor(0, 0, scaledWidth, scaledHeight);
 
             for (int i = 0; i < fontPreview.length; i++)
-                guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], -(int) scrollPos, i * (9 + gap), -1, false);
+                guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], -(int) scrollPos, i * (9 + gap), color, false);
 
             guiGraphics.disableScissor();
         }
@@ -99,10 +99,10 @@ public final class GraphicsHelper {
     }
 
     public static void drawScrollingFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, int x, int y, int width, int height) {
-        drawScrollingFontPreview(guiGraphics, fontPreview, x, y, width, height, 0);
+        drawScrollingFontPreview(guiGraphics, fontPreview, x, y, width, height, 0, -1);
     }
 
-    public static void drawFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, float anchorX, int x, int y, int height, int gap) {
+    public static void drawFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, float anchorX, int x, int y, int height, int gap, int color) {
         float scale = getScale(fontPreview.length, height, gap);
 
         guiGraphics.pose().pushMatrix();
@@ -113,13 +113,13 @@ public final class GraphicsHelper {
         int previewWidth = font.width(fontPreview[0]);
         int xOffset = (int) (anchorX * previewWidth);
         for (int i = 0; i < fontPreview.length; i++)
-            guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], -xOffset, i * (9 + gap), -1, false);
+            guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], -xOffset, i * (9 + gap), color, false);
 
         guiGraphics.pose().popMatrix();
     }
 
     public static void drawFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, float anchorX, int x, int y, int height) {
-        drawFontPreview(guiGraphics, fontPreview, anchorX, x, y, height, 0);
+        drawFontPreview(guiGraphics, fontPreview, anchorX, x, y, height, 0, -1);
     }
 
     public static List<Component[]> getWrappedFontPreview(FontInfo fontInfo, String text, int width, int lineHeight) {

@@ -37,6 +37,7 @@ public abstract class BigSignWriterConfig {
         public boolean showSymbolsButton = true;
         public boolean showSymbolSaveButton = true;
         public boolean largeSymbolPreviews = true;
+        public boolean alwaysColorSymbolPreviews = false;
         public boolean rememberOpenSymbolGroup = true;
         public boolean nonUSCharactersInSymbols = true;
         public HashSet<String> hiddenFonts = new HashSet<>();
