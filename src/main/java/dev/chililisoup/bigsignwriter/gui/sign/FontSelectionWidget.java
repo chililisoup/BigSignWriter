@@ -3,7 +3,7 @@ package dev.chililisoup.bigsignwriter.gui.sign;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
-import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
+import dev.chililisoup.bigsignwriter.config.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.font.FontInfo;
 import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
 import net.minecraft.ChatFormatting;

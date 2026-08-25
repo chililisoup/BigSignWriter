@@ -1,6 +1,6 @@
 package dev.chililisoup.bigsignwriter.gui.config;
 
-import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
+import dev.chililisoup.bigsignwriter.config.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.gui.DividerWidget;
 import dev.chililisoup.bigsignwriter.util.GraphicsHelper;
 import net.minecraft.ChatFormatting;
@@ -119,12 +119,12 @@ public class OptionsTab extends ConfigTab<OptionsTab.OptionsSidePanel> {
                 Component.translatable("bigsignwriter.config.largeSymbolPreviews"),
                 Component.translatable("bigsignwriter.config.largeSymbolPreviews.desc")
         ));
-        rowHelper.addChild(new OptionElement.BooleanOption(
-                workingConfig.alwaysColorSymbolPreviews,
-                defaults.alwaysColorSymbolPreviews,
-                value -> workingConfig.alwaysColorSymbolPreviews = value,
-                Component.translatable("bigsignwriter.config.alwaysColorSymbolPreviews"),
-                Component.translatable("bigsignwriter.config.alwaysColorSymbolPreviews.desc")
+        rowHelper.addChild(new OptionElement.EnumOption<>(
+                workingConfig.symbolColoringMode,
+                defaults.symbolColoringMode,
+                value -> workingConfig.symbolColoringMode = value,
+                Component.translatable("bigsignwriter.config.symbolColoringMode"),
+                Component.translatable("bigsignwriter.config.symbolColoringMode.desc")
         ));
         rowHelper.addChild(new OptionElement.BooleanOption(
                 workingConfig.rememberOpenSymbolGroup,

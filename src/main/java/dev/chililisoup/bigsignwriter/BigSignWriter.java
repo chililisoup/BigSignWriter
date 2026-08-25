@@ -3,6 +3,8 @@ package dev.chililisoup.bigsignwriter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import dev.chililisoup.bigsignwriter.config.BigSignWriterConfig;
+import dev.chililisoup.bigsignwriter.config.ConfigInterface;
 import dev.chililisoup.bigsignwriter.font.FamilyCharacterProvider;
 import dev.chililisoup.bigsignwriter.font.FontFile;
 import dev.chililisoup.bigsignwriter.font.FontInfo;
@@ -92,7 +94,7 @@ public final class BigSignWriter {
         BIG_FONT_MANAGER.selectFont(fontInfo);
     }
 
-    static void reselectFont() {
+    public static void reselectFont() {
         BIG_FONT_MANAGER.reselectFont();
     }
 
@@ -160,7 +162,7 @@ public final class BigSignWriter {
         }
     }
 
-    public static BigSignWriterConfig.ConfigInterface<FontFile> getFontFileInterface(Gson gson, Path path) {
-        return new BigSignWriterConfig.ConfigInterface<>(gson, new TypeToken<>() {}, path, new FontFile());
+    public static ConfigInterface<FontFile> getFontFileInterface(Gson gson, Path path) {
+        return new ConfigInterface<>(gson, new TypeToken<>() {}, path, new FontFile());
     }
 }

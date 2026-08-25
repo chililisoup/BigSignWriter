@@ -3,7 +3,7 @@ package dev.chililisoup.bigsignwriter.resources;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
-import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
+import dev.chililisoup.bigsignwriter.config.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.font.*;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;

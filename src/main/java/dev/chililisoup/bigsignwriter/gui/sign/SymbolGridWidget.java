@@ -1,7 +1,7 @@
 package dev.chililisoup.bigsignwriter.gui.sign;
 
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
-import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
+import dev.chililisoup.bigsignwriter.config.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.font.SymbolGroup;
 import dev.chililisoup.bigsignwriter.font.SymbolReference;
 import dev.chililisoup.bigsignwriter.input.SignEditContext;
@@ -218,8 +218,11 @@ public class SymbolGridWidget extends ObjectSelectionList<SymbolGridWidget.Entry
             int width = this.getContentWidth();
             int height = this.getContentHeight();
 
-            boolean colorPreview = BigSignWriterConfig.MAIN_CONFIG.alwaysColorSymbolPreviews
-                    || SymbolGridWidget.this.minecraft.hasShiftDown();
+            boolean colorPreview = switch (BigSignWriterConfig.MAIN_CONFIG.symbolColoringMode) {
+                case WHILE_HOLDING_SHIFT -> SymbolGridWidget.this.minecraft.hasShiftDown();
+                case ALWAYS -> true;
+                default -> false;
+            };
             if (colorPreview || hovered) guiGraphics.fill(
                     left - 1,
                     top - 1,

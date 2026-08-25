@@ -2,7 +2,7 @@ package dev.chililisoup.bigsignwriter.font;
 
 import dev.chililisoup.bigsignwriter.resources.BigFontManager;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
-import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
+import dev.chililisoup.bigsignwriter.config.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.util.ModUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;

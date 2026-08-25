@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.*;
+import static dev.chililisoup.bigsignwriter.config.BigSignWriterConfig.*;
 
 public class BigSignWriterConfigScreen extends Screen {
     private static final Component SCREEN_TITLE = Component.translatable("bigsignwriter.config");

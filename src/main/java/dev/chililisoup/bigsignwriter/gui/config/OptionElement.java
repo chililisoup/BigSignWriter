@@ -1,6 +1,7 @@
 package dev.chililisoup.bigsignwriter.gui.config;
 
 import dev.chililisoup.bigsignwriter.BigSignWriter;
+import dev.chililisoup.bigsignwriter.config.ConfigurableEnum;
 import dev.chililisoup.bigsignwriter.gui.AbstractLayoutElement;
 import dev.chililisoup.bigsignwriter.gui.IconButton;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -41,7 +42,7 @@ public class OptionElement<T> extends AbstractLayoutElement {
     public void setValue(T value) {
         this.value = value;
         this.resetButton.active = !defaultValue.equals(value);
-        this.controller.setValue(value);
+        this.controller.setValue(this);
         this.onChange.accept(value);
     }
 
@@ -110,6 +111,25 @@ public class OptionElement<T> extends AbstractLayoutElement {
                 Component description
         ) {
             this(value, defaultValue, 20, onChange, name, description);
+        }
+    }
+
+    public static class EnumOption<T extends ConfigurableEnum<T>> extends OptionElement<T> {
+        EnumOption(
+                T value,
+                T defaultValue,
+                Consumer<T> onChange,
+                Component name,
+                Component description
+        ) {
+            super(
+                    value,
+                    defaultValue,
+                    onChange,
+                    OptionController.EnumController::new,
+                    name,
+                    description
+            );
         }
     }
 }

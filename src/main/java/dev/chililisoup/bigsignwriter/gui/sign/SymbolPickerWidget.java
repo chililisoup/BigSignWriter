@@ -1,7 +1,7 @@
 package dev.chililisoup.bigsignwriter.gui.sign;
 
 import dev.chililisoup.bigsignwriter.BigSignWriter;
-import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
+import dev.chililisoup.bigsignwriter.config.BigSignWriterConfig;
 import dev.chililisoup.bigsignwriter.font.SymbolGroup;
 import dev.chililisoup.bigsignwriter.gui.ClickableSprite;
 import dev.chililisoup.bigsignwriter.gui.ClickableText;

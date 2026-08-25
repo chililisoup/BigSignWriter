@@ -1,19 +1,18 @@
-package dev.chililisoup.bigsignwriter;
+package dev.chililisoup.bigsignwriter.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
+import dev.chililisoup.bigsignwriter.BigSignWriter;
 import net.minecraft.resources.Identifier;
 
 import java.io.*;
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 
-public abstract class BigSignWriterConfig {
+public final class BigSignWriterConfig {
     public static final int CONFIG_VERSION = 3;
     public static final MainConfig MAIN_CONFIG = new MainConfig();
 
@@ -37,7 +36,7 @@ public abstract class BigSignWriterConfig {
         public boolean showSymbolsButton = true;
         public boolean showSymbolSaveButton = true;
         public boolean largeSymbolPreviews = true;
-        public boolean alwaysColorSymbolPreviews = false;
+        public SymbolColoringMode symbolColoringMode = SymbolColoringMode.WHILE_HOLDING_SHIFT;
         public boolean rememberOpenSymbolGroup = true;
         public boolean nonUSCharactersInSymbols = true;
         public HashSet<String> hiddenFonts = new HashSet<>();
@@ -161,7 +160,7 @@ public abstract class BigSignWriterConfig {
         }
     }
 
-    static Path getConfigDir() {
+    public static Path getConfigDir() {
         Path configDir = BigSignWriter.CONFIG_DIR;
         try {
             Files.createDirectories(configDir);
@@ -199,28 +198,5 @@ public abstract class BigSignWriterConfig {
         persistentConfig.save(new PersistentConfig().copyFrom(MAIN_CONFIG));
 
         BigSignWriter.LOGGER.debug(BigSignWriter.LOGGER_PREFIX + "Config loaded!");
-    }
-
-    public record ConfigInterface<T>(Gson gson, TypeToken<T> typeToken, Path path, T defaultConfig) {
-        public T load() {
-            try (InputStreamReader reader = new InputStreamReader(new FileInputStream(path.toFile()), StandardCharsets.UTF_8)) {
-                JsonReader jsonReader = new JsonReader(reader);
-                return gson.fromJson(jsonReader, typeToken);
-            } catch (FileNotFoundException e) {
-                this.save(defaultConfig);
-                return defaultConfig;
-            } catch (Exception e) {
-                BigSignWriter.LOGGER.error(BigSignWriter.LOGGER_PREFIX + "Failed to load config: {}", path.getFileName(), e);
-                return defaultConfig;
-            }
-        }
-
-        public void save(T config) {
-            try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(path.toFile()), StandardCharsets.UTF_8)) {
-                gson.toJson(config, writer);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 }

@@ -42,7 +42,7 @@ import org.joml.Vector2f;
 /*import org.spongepowered.asm.mixin.injection.ModifyVariable;
 *///?}
 
-import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.*;
+import static dev.chililisoup.bigsignwriter.config.BigSignWriterConfig.*;
 
 @Mixin(value = AbstractSignEditScreen.class, priority = 999)
 public abstract class AbstractSignEditScreenMixin extends Screen {

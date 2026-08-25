@@ -1,15 +1,19 @@
 package dev.chililisoup.bigsignwriter.gui.config;
 
+import dev.chililisoup.bigsignwriter.config.ConfigurableEnum;
 import dev.chililisoup.bigsignwriter.gui.DoubleSlider;
 import dev.chililisoup.bigsignwriter.gui.IntegerSlider;
 import dev.chililisoup.bigsignwriter.gui.LabeledEditBox;
 import dev.chililisoup.bigsignwriter.gui.TickBox;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
 
 import java.util.function.Function;
 
 public interface OptionController<T> {
-    void setValue(T value);
+    void setValue(OptionElement<T> option);
 
     AbstractWidget widget();
 
@@ -19,8 +23,8 @@ public interface OptionController<T> {
         }
 
         @Override
-        public void setValue(Boolean value) {
-            this.tickBox.value = value;
+        public void setValue(OptionElement<Boolean> option) {
+            this.tickBox.value = option.value;
         }
 
         @Override
@@ -35,8 +39,8 @@ public interface OptionController<T> {
         }
 
         @Override
-        public void setValue(Integer value) {
-            this.slider.setValueFrom(value);
+        public void setValue(OptionElement<Integer> option) {
+            this.slider.setValueFrom(option.value);
         }
 
         @Override
@@ -56,8 +60,8 @@ public interface OptionController<T> {
         }
 
         @Override
-        public void setValue(Double value) {
-            this.slider.setValueFrom(value);
+        public void setValue(OptionElement<Double> option) {
+            this.slider.setValueFrom(option.value);
         }
 
         @Override
@@ -72,13 +76,36 @@ public interface OptionController<T> {
         }
 
         @Override
-        public void setValue(String value) {
-            this.editBox.setValueSilent(value);
+        public void setValue(OptionElement<String> option) {
+            this.editBox.setValueSilent(option.value);
         }
 
         @Override
         public AbstractWidget widget() {
             return this.editBox;
+        }
+    }
+
+    record EnumController<T extends ConfigurableEnum<T>>(Button button) implements OptionController<T> {
+        public EnumController(OptionElement<T> option) {
+            this(Button.builder(
+                    createButtonMessage(option),
+                    button -> option.setValue(option.value.next())
+            ).build());
+        }
+
+        private static<T extends ConfigurableEnum<T>> Component createButtonMessage(OptionElement<T> option) {
+            return CommonComponents.optionNameValue(option.name, option.value.valueName());
+        }
+
+        @Override
+        public void setValue(OptionElement<T> option) {
+            this.button.setMessage(createButtonMessage(option));
+        }
+
+        @Override
+        public AbstractWidget widget() {
+            return this.button;
         }
     }
 }

@@ -3,7 +3,7 @@ package dev.chililisoup.bigsignwriter.resources;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
-import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
+import dev.chililisoup.bigsignwriter.config.ConfigInterface;
 import dev.chililisoup.bigsignwriter.font.FontFile;
 
 import java.nio.file.Path;
@@ -63,8 +63,8 @@ public final class UserSymbolsManager {
         if (source.symbols != null) USER_SYMBOLS.putAll(source.symbols);
     }
 
-    private static BigSignWriterConfig.ConfigInterface<FontFile> getUserFontInterface(Path path) {
-        return new BigSignWriterConfig.ConfigInterface<>(
+    private static ConfigInterface<FontFile> getUserFontInterface(Path path) {
+        return new ConfigInterface<>(
                 new GsonBuilder().setPrettyPrinting().create(), new TypeToken<>() {}, path, createEmpty()
         );
     }

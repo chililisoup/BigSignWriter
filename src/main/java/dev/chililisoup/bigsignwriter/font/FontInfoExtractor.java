@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.MAIN_CONFIG;
+import static dev.chililisoup.bigsignwriter.config.BigSignWriterConfig.MAIN_CONFIG;
 
 public final class FontInfoExtractor {
     public static Map<Identifier, FontInfoExtraction> prepareFonts(Map<Identifier, FontFile> fontSources) {
