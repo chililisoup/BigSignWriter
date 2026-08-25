@@ -412,7 +412,12 @@ public record BigFontTyper(SignEditContext context) {
             return true;
         }
 
-        if (keyEvent.key() != 259) return false;
+        //? if >= 26.3 {
+        if (keyEvent.key() != 42)
+        //?} else
+        //if (keyEvent.key() != 259)
+            return false;
+
         this.deleteBigChar(keyEvent);
         return true;
     }

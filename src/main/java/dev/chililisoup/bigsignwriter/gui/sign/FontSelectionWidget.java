@@ -149,8 +149,6 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
 
     @Override
     public boolean mouseClicked(@NotNull MouseButtonEvent mouseButtonEvent, boolean doubleClick) {
-        BigSignWriter.LOGGER.info(mouseButtonEvent);
-
         if (!this.open) {
             if (this.isValidClickButton(mouseButtonEvent.buttonInfo())) {
                 this.setOpen(true);
