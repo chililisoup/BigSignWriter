@@ -169,10 +169,7 @@ public class SymbolSaveWidget extends SimpleContainerWidget {
     @Override
     public boolean mouseClicked(@NotNull MouseButtonEvent mouseButtonEvent, boolean doubleClick) {
         if (!this.isActive()) return false;
-
-        if (this.parts().stream().anyMatch(part -> part.mouseClicked(mouseButtonEvent)))
-            return true;
-
+        if (this.clickParts(this.parts(), mouseButtonEvent)) return true;
         return super.mouseClicked(mouseButtonEvent, doubleClick);
     }
 

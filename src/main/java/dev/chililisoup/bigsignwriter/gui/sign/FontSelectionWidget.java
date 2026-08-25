@@ -148,17 +148,18 @@ public class FontSelectionWidget extends ObjectSelectionList<FontSelectionWidget
     }
 
     @Override
-    public boolean mouseClicked(@NotNull MouseButtonEvent event, boolean doubleClick) {
+    public boolean mouseClicked(@NotNull MouseButtonEvent mouseButtonEvent, boolean doubleClick) {
+        BigSignWriter.LOGGER.info(mouseButtonEvent);
+
         if (!this.open) {
-            int button = event.button();
-            if (button == 0) {
+            if (this.isValidClickButton(mouseButtonEvent.buttonInfo())) {
                 this.setOpen(true);
                 this.playDownSound(this.minecraft.getSoundManager());
             }
             return true;
         }
 
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(mouseButtonEvent, doubleClick);
     }
 
     @Override

@@ -260,10 +260,7 @@ public class SymbolPickerWidget extends SimpleContainerWidget {
         )) this.setFocused(null);
 
         if (!this.isActive()) return false;
-
-        if (this.parts().stream().anyMatch(part -> part.mouseClicked(mouseButtonEvent)))
-            return true;
-
+        if (this.clickParts(this.parts(), mouseButtonEvent)) return true;
         return super.mouseClicked(mouseButtonEvent, doubleClick);
     }
 

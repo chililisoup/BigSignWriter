@@ -21,6 +21,11 @@ public abstract class SimpleContainerWidget extends AbstractWidget implements Co
         super(x, y, width, height, message);
     }
 
+    protected boolean clickParts(List<ClickableWidgetPart> parts, MouseButtonEvent mouseButtonEvent) {
+        return this.isValidClickButton(mouseButtonEvent.buttonInfo())
+                && parts.stream().anyMatch(part -> part.mouseClicked(mouseButtonEvent));
+    }
+
     @Override
     public abstract @NotNull List<AbstractWidget> children();
 

@@ -43,6 +43,7 @@ stonecutter {
 
         // Configure your targets here!
         ml(listOf(
+            "26.3",
             "26.2",
             "26.1"
         ))
@@ -51,7 +52,7 @@ stonecutter {
 
         // This is the default target.
         // https://stonecutter.kikugie.dev/stonecutter/guide/setup#settings-settings-gradle-kts
-        vcsVersion = "26.2"
+        vcsVersion = "26.3"
     }
 }
 

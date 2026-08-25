@@ -43,7 +43,7 @@ public abstract class ClickableWidgetPart {
     }
 
     public boolean mouseClicked(MouseButtonEvent mouseButtonEvent) {
-        if (!this.visible || mouseButtonEvent.button() != 0 || !this.hovered(mouseButtonEvent))
+        if (!this.visible || !this.hovered(mouseButtonEvent))
             return false;
 
         AbstractWidget.playButtonClickSound(Minecraft.getInstance().getSoundManager());

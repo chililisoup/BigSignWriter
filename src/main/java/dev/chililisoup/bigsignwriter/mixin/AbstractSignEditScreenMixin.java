@@ -60,13 +60,12 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     @Unique private boolean bigSignWriter$ignoreNextRemoval = false;
 
     @Shadow protected @Final SignBlockEntity sign;
+    @Shadow /*? if >= 26.3 {*/@Final/*?}*/ private SignText/*? if >= 26.3 {*/.Mutable/*?}*/ text;
     @Shadow private @Final String[] messages;
-    @Shadow private void setMessage(String message) {}
     @Shadow private int line;
-    @Shadow private @Nullable TextFieldHelper signField;
+    @Shadow /*? if >= 26.3 {*/@Final/*?}*/ private @Nullable TextFieldHelper signField;
 
-    @Shadow
-    private SignText text;
+    @Shadow private void setMessage(String message) {}
 
     @WrapOperation(
             method = "init",
@@ -87,7 +86,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
         this.bigSignWriter$context = new SignEditContext(
                 this.sign,
-                this.text,
+                this.text/*? if >= 26.3 {*/.asImmutable()/*?}*/,
                 this.font,
                 () -> this.bigSignWriter$inSymbolPicker,
                 () -> this.line,
