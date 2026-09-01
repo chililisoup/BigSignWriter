@@ -13,6 +13,12 @@ A client-side utility mod that lets you easily add large, multi-line characters 
 
 <hr>
 
+> [!IMPORTANT]
+> ## Development of Big Sign Writer continues on [Codeberg](https://codeberg.org/chililisoup/BigSignWriter)
+> Code changes will not be mirrored here.
+
+<hr>
+
 <p align="center">
 <img alt="'BIG SIGN WRITER' written across several signs in large text" src="https://cdn.modrinth.com/data/cached_images/e349049404a0248aae271832dce2551e29134458_0.webp">
 </p>
