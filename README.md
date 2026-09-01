@@ -23,4 +23,4 @@ Big Sign Writer adds plenty of fonts and hundreds of symbols ready for use, easi
 
 The mod is highly configurable, with an in-game config screen accessible by default through the sign edit screen, or [Mod Menu](https://modrinth.com/mod/modmenu) on Fabric and NeoForge's mod list.
 
-For more information, check out the [wiki](https://github.com/chililisoup/BigSignWriter/wiki)!
+For more information, check out the [wiki](https://codeberg.org/chililisoup/BigSignWriter/wiki)!
