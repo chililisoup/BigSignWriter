@@ -1,8 +1,8 @@
-<p align="center"><img width="128" alt="Big Sign Writer Logo" src="https://github.com/user-attachments/assets/3e093f83-022e-42f4-96b5-39fac32d204c"></p>
+<p align="center"><img width="128" alt="Big Sign Writer Logo" src="src/main/resources/assets/bigsignwriter/icon.png"></p>
 
 <h1 align="center">Big Sign Writer</h1>
 
-A client-side utility mod that eases inputting text onto signs that forms larger letters! Just turn the toggle on in the sign editing UI, and type as normal! Each large character is made up of smaller, normal Unicode characters from the vanilla Minecraft font, allowing this mod to work on most servers.
+A client-side utility mod that lets you easily add large, multi-line characters and symbols to your signs! Each of the mod's characters/symbols are made up of regular Unicode characters from the vanilla Minecraft font, allowing this mod to work on most servers and be seen by most players, even without the mod!
 
 **Certain resource packs may cause issues.**
 
@@ -19,35 +19,8 @@ A client-side utility mod that eases inputting text onto signs that forms larger
 
 <hr>
 
-A button is added to the sign editing GUI to switch between large letter typing and normal. This button's position can be changed in the config file. (`config/bigsignwriter/config.json`)
+Big Sign Writer adds plenty of fonts and hundreds of symbols ready for use, easily accessible from vanilla Minecraft's sign edit screen.
 
-Most default fonts have large characters for all uppercase letters, all numbers, and a few additional symbols. Custom fonts can be added in the 'fonts' folder. (`config/bigsignwriter/fonts/`)
+The mod is highly configurable, with an in-game config screen accessible by default through the sign edit screen, or [Mod Menu](https://modrinth.com/mod/modmenu) on Fabric and NeoForge's mod list.
 
-<hr>
-<details>
-<summary>Configuration</summary>
-<br>
-The config and font files are loaded once at runtime, and can be reloaded through the in-game config screen.
-
-<hr>
-
-### `config/bigsignwriter/config.json`
-Contains the general mod configuration. Can be edited through the in-game config screen, accessible by default through the sign edit screen, or [Mod Menu](https://modrinth.com/mod/modmenu) on Fabric and NeoForge's mod list.
-
-<hr>
-
-### `config/bigsignwriter/fonts/`
-Folder where you can put custom fonts! You can create copies of the default fonts from the in-game config screen, which will go here.
-
-Custom fonts are .json files, which contain a `"name":""` field, an optional `"characterSeparator":""` field, which can override which character(s) to use in between letters, and a `"characters":{}` field containing every large character and the normal character they represent. You may add additional characters, as long as what you want replaced is a single, type-able character. There's also an optional `"credits":""` field for adding credits, and an optional `"parentFont":""` field for explicitly defining which font to inherit characters from (based on filename without ".json", or built-in id).
-
-When editing/creating large characters, it is important that each line is the exact same width to maintain alignment. Different fonts will have different widths for different characters, so it is a good idea to make these directly inside Minecraft, and then copy each line into the config file.
-
-The default 'T' is a good example, the top line is 3 blocks, which are 9 pixels wide each, making for a total of 27 pixels. Each subsequent line has one block, then on both sides of the block there is 1 space (4 pixels wide), and 1 "no-break space" (5 pixels wide), bringing the total in line at 27.
-
-To check that your alignment is good, I like to copy three blocks `███` onto both sides of each line, then modify each line until all the blocks are in line with each other.
-
-A massively helpful tool to aid in this process is [Symbol Chat](https://modrinth.com/mod/symbol-chat), which adds a menu where you can filter every available Unicode character by their width, among other things.
-
-</details>
-
+For more information, check out the [wiki](https://github.com/chililisoup/BigSignWriter/wiki)!

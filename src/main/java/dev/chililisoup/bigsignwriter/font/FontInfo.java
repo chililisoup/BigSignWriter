@@ -1,38 +1,45 @@
 package dev.chililisoup.bigsignwriter.font;
 
+import dev.chililisoup.bigsignwriter.resources.BigFontManager;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
-import dev.chililisoup.bigsignwriter.BigSignWriterConfig;
+import dev.chililisoup.bigsignwriter.config.BigSignWriterConfig;
+import dev.chililisoup.bigsignwriter.util.ModUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class FontInfo {
+public class FontInfo implements FamilyCharacterProvider {
     public final FontFile fontFile;
-    public final String source;
-    public final String id;
-    private boolean relationsChecked = false;
-    private @Nullable FontInfo parentFont = null;
-    private @Nullable FontInfo rootAncestorFont = null;
-    private boolean infoChecked = false;
-    private @Nullable Component error = null;
-    private @Nullable TreeSet<Character> cumulativeCharacters = null;
-    private String widthInfo = "0";
-    private @Nullable String cumulativeWidthInfo = null;
-    private @Nullable List<FontInfo> children = null;
+    public final Identifier id;
+    private final @Nullable FontInfo parentFont;
+    private final @Nullable FontInfo rootAncestorFont;
+    private final @Nullable Component error;
+    private final Set<Character> cumulativeCharacters;
+    private final String widthInfo;
+    private final @Nullable String cumulativeWidthInfo;
+    private final Map<String, String[]> symbols;
+    private final @Nullable Component symbolError;
+    private final String symbolWidthInfo;
+    private final String symbolHeightInfo;
+    private List<FontInfo> children;
 
-    FontInfo(FontFile fontFile, String source) {
-        this.fontFile = fontFile;
-        this.source = source;
-
-        String builtInName = this.getBuiltInName();
-        if (builtInName != null) this.id = builtInName;
-        else {
-            int index = source.lastIndexOf(".json");
-            this.id = index > 0 ? source.substring(0, index) : source;
-        }
+    FontInfo(FontInfoExtractor.FontInfoExtraction extraction) {
+        this.fontFile = extraction.fontFile;
+        this.id = extraction.id;
+        this.parentFont = extraction.parentFontInfo();
+        this.rootAncestorFont = extraction.rootAncestorFont();
+        this.error = extraction.error;
+        this.cumulativeCharacters = extraction.cumulativeCharacters();
+        this.widthInfo = extraction.widthInfo;
+        this.cumulativeWidthInfo = extraction.cumulativeWidthInfo;
+        this.symbols = extraction.symbols();
+        this.symbolError = extraction.symbolError;
+        this.symbolWidthInfo = extraction.symbolWidthInfo;
+        this.symbolHeightInfo = extraction.symbolHeightInfo;
     }
 
     public String name() {
@@ -44,7 +51,7 @@ public class FontInfo {
     }
 
     public int height() {
-        return this.fontFile.height > 0 ? this.fontFile.height : 4;
+        return this.fontFile.getHeight();
     }
 
     public String characterSeparator() {
@@ -53,47 +60,51 @@ public class FontInfo {
                 (this.fontFile.characterSeparator != null ? this.fontFile.characterSeparator : " ");
     }
 
+    @Override
     public Map<Character, String[]> characters() {
-        return this.fontFile.characters;
+        return this.fontFile.getCharacters();
     }
 
     public Set<Character> cumulativeCharacters() {
-        if (this.cumulativeCharacters != null) return this.cumulativeCharacters;
-        if (!this.hasExplicitParent()) return this.characters().keySet();
-
-        this.cumulativeCharacters = new TreeSet<>(FontFile::compareChars);
-        FontInfo nextFont = this;
-        while (nextFont != null) {
-            this.cumulativeCharacters.addAll(nextFont.characters().keySet());
-            nextFont = nextFont.parentFont();
-        }
         return this.cumulativeCharacters;
     }
 
+    public Map<String, String[]> symbols() {
+        return this.symbols;
+    }
+
+    public Map<String, String[]> explicitSymbols() {
+        return this.fontFile.symbols != null ? this.fontFile.symbols : Map.of();
+    }
+
+    @Override
     public @Nullable FontInfo parentFont() {
-        this.checkRelations();
         return this.parentFont;
     }
 
     public @Nullable FontInfo rootAncestorFont() {
-        this.checkRelations();
         return this.rootAncestorFont;
     }
 
+    @Override
     public boolean parentIsImplicit() {
-        return this.fontFile.parentFont == null;
+        return this.fontFile.parentFont().isEmpty();
     }
 
     public boolean hasExplicitParent() {
         return !this.parentIsImplicit() && this.parentFont() != null;
     }
 
-    private void checkRelations() {
-        if (this.relationsChecked) return;
-        this.relationsChecked = true;
+    public boolean hasCharacters() {
+        return !this.cumulativeCharacters.isEmpty();
+    }
 
-        this.parentFont = this.findParent();
-        this.rootAncestorFont = this.findRootAncestor();
+    public boolean hasSymbols() {
+        return !this.symbols.isEmpty();
+    }
+
+    public boolean hasExplicitSymbols() {
+        return !this.explicitSymbols().isEmpty();
     }
 
     public boolean isBroken() {
@@ -104,12 +115,22 @@ public class FontInfo {
         return !this.isBroken();
     }
 
-    public boolean isBuiltIn() {
-        return this.getBuiltInName() != null;
+    public boolean areSymbolsBroken() {
+        return this.symbolError() != null;
+    }
+
+    public boolean areSymbolsWorking() {
+        return !this.areSymbolsBroken();
+    }
+
+    public boolean isFromConfigFolder() {
+        return this.id.getNamespace().equals(BigSignWriter.MOD_ID)
+                && this.id.getPath().startsWith("user/")
+                && this.id.getPath().endsWith(".json");
     }
 
     public boolean isVisible(BigSignWriterConfig.PersistentConfig config) {
-        return !config.hiddenFonts.contains(this.source);
+        return !config.isFontHidden(this.id);
     }
 
     public boolean isVisible() {
@@ -117,42 +138,42 @@ public class FontInfo {
     }
 
     public void setVisible(BigSignWriterConfig.PersistentConfig config, boolean visible) {
-        if (visible) config.hiddenFonts.remove(this.source);
-        else config.hiddenFonts.add(this.source);
+        if (visible) config.showFont(this.id);
+        else config.hideFont(this.id);
+    }
+
+    public boolean isDefault() {
+        return this.id.equals(BigFontManager.DEFAULT_FONT_ID);
+    }
+
+    public @Nullable Component error() {
+        return this.error;
     }
 
     public String widthInfo() {
-        this.ensureInfoReady();
         return this.widthInfo;
     }
 
     public @Nullable String cumulativeWidthInfo() {
-        this.ensureInfoReady();
         return this.cumulativeWidthInfo;
     }
 
-    public @Nullable String getBuiltInName() {
-        String[] fontSource = this.source.split("/");
-        return fontSource.length == 2 && fontSource[0].equals("builtin") ?
-                fontSource[1] : null;
+    public @Nullable Component symbolError() {
+        return this.symbolError;
     }
 
-    public @Nullable Component error() {
-        this.ensureInfoReady();
-        return this.error;
+    public String symbolWidthInfo() {
+        return this.symbolWidthInfo;
     }
 
-    private void ensureInfoReady() {
-        if (!this.infoChecked) {
-            this.infoChecked = true;
-            this.error = this.extractInfo();
-        }
+    public String symbolHeightInfo() {
+        return this.symbolHeightInfo;
     }
 
     public List<FontInfo> children() {
         if (this.children != null) return this.children;
 
-        this.children = BigSignWriter.AVAILABLE_FONTS.stream()
+        this.children = BigSignWriter.availableFonts().stream()
                 .filter(font -> font.rootAncestorFont() == this)
                 .toList();
 
@@ -161,118 +182,6 @@ public class FontInfo {
 
     public List<FontInfo> visibleChildren() {
         return this.children().stream().filter(FontInfo::isVisible).toList();
-    }
-
-    private @Nullable Component extractInfo() {
-        if (this.fontFile.height <= 0) return Component.translatable(
-                "bigsignwriter.font.error.invalidHeight",
-                fontFile.height
-        );
-
-        this.checkRelations();
-        if (this.fontFile.characters.isEmpty()) {
-            if (!this.parentIsImplicit() && this.parentFont != null)
-                this.cumulativeWidthInfo = this.parentFont.widthInfo();
-            return null;
-        }
-
-        Font font = Minecraft.getInstance().font;
-        Set<Character> cumulativeCharacters = this.cumulativeCharacters();
-        ArrayList<Integer> ownWidths = new ArrayList<>(this.fontFile.characters.size());
-        ArrayList<Integer> cumulativeWidths = new ArrayList<>(cumulativeCharacters.size());
-
-        for (char chr : cumulativeCharacters) {
-            String[] bigChar = this.fontFile.characters.get(chr);
-            if (bigChar == null && this.parentFont != null)
-                bigChar = BigSignWriter.getBigChar(chr, this.parentFont).orElse(null);
-            if (bigChar == null) continue;
-
-            if (bigChar.length != this.fontFile.height) return Component.translatable(
-                    "bigsignwriter.font.error.wrongLineCount",
-                    String.valueOf(chr),
-                    bigChar.length,
-                    this.fontFile.height
-            );
-
-            int[] widths = new int[bigChar.length];
-            int topWidth = font.width(bigChar[0]);
-            widths[0] = topWidth;
-
-            if (this.fontFile.characters.containsKey(chr)) {
-                boolean unfixed = false;
-                for (int i = 1; i < bigChar.length; i++) {
-                    widths[i] = font.width(bigChar[i]);
-                    if (widths[i] != widths[0]) unfixed = true;
-                }
-                if (unfixed) return Component.translatable(
-                        "bigsignwriter.font.error.unfixedWidth",
-                        String.valueOf(chr),
-                        Arrays.toString(widths)
-                );
-
-                ownWidths.add(topWidth);
-            }
-
-            cumulativeWidths.add(topWidth);
-        }
-
-        this.widthInfo = createWidthInfo(ownWidths);
-        if (!this.parentIsImplicit()) {
-            String cumulativeWidthInfo = createWidthInfo(cumulativeWidths);
-            if (!this.widthInfo.equals(cumulativeWidthInfo))
-                this.cumulativeWidthInfo = cumulativeWidthInfo;
-        }
-
-        return null;
-    }
-
-    private static String createWidthInfo(ArrayList<Integer> widths) {
-        int minWidth = Collections.min(widths);
-        int maxWidth = Collections.max(widths);
-        return minWidth == maxWidth ?
-                String.valueOf(minWidth) :
-                String.format(
-                        "%d-%d ~%.2f",
-                        minWidth,
-                        maxWidth,
-                        (float) widths.stream().mapToInt(Integer::intValue).sum() / widths.size()
-                );
-    }
-
-    private @Nullable FontInfo findParent() {
-        if (this == BigSignWriter.DEFAULT_FONT) return null;
-
-        FontInfo parentFont = null;
-        if (this.fontFile.parentFont == null) {
-            if (this.height() == 4) {
-                parentFont = BigSignWriter.DEFAULT_FONT;
-            } else return null;
-        } else for (FontInfo fontInfo : BigSignWriter.AVAILABLE_FONTS) {
-            if (this == fontInfo) continue;
-            if (fontInfo.id.equals(this.fontFile.parentFont)) {
-                parentFont = fontInfo;
-                break;
-            }
-        }
-
-        if (parentFont == null) return null;
-        if (parentFont.height() != this.height()) return null;
-
-        boolean explicit = !this.parentIsImplicit();
-        for (char chr : parentFont.characters().keySet()) {
-            if (!this.characters().containsKey(chr)
-                    && (explicit || !this.characters().containsKey(Character.toUpperCase(chr)))
-            ) return parentFont;
-        }
-
-        return null;
-    }
-
-    private @Nullable FontInfo findRootAncestor() {
-        if (this.parentIsImplicit()) return null;
-        return this.parentFont != null && this.parentFont.hasExplicitParent() ?
-                this.parentFont.findRootAncestor() :
-                this.parentFont;
     }
 
     public final Component[] getPreview(String text, String characterSeparator) {
@@ -284,7 +193,9 @@ public class FontInfo {
     }
 
     public final Component[] getPreview() {
-        return this.getPreview(this.name());
+        return this.hasCharacters() ?
+                this.getPreview(this.name()) :
+                new Component[]{ Component.literal(this.name()) };
     }
 
     private static Component[] getFontPreview(FontInfo fontInfo, String text, String characterSeparator) {
@@ -300,6 +211,112 @@ public class FontInfo {
         }
 
         if (lines.isEmpty()) return new Component[0];
+
+        Component[] preview = new Component[height];
+        for (int i = 0; i < lines.size(); i++)
+            preview[i] = Component.literal(String.join(characterSeparator, lines.get(i)));
+
+        return preview;
+    }
+
+    public final List<Component[]> getWrappedFontPreview(String text, int width) {
+        return getWrappedFontPreview(
+                this,
+                text,
+                this.characterSeparator().isEmpty() ? " " : this.characterSeparator(),
+                width
+        );
+    }
+
+    private static List<Component[]> getWrappedFontPreview(FontInfo fontInfo, String text, String characterSeparator, int width) {
+        Font font = Minecraft.getInstance().font;
+        float separatorWidth = font.width(characterSeparator);
+
+        ArrayList<Component[]> previewLines = new ArrayList<>();
+        StringBuilder runningString = new StringBuilder();
+        float runningWidth = 0F;
+
+        for (char chr : text.toCharArray()) {
+            String top = BigSignWriter.getBigChar(chr, fontInfo).orElse(new String[]{""})[0];
+
+            float chrWidth = font.width(top);
+            if (runningWidth > 0 && runningWidth + chrWidth > width) {
+                if (!runningString.isEmpty())
+                    previewLines.add(fontInfo.getPreview(runningString.toString(), characterSeparator));
+
+                runningWidth = separatorWidth + chrWidth;
+                runningString = new StringBuilder(String.valueOf(chr));
+            } else {
+                runningWidth += separatorWidth + chrWidth;
+                runningString.append(chr);
+            }
+        }
+
+        if (!runningString.isEmpty())
+            previewLines.add(fontInfo.getPreview(runningString.toString(), characterSeparator));
+
+        return previewLines;
+    }
+
+    public final List<Component[]> getWrappedSymbolsPreview(int width) {
+        String characterSeparator = this.characterSeparator().isEmpty() ? " " : this.characterSeparator();
+        return getWrappedSymbolsPreview(
+                this.symbols.entrySet().stream()
+                        .filter(entry -> SymbolGroup.filterFromInclude(entry.getKey()))
+                        .map(Map.Entry::getValue)
+                        .toList(),
+                characterSeparator + characterSeparator,
+                width
+        );
+    }
+
+    private static List<Component[]> getWrappedSymbolsPreview(Collection<String[]> symbols, String characterSeparator, int width) {
+        Font font = Minecraft.getInstance().font;
+        float separatorWidth = font.width(characterSeparator);
+
+        ArrayList<Component[]> previewLines = new ArrayList<>();
+        ArrayList<String[]> runningLine = new ArrayList<>();
+        float runningWidth = 0F;
+
+        for (String[] symbol : symbols) {
+            float symbolWidth = font.width(symbol[0]);
+            if (runningWidth > 0 && runningWidth + symbolWidth > width) {
+                if (!runningLine.isEmpty())
+                    previewLines.add(joinSymbols(runningLine, characterSeparator));
+
+                runningWidth = separatorWidth + symbolWidth;
+                runningLine.clear();
+                runningLine.add(symbol);
+            } else {
+                runningWidth += separatorWidth + symbolWidth;
+                runningLine.add(symbol);
+            }
+        }
+
+        if (!runningLine.isEmpty())
+            previewLines.add(joinSymbols(runningLine, characterSeparator));
+
+        return previewLines;
+    }
+
+    private static Component[] joinSymbols(ArrayList<String[]> separatedSymbols, String characterSeparator) {
+        int height = separatedSymbols.stream()
+                .map(symbol -> symbol.length)
+                .max(Integer::compareTo)
+                .orElse(0);
+        if (height == 0) return new Component[0];
+
+        ArrayList<ArrayList<String>> lines = new ArrayList<>(height);
+        for (int i = 0; i < height; i++) lines.add(new ArrayList<>());
+
+        Font font = Minecraft.getInstance().font;
+        for (String[] symbol : separatedSymbols) {
+            String filler = symbol.length < height ?
+                    ModUtil.getGapFiller(font.width(symbol[0])) :
+                    "";
+            for (int i = 0; i < height; i++)
+                lines.get(i).add(i < symbol.length ? symbol[i] : filler);
+        }
 
         Component[] preview = new Component[height];
         for (int i = 0; i < lines.size(); i++)

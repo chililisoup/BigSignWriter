@@ -1,0 +1,202 @@
+package dev.chililisoup.bigsignwriter.config;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import dev.chililisoup.bigsignwriter.BigSignWriter;
+import net.minecraft.resources.Identifier;
+
+import java.io.*;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashSet;
+
+public final class BigSignWriterConfig {
+    public static final int CONFIG_VERSION = 3;
+    public static final MainConfig MAIN_CONFIG = new MainConfig();
+
+    public static void init() {}
+
+    static {
+        loadConfig();
+    }
+
+    public static class PersistentConfig {
+        public int configVersionDontTouch = 0; // Current config version set in CONFIG_VERSION
+        public int buttonsX = 0;
+        public int buttonsY = 120;
+        public int buttonsWidth = 200;
+        public double buttonsAlignmentX = 0.5;
+        public double buttonsAlignmentY = 0.25;
+        public boolean fontSelectorCoversDoneButton = true;
+        public boolean fontSelectorOpensScrolledUp = true;
+        public boolean displayFontHeights = true;
+        public boolean showConfigButton = true;
+        public boolean showSymbolsButton = true;
+        public boolean showSymbolSaveButton = true;
+        public boolean largeSymbolPreviews = true;
+        public SymbolColoringMode symbolColoringMode = SymbolColoringMode.WHILE_HOLDING_SHIFT;
+        public boolean rememberOpenSymbolGroup = true;
+        public boolean nonUSCharactersInSymbols = true;
+        public HashSet<String> hiddenFonts = new HashSet<>();
+
+        static PersistentConfig initial() {
+            PersistentConfig initial = new PersistentConfig();
+            initial.configVersionDontTouch = CONFIG_VERSION;
+            return initial;
+        }
+
+        public PersistentConfig copyFrom(PersistentConfig other) {
+            for (Field field : PersistentConfig.class.getDeclaredFields()) {
+                try {
+                    if (field.getType() == HashSet.class) continue;
+                    field.set(this, field.get(other));
+                } catch (IllegalAccessException ignored) {}
+            }
+
+            this.hiddenFonts = new HashSet<>(other.hiddenFonts);
+
+            return this;
+        }
+
+        public boolean isFontHidden(Identifier id) {
+            return this.hiddenFonts.contains(id.toString());
+        }
+
+        public void showFont(Identifier id) {
+            this.hiddenFonts.remove(id.toString());
+        }
+
+        public void hideFont(Identifier id) {
+            this.hiddenFonts.add(id.toString());
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (other == this) return true;
+            if (!(other instanceof PersistentConfig)) return false;
+            for (Field field : PersistentConfig.class.getDeclaredFields()) {
+                try {
+                    if (!field.get(this).equals(field.get(other)))
+                        return false;
+                } catch (IllegalAccessException ignored) {}
+            }
+            return true;
+        }
+
+        void migrateVersion() {
+            if (this.configVersionDontTouch >= CONFIG_VERSION) return;
+
+            BigSignWriter.LOGGER.info(
+                    BigSignWriter.LOGGER_PREFIX + "Migrating config from version {}",
+                    this.configVersionDontTouch
+            );
+
+            // Hidden Fonts now uses Identifiers instead of old font source strings
+            // Monospace was renamed to Default Mono
+            if (this.configVersionDontTouch < 3) {
+                HashSet<String> fixedHiddenFonts = new HashSet<>();
+                this.hiddenFonts.forEach(source -> {
+                    if (source.matches("builtin/\\w+")) {
+                        String path = source.substring(8);
+                        fixedHiddenFonts.add(BigSignWriter.id(
+                                path.equals("monospace") ? "default_mono" : path
+                        ).toString());
+                        return;
+                    }
+
+                    if (source.matches(".+\\.json")) {
+                        fixedHiddenFonts.add(BigSignWriter.userFontId(source).toString());
+                        return;
+                    }
+
+                    BigSignWriter.LOGGER.warn(
+                            BigSignWriter.LOGGER_PREFIX + "Unable to migrate hidden font '{}' to config version 3",
+                            source
+                    );
+                });
+
+                this.hiddenFonts.clear();
+                this.hiddenFonts.addAll(fixedHiddenFonts);
+            }
+
+            this.configVersionDontTouch = CONFIG_VERSION;
+        }
+    }
+
+    public static class MainConfig extends PersistentConfig {
+        public boolean characterSeparatorOverrideEnabled = false;
+        public String characterSeparatorOverride = "";
+
+        public static MainConfig of(MainConfig other) {
+            return new MainConfig().copyFrom(other);
+        }
+
+        public MainConfig createCopy() {
+            return of(this);
+        }
+
+        public MainConfig copyFrom(MainConfig other) {
+            super.copyFrom(other);
+            for (Field field : MainConfig.class.getDeclaredFields()) {
+                try {
+                    field.set(this, field.get(other));
+                } catch (IllegalAccessException ignored) {}
+            }
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (!super.equals(other)) return false;
+            for (Field field : MainConfig.class.getDeclaredFields()) {
+                try {
+                    if (!field.get(this).equals(field.get(other)))
+                        return false;
+                } catch (IllegalAccessException ignored) {}
+            }
+            return true;
+        }
+    }
+
+    public static Path getConfigDir() {
+        Path configDir = BigSignWriter.CONFIG_DIR;
+        try {
+            Files.createDirectories(configDir);
+        } catch (IOException e) {
+            BigSignWriter.LOGGER.error(BigSignWriter.LOGGER_PREFIX + "Failed to create config directory: {}", configDir, e);
+        }
+        return configDir;
+    }
+
+    private static ConfigInterface<PersistentConfig> getConfig() {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Path configDir = getConfigDir();
+        return new ConfigInterface<>(
+                gson,
+                TypeToken.get(PersistentConfig.class),
+                configDir.resolve("config.json"),
+                PersistentConfig.initial()
+        );
+    }
+
+    public static void saveConfig() {
+        ConfigInterface<PersistentConfig> persistentConfig = getConfig();
+
+        persistentConfig.save(new PersistentConfig().copyFrom(MAIN_CONFIG));
+        BigSignWriter.reselectFont();
+
+        BigSignWriter.LOGGER.info(BigSignWriter.LOGGER_PREFIX + "Config saved!");
+    }
+
+    public static void loadConfig() {
+        ConfigInterface<PersistentConfig> persistentConfig = getConfig();
+
+        MAIN_CONFIG.copyFrom(persistentConfig.load());
+        MAIN_CONFIG.migrateVersion();
+        persistentConfig.save(new PersistentConfig().copyFrom(MAIN_CONFIG));
+
+        BigSignWriter.LOGGER.debug(BigSignWriter.LOGGER_PREFIX + "Config loaded!");
+    }
+}

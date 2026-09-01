@@ -4,11 +4,12 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import dev.chililisoup.bigsignwriter.BigFontTyper;
 import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.gui.ClickableButtonWidget;
-import dev.chililisoup.bigsignwriter.gui.FontSelectionWidget;
+import dev.chililisoup.bigsignwriter.gui.sign.FontSelectionWidget;
+import dev.chililisoup.bigsignwriter.gui.sign.SymbolPickerWidget;
 import dev.chililisoup.bigsignwriter.gui.config.BigSignWriterConfigScreen;
+import dev.chililisoup.bigsignwriter.input.SignEditContext;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -17,11 +18,13 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
+import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.entity.SignText;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
@@ -33,17 +36,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-//? if >= 1.21.9 {
-import net.minecraft.client.input.CharacterEvent;
-//?}
-
 //? if >= 26.1 {
 import org.joml.Vector2f;
-//?}
+//?} else {
+/*import org.spongepowered.asm.mixin.injection.ModifyVariable;
+*///?}
 
-import java.util.*;
-
-import static dev.chililisoup.bigsignwriter.BigSignWriterConfig.*;
+import static dev.chililisoup.bigsignwriter.config.BigSignWriterConfig.*;
 
 @Mixin(value = AbstractSignEditScreen.class, priority = 999)
 public abstract class AbstractSignEditScreenMixin extends Screen {
@@ -54,15 +53,19 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         return Component.literal(open ? "▼" : "▶");
     }
 
+    @Unique private @Nullable SignEditContext bigSignWriter$context;
     @Unique private @Nullable Button bigSignWriter$doneButton;
-    @Unique private @Nullable BigFontTyper bigSignWriter$fontTyper;
+    @Unique private @Nullable SymbolPickerWidget bigSignWriter$symbolPicker;
+    @Unique private boolean bigSignWriter$inSymbolPicker = false;
     @Unique private boolean bigSignWriter$ignoreNextRemoval = false;
 
-    @Shadow /*? if >= 1.21.2 {*/ protected /*?} else {*/ /*private *//*?}*/ @Final SignBlockEntity sign;
+    @Shadow protected @Final SignBlockEntity sign;
+    @Shadow /*? if >= 26.3 {*/@Final/*?}*/ private SignText/*? if >= 26.3 {*/.Mutable/*?}*/ text;
     @Shadow private @Final String[] messages;
-    @Shadow private void setMessage(String message) {}
     @Shadow private int line;
-    @Shadow private @Nullable TextFieldHelper signField;
+    @Shadow /*? if >= 26.3 {*/@Final/*?}*/ private @Nullable TextFieldHelper signField;
+
+    @Shadow private void setMessage(String message) {}
 
     @WrapOperation(
             method = "init",
@@ -81,9 +84,11 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     private void bigSignWriterInit(CallbackInfo ci) {
         if (this.signField == null) return;
 
-        this.bigSignWriter$fontTyper = new BigFontTyper(
+        this.bigSignWriter$context = new SignEditContext(
                 this.sign,
+                this.text/*? if >= 26.3 {*/.asImmutable()/*?}*/,
                 this.font,
+                () -> this.bigSignWriter$inSymbolPicker,
                 () -> this.line,
                 i -> this.line = i,
                 this.messages,
@@ -93,20 +98,23 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
         int x = (int) (this.width * MAIN_CONFIG.buttonsAlignmentX + MAIN_CONFIG.buttonsX);
         int y = (int) (this.height * MAIN_CONFIG.buttonsAlignmentY + MAIN_CONFIG.buttonsY);
+        int buttonsWidth = Math.min(this.width - 40, MAIN_CONFIG.buttonsWidth);
+        buttonsWidth -= buttonsWidth % 2;
+        int halfButtonsWidth = buttonsWidth / 2;
 
         FontSelectionWidget fontSelector = new FontSelectionWidget(
                 this.minecraft,
-                200,
+                buttonsWidth,
                 Math.min(200, this.height - y - 5),
-                x - 100,
+                x - halfButtonsWidth,
                 y,
                 20,
                 this.messages.length,
-                this.bigSignWriter$fontTyper::onFontSelected
+                this.bigSignWriter$context.fontTyper::fixCursor
         );
 
         ClickableButtonWidget fontSelectorToggleButton = new ClickableButtonWidget(
-                x - 99,
+                x - halfButtonsWidth + 1,
                 y + 3,
                 14,
                 14,
@@ -116,7 +124,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
         fontSelector.setOnOpenChanged(instance -> {
             fontSelectorToggleButton.setMessage(bigSignWriter$getDropdownLabel(instance.isOpen()));
-            if (this.bigSignWriter$doneButton != null) this.bigSignWriter$doneButton.active =
+            if (this.bigSignWriter$doneButton != null) this.bigSignWriter$doneButton.visible =
                     !MAIN_CONFIG.fontSelectorCoversDoneButton || !instance.isOpen();
         });
 
@@ -126,7 +134,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
 
         if (MAIN_CONFIG.showConfigButton) {
             ClickableButtonWidget configButton = new ClickableButtonWidget(
-                    x - 118,
+                    x - halfButtonsWidth - 18,
                     y + 3,
                     14,
                     14,
@@ -140,38 +148,79 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             configButton.setTooltip(Tooltip.create(Component.translatable("bigsignwriter.config")));
             this.addRenderableWidget(configButton);
         }
+
+        if (MAIN_CONFIG.showSymbolsButton) {
+            SymbolPickerWidget symbolPicker = new SymbolPickerWidget(
+                    this.minecraft,
+                    this.bigSignWriter$context,
+                    x - halfButtonsWidth,
+                    y,
+                    buttonsWidth,
+                    Math.min(200, this.height - y - 5),
+                    this::repositionElements,
+                    visible -> {
+                        this.bigSignWriter$inSymbolPicker = visible;
+                        if (!visible && this.bigSignWriter$context != null)
+                            this.bigSignWriter$context.fontTyper.fixCursor();
+
+                        if (fontSelector.isOpen()) fontSelector.setOpen(false);
+                        fontSelector.visible = !visible;
+                        fontSelectorToggleButton.visible = !visible;
+                        if (this.bigSignWriter$doneButton != null) this.bigSignWriter$doneButton.visible =
+                                !MAIN_CONFIG.fontSelectorCoversDoneButton || !visible;
+                    }
+            );
+            symbolPicker.initForSignEditScreen();
+
+            ClickableButtonWidget symbolsButton = new ClickableButtonWidget(
+                    x + halfButtonsWidth + 4,
+                    y + 3,
+                    14,
+                    14,
+                    Component.literal("☻"),
+                    button -> symbolPicker.toggleVisibility()
+            );
+            symbolsButton.setTooltip(Tooltip.create(Component.translatable("bigsignwriter.symbols")));
+
+            this.addRenderableWidget(symbolsButton);
+            this.addRenderableWidget(symbolPicker);
+            this.bigSignWriter$symbolPicker = symbolPicker;
+        }
     }
 
     @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
-    //? if < 1.21.9 {
-    /*private void charTypedInject(char chr, int modifiers, CallbackInfoReturnable<Boolean> cir) {
-    *///?} else
-    private void charTypedInject(CharacterEvent characterEvent, CallbackInfoReturnable<Boolean> cir) {
-        if (!BigSignWriter.enabled() || this.bigSignWriter$fontTyper == null) return;
+    private void charTypedInject(CharacterEvent event, CallbackInfoReturnable<Boolean> cir) {
+        if (this.bigSignWriter$context == null) return;
+
+        if (this.bigSignWriter$symbolPicker != null && this.bigSignWriter$symbolPicker.charTyped(event)) {
+            cir.setReturnValue(true);
+            return;
+        }
+
+        if (BigSignWriter.isVanillaTyping()) return;
         cir.setReturnValue(true);
 
-        //? if >= 1.21.9
-        char chr = Character.toChars(characterEvent.codepoint())[0];
-        this.bigSignWriter$fontTyper.charTyped(chr);
+        char chr = Character.toChars(event.codepoint())[0];
+        this.bigSignWriter$context.fontTyper.charTyped(chr);
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-    //? if < 1.21.9 {
-    /*private void keyPressedInject(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
-    *///?} else
-    private void keyPressedInject(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
-        if (!BigSignWriter.enabled() || this.bigSignWriter$fontTyper == null) return;
-        //? if < 1.21.9
-        //KeyEvent keyEvent = new KeyEvent(keyCode, scanCode, modifiers);
+    private void keyPressedInject(KeyEvent event, CallbackInfoReturnable<Boolean> cir) {
+        if (this.bigSignWriter$context == null) return;
 
-        if (this.bigSignWriter$fontTyper.keyPressed(keyEvent))
+        if (this.bigSignWriter$symbolPicker != null && this.bigSignWriter$symbolPicker.keyPressed(event)) {
+            cir.setReturnValue(true);
+            return;
+        }
+
+        if (!BigSignWriter.isVanillaTyping() && this.bigSignWriter$context.fontTyper.keyPressed(event))
             cir.setReturnValue(true);
     }
 
     //? if >= 26.1
     @SuppressWarnings("LocalMayUseName")
     @Inject(
-            method = /*? if >= 26.1 {*/ "extractSignText" /*?} else {*/ /*"renderSignText" *//*?}*/,
+            method = "extractSignText",
             at = @At(
                     value = "FIELD",
                     target = "Lnet/minecraft/client/gui/screens/inventory/AbstractSignEditScreen;messages:[Ljava/lang/String;",
@@ -189,64 +238,85 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
             @Local(ordinal = 0) boolean showCursor,
             @Local(ordinal = 1) int cursorPos
     ) {
-        if (!BigSignWriter.enabled() || this.bigSignWriter$fontTyper == null) return;
+        if (BigSignWriter.isVanillaTyping() || this.bigSignWriter$context == null) return;
 
         if (!showCursor) {
             ci.cancel();
             return;
         }
 
-        String topLine = this.messages[this.line] == null ? "" : this.messages[this.line];
-        boolean atEnd = topLine.length() == cursorPos;
+        String wideLine = this.bigSignWriter$context.getWidestMessage();
         int lineHeight = this.sign.getTextLineHeight();
+        int cursorHeight = this.bigSignWriter$context.cursorHeight();
+        int cursorPosition = this.font.width(
+                wideLine.substring(0, cursorPos != 0 && cursorPos == this.messages[this.line].length() ?
+                        wideLine.length() :
+                        Math.min(cursorPos, wideLine.length())
+                )
+        );
+        int cursorX = cursorPosition - this.font.width(wideLine) / 2;
+        int cursorY = (this.line - 2) * lineHeight;
+        int endY = cursorY + lineHeight * cursorHeight;
+
         int opaqueColor = 0xFF000000 | color;
+        guiGraphics.fill(cursorX, cursorY - 1, cursorX + 1, endY, opaqueColor);
 
-        if (cursorPos <= 0 || atEnd) {
-            for (int i = this.line; i < this.bigSignWriter$fontTyper.getEndLine(); i++) {
-                String message = this.messages[i] == null ? "" : this.messages[i];
-                int cursorX = this.font.width(message) / 2;
-                if (cursorPos <= 0 && !atEnd) cursorX *= -1;
-                int cursorY = (i - 2) * lineHeight;
-
-                guiGraphics.fill(cursorX, cursorY - 1, cursorX + 1, cursorY + lineHeight, opaqueColor);
-            }
-        } else {
-            int cursorPosition = this.font.width(topLine.substring(0, Math.min(cursorPos, topLine.length())));
-            int cursorX = cursorPosition - this.font.width(topLine) / 2;
-            int cursorY = (this.line - 2) * lineHeight;
-
-            guiGraphics.fill(cursorX, cursorY - 1, cursorX + 1, cursorY + lineHeight * BigSignWriter.getHeight(), opaqueColor);
+        int clampedLine = this.bigSignWriter$context.getClampedLine();
+        int fullHeight = Math.min(BigSignWriter.height(), this.messages.length - clampedLine);
+        if (fullHeight > cursorHeight) {
+            int trueY = (clampedLine - 2) * lineHeight;
+            for (int y = trueY; y < trueY + lineHeight * fullHeight; y += 4)
+                guiGraphics.fill(cursorX, y, cursorX + 1, y + 2, opaqueColor);
         }
 
         ci.cancel();
     }
 
     @WrapWithCondition(
-            method = /*? if >= 26.1 {*/ "extractSignText" /*?} else {*/ /*"renderSignText" *//*?}*/,
+            method = "extractSignText",
             at = @At(
                     value = "INVOKE",
-                    //? if < 21.6
+                    //? if < 26.1
                     //ordinal = 1,
-                    //? if >= 21.6 {
+                    //? if >= 26.1 {
                     target = "Lnet/minecraft/client/gui/components/TextCursorUtils;extractAppendCursor(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIIZ)V"
-                    //?} elif >= 1.21.6 {
-                    /*target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V"
-                    *///?} else
-                    //target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I"
+                    //?} else
+                    //target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V"
             )
     )
     private boolean hideUnderscore(
             GuiGraphicsExtractor guiGraphics,
             Font font,
-            //? if < 21.6
+            //? if < 26.1
             //String string,
-            int cursorX,
-            int cursorY,
+            int x,
+            int y,
             int color,
             boolean shadow
     ) {
-        return !BigSignWriter.enabled();
+        return BigSignWriter.isVanillaTyping();
     }
+
+    //? if >= 26.1 {
+    @WrapOperation(
+            method = "extractSignText", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/components/TextCursorUtils;isCursorVisible(J)Z"
+    ))
+    private boolean freezeCursor(long timeInMs, Operation<Boolean> original) {
+        if (this.bigSignWriter$symbolPicker != null && this.bigSignWriter$symbolPicker.isControllingKeyboard())
+            return true;
+
+        return original.call(timeInMs);
+    }
+    //?} else {
+    /*@ModifyVariable(method = "extractSignText", at = @At(value = "STORE", ordinal = 0))
+    private boolean freezeCursor(boolean cursor) {
+        return cursor || (
+                this.bigSignWriter$symbolPicker != null && this.bigSignWriter$symbolPicker.isControllingKeyboard()
+        );
+    }
+    *///?}
 
     @WrapWithCondition(
             method = "removed", at = @At(

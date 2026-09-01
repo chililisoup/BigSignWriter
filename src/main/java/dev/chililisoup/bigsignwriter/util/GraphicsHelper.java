@@ -1,68 +1,28 @@
 package dev.chililisoup.bigsignwriter.util;
 
-import dev.chililisoup.bigsignwriter.BigSignWriter;
 import dev.chililisoup.bigsignwriter.font.FontInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Util;
 
-import java.util.ArrayList;
 import java.util.List;
 
-//? if < 1.21.4 {
-/*import org.joml.Vector3f;
-*///?}
-
-//? if >= 1.21.11 {
-import net.minecraft.util.Util;
-//?} else {
-/*import net.minecraft.Util;
-//? if > 1.21.3 {
-import net.minecraft.client.gui.components.AbstractWidget;
-//?}
+//? if < 1.21.11 {
+/*import net.minecraft.client.gui.components.AbstractWidget;
 *///?}
 
 public final class GraphicsHelper {
+    public static final Identifier INWORLD_MENU_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/inworld_menu_background.png");
+    public static final Identifier MENU_LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/menu_list_background.png");
+    public static final Identifier INWORLD_MENU_LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
+
     public static void drawScrollingString(GuiGraphicsExtractor guiGraphics, Component text, int centerX, int left, int right, int top, int bottom) {
-        // <= 1.21.3 doesn't use AbstractWidget.renderScrollingString
-        // cause its scissor doesn't care for the pose transform
-
-        //? if <= 1.21.3 {
-        /*Font font = Minecraft.getInstance().font;
-        int width = font.width(text);
-        int middleY = (top + bottom - 9) / 2 + 1;
-        int maxWidth = right - left;
-        if (width <= maxWidth)
-            guiGraphics.drawCenteredString(
-                    font,
-                    text,
-                    Mth.clamp(centerX, left + width / 2, right - width / 2),
-                    middleY,
-                    -1
-            );
-        else {
-            int hiddenWidth = width - maxWidth;
-            double time = Util.getMillis() / 1000.0;
-            double speed = Math.max(hiddenWidth * 0.5, 3.0);
-            double scrollEnd = Math.sin((Math.PI / 2) * Math.cos((Math.PI * 2) * time / speed)) / 2.0 + 0.5;
-            double scrollPos = Mth.lerp(scrollEnd, 0.0, hiddenWidth);
-
-            Vector3f scale = guiGraphics.pose().last().pose().getScale(new Vector3f());
-            Vector3f translation = guiGraphics.pose().last().pose().getTranslation(new Vector3f());
-
-            guiGraphics.enableScissor(
-                    (int) (left * scale.x + translation.x),
-                    (int) (top * scale.y + translation.y),
-                    (int) (right * scale.x + translation.x),
-                    (int) (bottom * scale.y + translation.y)
-            );
-
-            guiGraphics.text(font, text, left - (int) scrollPos, middleY, -1);
-            guiGraphics.disableScissor();
-        }
-        *///?} else {
         //? if < 1.21.11 {
         /*AbstractWidget.renderScrollingString(
                 guiGraphics,
@@ -83,32 +43,43 @@ public final class GraphicsHelper {
                 bottom
                 //?}
         );
-        //?}
     }
 
     public static void drawScrollingString(GuiGraphicsExtractor guiGraphics, Component text, int left, int right, int top, int bottom) {
         drawScrollingString(guiGraphics, text, (left + right) / 2, left, right, top, bottom);
     }
 
-    public static void drawScrollingFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, int x, int y, int width, int height) {
-        float scale = (height / 9F) / (float) fontPreview.length;
+    public static void drawScrollingString(GuiGraphicsExtractor guiGraphics, Component text, int left, int right, int y) {
+        drawScrollingString(guiGraphics, text, left, left, right, y, y + 8);
+    }
+
+    private static float getScale(int lineCount, int height, int gap) {
+        return (height / (9F + gap)) / (float) lineCount;
+    }
+
+    public static float getScaledWidth(Font font, String[] lines, int height, int gap) {
+        return lines.length != 0 ?
+                font.width(lines[0]) * getScale(lines.length, height, gap) :
+                0;
+    }
+
+    public static float getScaledWidth(Font font, String[] lines, int height) {
+        return getScaledWidth(font, lines, height, 0);
+    }
+
+    public static void drawScrollingFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, int x, int y, int width, int height, int gap, int color) {
+        float scale = getScale(fontPreview.length, height, gap);
         int scaledWidth = (int) (width / scale);
 
-        //? if < 1.21.6 {
-        /*guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(x, y, 0);
-        guiGraphics.pose().scale(scale, scale, scale);
-        *///?} else {
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(x, y);
         guiGraphics.pose().scale(scale);
-        //?}
 
         Font font = Minecraft.getInstance().font;
         int previewWidth = font.width(fontPreview[0]);
         if (previewWidth <= scaledWidth) {
             for (int i = 0; i < fontPreview.length; i++)
-                guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], 0, i * 9, -1, false);
+                guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], 0, i * (9 + gap), color, false);
         } else {
             int scaledHeight = (int) (height / scale);
             int hiddenWidth = previewWidth - scaledWidth;
@@ -116,92 +87,108 @@ public final class GraphicsHelper {
             double speed = Math.max(hiddenWidth * 0.5, 3.0);
             double scrollEnd = Math.sin((Math.PI / 2.0) * Math.cos((Math.PI * 2.0) * time / speed)) / 2.0 + 0.5;
             double scrollPos = Mth.lerp(scrollEnd, 0.0, hiddenWidth);
-            //? if >= 1.21.4 {
             guiGraphics.enableScissor(0, 0, scaledWidth, scaledHeight);
-            //?} else {
-            /*Vector3f poseScale = guiGraphics.pose().last().pose().getScale(new Vector3f());
-            Vector3f poseTranslation = guiGraphics.pose().last().pose().getTranslation(new Vector3f());
-
-            guiGraphics.enableScissor(
-                    (int) (0 * poseScale.x + poseTranslation.x),
-                    (int) (0 * poseScale.y + poseTranslation.y),
-                    (int) (scaledWidth * poseScale.x + poseTranslation.x),
-                    (int) (scaledHeight * poseScale.y + poseTranslation.y)
-            );
-            *///?}
 
             for (int i = 0; i < fontPreview.length; i++)
-                guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], -(int) scrollPos, i * 9, -1, false);
+                guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], -(int) scrollPos, i * (9 + gap), color, false);
 
             guiGraphics.disableScissor();
         }
 
-        //? if < 1.21.6 {
-        /*guiGraphics.pose().popMatrix();
-        *///?} else
         guiGraphics.pose().popMatrix();
     }
 
-    public static void drawFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, float anchorX, int x, int y, int height, int gap) {
-        float scale = (height / 9F) / (float) fontPreview.length;
+    public static void drawScrollingFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, int x, int y, int width, int height) {
+        drawScrollingFontPreview(guiGraphics, fontPreview, x, y, width, height, 0, -1);
+    }
 
-        //? if < 1.21.6 {
-        /*guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(x, y, 0);
-        guiGraphics.pose().scale(scale, scale, scale);
-        *///?} else {
+    public static void drawFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, float anchorX, int x, int y, int height, int gap, int color) {
+        float scale = getScale(fontPreview.length, height, gap);
+
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(x, y);
         guiGraphics.pose().scale(scale);
-        //?}
 
         Font font = Minecraft.getInstance().font;
         int previewWidth = font.width(fontPreview[0]);
         int xOffset = (int) (anchorX * previewWidth);
         for (int i = 0; i < fontPreview.length; i++)
-            guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], -xOffset, i * (9 + gap), -1, false);
+            guiGraphics.text(Minecraft.getInstance().font, fontPreview[i], -xOffset, i * (9 + gap), color, false);
 
-        //? if < 1.21.6 {
-        /*guiGraphics.pose().popMatrix();
-        *///?} else
         guiGraphics.pose().popMatrix();
     }
 
     public static void drawFontPreview(GuiGraphicsExtractor guiGraphics, Component[] fontPreview, float anchorX, int x, int y, int height) {
-        drawFontPreview(guiGraphics, fontPreview, anchorX, x, y, height, 0);
+        drawFontPreview(guiGraphics, fontPreview, anchorX, x, y, height, 0, -1);
     }
 
     public static List<Component[]> getWrappedFontPreview(FontInfo fontInfo, String text, int width, int lineHeight) {
         if (fontInfo.isBroken()) return List.of();
+        float scale = getScale(fontInfo.height(), lineHeight, 1);
+        return fontInfo.getWrappedFontPreview(text, (int) (width / scale));
+    }
 
-        Font font = Minecraft.getInstance().font;
-        float scale = (lineHeight / 9F) / (float) fontInfo.height();
-        String characterSeparator = fontInfo.characterSeparator();
-        if (characterSeparator.isEmpty()) characterSeparator = " ";
-        float separatorWidth = font.width(characterSeparator) * scale;
+    public static List<Component[]> getWrappedSymbolsPreview(FontInfo fontInfo, int width, int lineHeight) {
+        if (fontInfo.areSymbolsBroken()) return List.of();
+        float scale = getScale(fontInfo.height(), lineHeight, 1);
+        return fontInfo.getWrappedSymbolsPreview((int) (width / scale));
+    }
 
-        ArrayList<Component[]> previewLines = new ArrayList<>();
-        StringBuilder runningString = new StringBuilder();
-        float runningWidth = 0F;
-        for (char chr : text.toCharArray()) {
-            String top = BigSignWriter.getBigChar(chr, fontInfo).orElse(new String[]{""})[0];
+    private static void drawSeparator(GuiGraphicsExtractor guiGraphics, int x, int y, int width, Identifier texture) {
+        guiGraphics.blit(
+                RenderPipelines.GUI_TEXTURED,
+                texture,
+                x,
+                y,
+                0.0F,
+                0.0F,
+                width,
+                2,
+                32,
+                2
+        );
+    }
 
-            float chrWidth = font.width(top) * scale;
-            if (runningWidth > 0 && runningWidth + chrWidth > width) {
-                if (!runningString.isEmpty())
-                    previewLines.add(fontInfo.getPreview(runningString.toString(), characterSeparator));
+    public static void drawHeaderSeparator(GuiGraphicsExtractor guiGraphics, int x, int y, int width) {
+        drawSeparator(guiGraphics, x, y, width, Minecraft.getInstance().level == null ?
+                Screen.HEADER_SEPARATOR : Screen.INWORLD_HEADER_SEPARATOR
+        );
+    }
 
-                runningWidth = chrWidth + separatorWidth;
-                runningString = new StringBuilder(String.valueOf(chr));
-            } else {
-                runningWidth += chrWidth + separatorWidth;
-                runningString.append(chr);
-            }
-        }
+    public static void drawFooterSeparator(GuiGraphicsExtractor guiGraphics, int x, int y, int width) {
+        drawSeparator(guiGraphics, x, y, width, Minecraft.getInstance().level == null ?
+                Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR
+        );
+    }
 
-        if (!runningString.isEmpty())
-            previewLines.add(fontInfo.getPreview(runningString.toString(), characterSeparator));
+    public static void drawCompleteMenuBackground(GuiGraphicsExtractor guiGraphics, Identifier menuBackground, int x, int y, int width, int height) {
+        Screen.extractMenuBackgroundTexture(
+                guiGraphics,
+                menuBackground,
+                x,
+                y,
+                0,
+                0,
+                width,
+                height
+        );
+        drawHeaderSeparator(guiGraphics, x, y - 2, width);
+        drawFooterSeparator(guiGraphics, x, y + height, width);
+    }
 
-        return previewLines;
+    public static void drawCompleteMenuBackground(GuiGraphicsExtractor guiGraphics, boolean inWorld, int x, int y, int width, int height) {
+        drawCompleteMenuBackground(guiGraphics, inWorld ? INWORLD_MENU_BACKGROUND : Screen.MENU_BACKGROUND, x, y, width, height);
+    }
+
+    public static void drawCompleteMenuBackground(GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height) {
+        drawCompleteMenuBackground(guiGraphics, true, x, y, width, height);
+    }
+
+    public static void drawCompleteMenuListBackground(GuiGraphicsExtractor guiGraphics, boolean inWorld, int x, int y, int width, int height) {
+        drawCompleteMenuBackground(guiGraphics, inWorld ? INWORLD_MENU_LIST_BACKGROUND : MENU_LIST_BACKGROUND, x, y, width, height);
+    }
+
+    public static void drawCompleteMenuListBackground(GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height) {
+        drawCompleteMenuListBackground(guiGraphics, true, x, y, width, height);
     }
 }

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Consumer;
 
 public class LabeledEditBox extends EditBox {
-    private final int boxWidth;
+    public final int boxWidth;
 
     public LabeledEditBox(String value, int boxWidth, Consumer<String> onChange, Component label) {
         super(Minecraft.getInstance().font, 0, 20, label);

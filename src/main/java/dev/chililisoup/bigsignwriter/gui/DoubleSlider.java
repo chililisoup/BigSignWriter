@@ -1,7 +1,9 @@
 package dev.chililisoup.bigsignwriter.gui;
 
 import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -39,6 +41,20 @@ public class DoubleSlider extends AbstractSliderButton {
         value -= value % this.step;
 
         return Math.clamp(value, this.min, this.max);
+    }
+
+    @Override
+    public boolean keyPressed(@NotNull KeyEvent event) {
+        if (event.isSelection()) {
+            this.canChangeValue = !this.canChangeValue;
+            return true;
+        }
+
+        if (!this.canChangeValue) return false;
+        if (!event.isLeft() && !event.isRight()) return false;
+
+        this.setValueFrom(this.getValue() + (event.isLeft() ? -this.step : this.step));
+        return true;
     }
 
     @Override

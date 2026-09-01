@@ -6,32 +6,15 @@ plugins {
     id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT" apply false
 }
 
-stonecutter active "26.2-fabric"
+stonecutter active "26.3"
 
 stonecutter parameters {
     replacements {
-        string(current.parsed >= "1.21.6") {
-            replace("RenderType::guiTextured", "RenderPipelines.GUI_TEXTURED")
-            replace("net.minecraft.client.renderer.RenderType", "net.minecraft.client.renderer.RenderPipelines")
-            replace("pushPose", "pushMatrix")
-            replace("popPose", "popMatrix")
-            replace("guiGraphics.renderTooltip(", "guiGraphics.setTooltipForNextFrame(")
-        }
-
-        string(current.parsed > "1.21.6") {
-            replace(
-                "dev.chililisoup.bigsignwriter.util.VersionHelper.KeyEvent",
-                "net.minecraft.client.input.KeyEvent"
-            )
-        }
-
-        string(current.parsed >= "1.21.9" && current.parsed < "1.21.11") {
-            replace("guiGraphics.renderOutline(", "guiGraphics.submitOutline(")
-        }
-
         string(current.parsed >= "1.21.11") {
             replace("ResourceLocation", "Identifier")
             replace(".location()", ".identifier()")
+            replace("net.minecraft.Util", "net.minecraft.util.Util")
+            replace("guiGraphics.submitOutline(", "guiGraphics.renderOutline(")
         }
 
         string(current.parsed >= "26.1") {
@@ -46,6 +29,7 @@ stonecutter parameters {
             replace("renderWidget", "extractWidgetRenderState")
             replace("renderMenuBackground", "extractMenuBackground")
             replace("renderMenuBackgroundTexture", "extractMenuBackgroundTexture")
+            replace("renderSignText", "extractSignText")
         }
 
         string(current.parsed >= "26.2") {

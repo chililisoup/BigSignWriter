@@ -2,86 +2,31 @@ plugins {
     id("idea")
     id("dev.kikugie.stonecutter")
     id("dev.isxander.modstitch.base")
+    id("mod-build-common")
 }
 
-fun prop(name: String, consumer: (prop: String) -> Unit) {
-    (findProperty(name) as? String?)
-        ?.let(consumer)
-}
+val mod = `mod-common`.mod.get()
+val deps = mod.deps
 
-class ModData {
-    val version = property("mod.version") as String
-    val group = property("mod.group") as String
-    val id = property("mod.id") as String
-    val name = property("mod.name") as String
-    val authors = property("mod.authors") as String
-    val contributors = property("mod.contributors") as String
-    val description = property("mod.description") as String
-    val homepage = property("mod.homepage") as String
-    val sources = property("mod.sources") as String
-    val issues = property("mod.issues") as String
-    val license = property("mod.license") as String
-}
-
-val mod = ModData()
-val minecraft = property("deps.minecraft") as String
-
-// Stonecutter constants for mod loaders.
-// See https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants
-var loader: String = name.split("-")[1]
 stonecutter {
     constants {
-        match(loader, "fabric", "neoforge")
+        match(name.split("-")[1], "fabric", "neoforge")
     }
 }
 
 modstitch {
-    minecraftVersion = minecraft
+    minecraftVersion = deps.minecraft
+    javaVersion = deps.javaVersion
+    parchment { deps.parchment { mappingsVersion = it } }
 
-    // Alternatively use stonecutter.eval if you have a lot of versions to target.
-    // https://stonecutter.kikugie.dev/stonecutter/guide/setup#checking-versions
-    javaVersion = when {
-        minecraft >= "26.1" -> 25
-        minecraft >= "1.21.1" -> 21
-        else -> throw IllegalArgumentException("Please store the java version for ${property("deps.minecraft")} in build.gradle.kts!")
-    }
-
-    // If parchment doesn't exist for a version yet, you can safely
-    // omit the "deps.parchment" property from your versioned gradle.properties
-    parchment {
-        prop("deps.parchment") { mappingsVersion = it }
-    }
-
-    // This metadata is used to fill out the information inside
-    // the metadata files found in the templates folder.
     metadata {
         modId = mod.id
-        modName = mod.name
-        modVersion = "${mod.version}+$name"
-        modGroup = mod.group
-        modAuthor = mod.authors
-        modCredits = mod.contributors
-        modLicense = mod.license
-        modDescription = mod.description
-
-        fun <K: Any, V: Any> MapProperty<K, V>.populate(block: MapProperty<K, V>.() -> Unit) {
-            block()
-        }
-
-        replacementProperties.populate {
-            put("mod_homepage", mod.homepage)
-            put("mod_sources", mod.sources)
-            put("mod_issues", mod.issues)
-            put("mod_author_list", mod.authors.split(", ").joinToString("\",\""))
-            put("mod_contributor_list", mod.contributors.split(", ").joinToString("\",\""))
-            prop("deps.minecraft_range") { put("minecraft_range", it) }
-            prop("deps.neoforge_range") { put("neoforge_range", it) }
-        }
+        modVersion = mod.archiveVersion
     }
 
     // Fabric Loom (Fabric)
     loom {
-        prop("deps.fabric_loader") { fabricLoaderVersion = it }
+        fabricLoaderVersion = deps.fabricLoader
 
         // Configure loom like normal in this block.
         configureLoom {
@@ -105,7 +50,7 @@ modstitch {
 
     // ModDevGradle (NeoForge, Forge, Forgelike)
     moddevgradle {
-        prop("deps.neoforge") { neoForgeVersion = it }
+        deps.neoForge { neoForgeVersion = it }
 
         configureNeoForge {
             runs {
@@ -123,22 +68,14 @@ modstitch {
     }
 }
 
-// All dependencies should be specified through modstitch's proxy configuration.
-// Wondering where the "repositories" block is? Go to "stonecutter.gradle.kts"
-// If you want to create proxy configurations for more source sets, such as client source sets,
-// use the modstitch.createProxyConfigurations(sourceSets["client"]) function.
 dependencies {
-    if (modstitch.isLoom) {
-        prop("deps.fapi") { modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:${it}") }
-        prop("deps.modmenu") { modstitchModImplementation("com.terraformersmc:modmenu:${it}") }
-    }
+    deps.fabricApi { modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:${it}") }
+    deps.modMenu { modstitchModImplementation("com.terraformersmc:modmenu:${it}") }
 }
 
-idea {
-    module {
-        isDownloadSources = true
-        isDownloadJavadoc = true
-    }
+java {
+    targetCompatibility = deps.java
+    sourceCompatibility = deps.java
 }
 
 modstitch.onEnable {
@@ -147,34 +84,9 @@ modstitch.onEnable {
             dependsOn("stonecutterGenerate")
         }
     }
-
-    val finalJarTasks = listOf(
-        modstitch.finalJarTask
-    )
-
-    tasks.register<Copy>("buildAndCollect") {
-        description = "Builds the mod, then copies the jar into the root libs folder"
-        group = "build"
-
-        finalJarTasks.forEach { jar ->
-            dependsOn(jar)
-            from(jar.flatMap { it.archiveFile })
-        }
-
-        into(rootProject.layout.buildDirectory.file("libs/${mod.version}"))
-        dependsOn("build")
-    }
 }
 
 tasks {
-    processResources {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    }
-
-    named("generateModMetadata") {
-        dependsOn("stonecutterGenerate")
-    }
-
     named("jar") {
         dependsOn("filterArtifacts")
     }
@@ -183,20 +95,8 @@ tasks {
         description = "Deletes meta files irrelevant to the target platform"
 
         if (modstitch.isLoom)
-            delete(layout.buildDirectory.dir("resources/main/META-INF"))
-        else if (modstitch.isModDevGradleRegular)
-            delete(layout.buildDirectory.file("resources/main/META-INF/mods.toml"))
-        else
             delete(layout.buildDirectory.file("resources/main/META-INF/neoforge.mods.toml"))
-    }
-
-    register<Delete>("buildCollectAndClean") {
-        description = "Builds the mod, then moves the jar into the root libs folder"
-        group = "build"
-
-        delete(layout.buildDirectory.dir("libs"))
-        delete(layout.buildDirectory.dir("devlibs"))
-
-        dependsOn("buildAndCollect")
+        else
+            delete(layout.buildDirectory.file("resources/main/fabric.mod.json"))
     }
 }
