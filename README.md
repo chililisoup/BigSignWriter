@@ -19,7 +19,7 @@ A client-side utility mod that lets you easily add large, multi-line characters 
 
 <hr>
 
-Big Sign Writer adds plenty of fonts and hundreds of symbols ready for use, easily accessible from vanilla Minecraft's sign edit screen!
+Big Sign Writer adds plenty of fonts and hundreds of symbols ready for use, easily accessible from vanilla Minecraft's sign edit screen.
 
 The mod is highly configurable, with an in-game config screen accessible by default through the sign edit screen, or [Mod Menu](https://modrinth.com/mod/modmenu) on Fabric and NeoForge's mod list.
 
